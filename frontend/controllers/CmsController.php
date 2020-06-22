@@ -1,7 +1,9 @@
 <?php
+
 namespace frontend\controllers;
 
 use common\models\CmsAction;
+use common\models\NewsTags;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -28,8 +30,12 @@ class CmsController extends Controller
      */
     public function actionIndex()
     {
-        $model = new  CmsAction();
-        $model->result();
-    }
+        $tag = new NewsTags();
+        list($code, $msg) = $tag->result();
+        list($code, $msg) = $tag->result2();
 
+        $model = new  CmsAction();
+        list($code, $msg) = $model->result();
+        list($code, $msg) = $model->result2();
+    }
 }
