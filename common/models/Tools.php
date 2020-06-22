@@ -1,0 +1,23 @@
+<?php
+
+
+namespace common\models;
+
+
+class Tools extends \yii\db\ActiveRecord
+{
+    /** 写入日志 */
+    public static function writeLog($data, $title = 'log.txt')
+    {
+        $time = ['time_at' => date('Y-m-d H:i:s')];
+        if (is_array($data)) {
+            $res = array_merge($data + $time);
+        } else {
+            $res = array_merge(['res' => $data], $time);
+        }
+        $res = json_encode($res, JSON_UNESCAPED_UNICODE);
+        $res = str_replace('\/', '/', $res);
+        $path = PHP_OS == "Linux" ? '/www/wwwroot/logs/cms/' : 'E:/phpstudy_pro/WWW/';
+        file_put_contents($path . $title, $res . PHP_EOL . PHP_EOL, FILE_APPEND);
+    }
+}

@@ -10,17 +10,15 @@ use Yii;
  * @property string $version
  * @property int|null $apply_time
  */
-class CmsAction extends \yii\db\ActiveRecord
+class NewsTags extends \yii\db\ActiveRecord
 {
-
-    const BAIDU_URL = 'http://data.zz.baidu.com/urls';
 
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'phome_ecms_news';
+        return 'phome_enewstags';
     }
 
     public static function getDb()
@@ -38,7 +36,10 @@ class CmsAction extends \yii\db\ActiveRecord
         ];
     }
 
-    //获取不同数据库的数据
+    /**
+     * 获取不同数据库的数据
+     *
+     */
     public function result()
     {
         $request = Yii::$app->request;
@@ -52,16 +53,16 @@ class CmsAction extends \yii\db\ActiveRecord
             return [-1, '不存在该数据库！'];
         }
 
-        $res = CmsAction::find()->all();
+        $res = NewsTags::find()->all();
         $urls = $errorArr = [];
         $info = [];
 
         //获取所有的文章进行
         foreach ($res as $re) {
             //判断是否已经提交过了
-            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_ARTICLE, $re->id);
+            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_TAG, $re->tagid);
             if (!empty($flag)) { //表示已经提交过了
-                $errorArr[] = $re->id;
+                $errorArr[] = $re->tagid;
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
@@ -70,10 +71,10 @@ class CmsAction extends \yii\db\ActiveRecord
                     $domain = $db->domain;
                 }
 
-                $urls[] = $domain . $re->titleurl;
+                $urls[] = $domain . '/e/tags/?tagid=' . $re->tagid;
 
                 $info[] = [
-                    'type_id' => $re->id,
+                    'type_id' => $re->tagid,
                 ];
             }
         }
@@ -91,17 +92,17 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->success >= 400) {
-            Tools::writeLog("百度站长推送失败:" . $jsonres);
+            Tools::writeLog("百度站长Tag推送失败:" . $jsonres);
             exit;
         } else {
-            Tools::writeLog("百度站长成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog("百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     //更新插入 标记已经推送过了
                     $saveData = [
                         'db_id' => $db->id,
                         'db_name' => $db->name,
-                        'type' => MipFlag::TYPE_ARTICLE,
+                        'type' => MipFlag::TYPE_TAG,
                         'type_id' => $re['type_id'],
                     ];
                     MipFlag::createOne($saveData);
@@ -118,7 +119,7 @@ class CmsAction extends \yii\db\ActiveRecord
         }
 
         if (empty($urls)) {
-            Tools::writeLog("百度站长成功推送1条");
+            Tools::writeLog("百度站长Tag成功推送1条");
             exit;
         }
 
@@ -126,9 +127,9 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->error >= 400) {
-            Tools::writeLog("百度站长推送失败:" . $res);
+            Tools::writeLog("百度站长Tag推送失败:" . $res);
         } else {
-            Tools::writeLog("百度站长成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog("百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     continue;
@@ -137,7 +138,7 @@ class CmsAction extends \yii\db\ActiveRecord
                 $saveData = [
                     'db_id' => $db->id,
                     'db_name' => $db->name,
-                    'type' => MipFlag::TYPE_ARTICLE,
+                    'type' => MipFlag::TYPE_TAG,
                     'type_id' => $re['type_id'],
                 ];
                 MipFlag::createOne($saveData);
@@ -165,16 +166,16 @@ class CmsAction extends \yii\db\ActiveRecord
             return [-1, '不存在该数据库！'];
         }
 
-        $res = CmsAction::find()->all();
+        $res = NewsTags::find()->all();
         $urls = $errorArr = [];
         $info = [];
 
         //获取所有的文章进行
         foreach ($res as $re) {
             //判断是否已经提交过了
-            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_ARTICLE, $re->id);
+            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_TAG, $re->tagid);
             if (!empty($flag)) { //表示已经提交过了
-                $errorArr[] = $re->id;
+                $errorArr[] = $re->tagid;
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
@@ -183,10 +184,10 @@ class CmsAction extends \yii\db\ActiveRecord
                     $domain = $db->domain;
                 }
 
-                $urls[] = $domain . $re->titleurl;
+                $urls[] = $domain . '/e/tags/?tagid=' . $re->tagid;
 
                 $info[] = [
-                    'type_id' => $re->id,
+                    'type_id' => $re->tagid,
                 ];
             }
         }
@@ -204,17 +205,17 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->success >= 400) {
-            Tools::writeLog("百度快速推送失败:" . $jsonres);
+            Tools::writeLog("百度快速Tag推送失败:" . $jsonres);
             exit;
         } else {
-            Tools::writeLog("百度快速成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog("百度快速Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     //更新插入 标记已经推送过了
                     $saveData = [
                         'db_id' => $db->id,
                         'db_name' => $db->name,
-                        'type' => MipFlag::TYPE_ARTICLE_FAST,
+                        'type' => MipFlag::TYPE_TAG_FAST,
                         'type_id' => $re['type_id'],
                     ];
                     MipFlag::createOne($saveData);
@@ -231,7 +232,7 @@ class CmsAction extends \yii\db\ActiveRecord
         }
 
         if (empty($urls)) {
-            Tools::writeLog("百度快速成功推送1条");
+            Tools::writeLog("百度快速Tag成功推送1条");
             exit;
         }
 
@@ -239,9 +240,9 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->error >= 400) {
-            Tools::writeLog("百度快速推送失败:" . $res);
+            Tools::writeLog("百度快速Tag推送失败:" . $res);
         } else {
-            Tools::writeLog("百度快速成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog("百度快速Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     continue;
@@ -250,7 +251,7 @@ class CmsAction extends \yii\db\ActiveRecord
                 $saveData = [
                     'db_id' => $db->id,
                     'db_name' => $db->name,
-                    'type' => MipFlag::TYPE_ARTICLE_FAST,
+                    'type' => MipFlag::TYPE_TAG_FAST,
                     'type_id' => $re['type_id'],
                 ];
                 MipFlag::createOne($saveData);
@@ -264,11 +265,10 @@ class CmsAction extends \yii\db\ActiveRecord
         exit;
     }
 
-
     //mip推送
     public function push($token, $domain, $urls)
     {
-        $api = self::BAIDU_URL . '?site=' . $domain . '&token=' . $token;
+        $api = CmsAction::BAIDU_URL . '?site=' . $domain . '&token=' . $token;
         $ch = curl_init();
         $options = array(
             CURLOPT_URL => $api,
@@ -285,7 +285,7 @@ class CmsAction extends \yii\db\ActiveRecord
     //mip推送
     public function pushFast($token, $domain, $urls)
     {
-        $api = self::BAIDU_URL . '?site=' . $domain . '&token=' . $token . '&type=daily';
+        $api = CmsAction::BAIDU_URL . '?site=' . $domain . '&token=' . $token . '&type=daily';
         $ch = curl_init();
         $options = array(
             CURLOPT_URL => $api,
@@ -298,4 +298,5 @@ class CmsAction extends \yii\db\ActiveRecord
         $result = curl_exec($ch);
         return $result;
     }
+
 }
