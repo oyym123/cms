@@ -38,4 +38,5 @@ class CmsController extends Controller
         list($code, $msg) = $model->result();
         list($code, $msg) = $model->result2();
     }
+
 }
