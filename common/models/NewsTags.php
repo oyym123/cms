@@ -81,7 +81,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if (empty($urls)) {
             Tools::writeLog("没有更新的链接可以提交");
-            exit;
+            return 1;
         }
 
         //获取第一条 推送，然后获取到生剩余条数，根据剩余条数 再推送
@@ -93,7 +93,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if ($jsonres->success >= 400) {
             Tools::writeLog("百度站长Tag推送失败:" . $jsonres);
-            exit;
+            return 1;
         } else {
             Tools::writeLog("百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
@@ -113,14 +113,14 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if ($remain == 0) {
             Tools::writeLog("推送次数用完");
-            exit;
+            return 1;
         } else {
             $urls = array_slice($urls, 1, $remain);
         }
 
         if (empty($urls)) {
             Tools::writeLog("百度站长Tag成功推送1条");
-            exit;
+            return 1;
         }
 
         $resData = $this->push($db->baidu_token, $domain, $urls);
@@ -149,7 +149,7 @@ class NewsTags extends \yii\db\ActiveRecord
         print_r($urls);
         echo '<hr/>';
         print_r($errorArr);
-        exit;
+        return 1;
     }
 
     //获取不同数据库的数据
@@ -194,7 +194,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if (empty($urls)) {
             Tools::writeLog("没有更新的链接可以提交");
-            exit;
+            return 1;
         }
 
         //获取第一条 推送，然后获取到生剩余条数，根据剩余条数 再推送
@@ -206,7 +206,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if ($jsonres->success >= 400) {
             Tools::writeLog("百度快速Tag推送失败:" . $jsonres);
-            exit;
+            return 1;
         } else {
             Tools::writeLog("百度快速Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
@@ -226,14 +226,14 @@ class NewsTags extends \yii\db\ActiveRecord
 
         if ($remain == 0) {
             Tools::writeLog("推送次数用完");
-            exit;
+            return 1;
         } else {
             $urls = array_slice($urls, 1, $remain);
         }
 
         if (empty($urls)) {
             Tools::writeLog("百度快速Tag成功推送1条");
-            exit;
+            return 1;
         }
 
         $resData = $this->pushFast($db->baidu_token, $domain, $urls);
@@ -262,7 +262,7 @@ class NewsTags extends \yii\db\ActiveRecord
         print_r($urls);
         echo '<hr/>';
         print_r($errorArr);
-        exit;
+
     }
 
     //mip推送
