@@ -80,7 +80,7 @@ class NewsTags extends \yii\db\ActiveRecord
         }
 
         if (empty($urls)) {
-            Tools::writeLog($dbName . "没有更新的链接可以提交");
+            Tools::writeLog($dbName . "没有更新的Tag链接可以提交");
             return 1;
         }
 
@@ -112,7 +112,7 @@ class NewsTags extends \yii\db\ActiveRecord
         }
 
         if ($remain == 0) {
-            Tools::writeLog($dbName . "推送次数用完");
+            Tools::writeLog($dbName . "Tag推送次数用完");
             return 1;
         } else {
             $urls = array_slice($urls, 1, $remain);
@@ -193,7 +193,7 @@ class NewsTags extends \yii\db\ActiveRecord
         }
 
         if (empty($urls)) {
-            Tools::writeLog($dbName . "没有快速更新的链接可以提交");
+            Tools::writeLog($dbName . "没有快速更新的Tag链接可以提交");
             return 1;
         }
 
@@ -225,7 +225,7 @@ class NewsTags extends \yii\db\ActiveRecord
         }
 
         if ($remain == 0) {
-            Tools::writeLog($dbName . "快速推送次数用完");
+            Tools::writeLog($dbName . "快速Tag推送次数用完");
             return 1;
         } else {
             $urls = array_slice($urls, 1, $remain);
