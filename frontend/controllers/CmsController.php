@@ -3,7 +3,9 @@
 namespace frontend\controllers;
 
 use common\models\CmsAction;
+use common\models\DbName;
 use common\models\NewsTags;
+use common\models\Tools;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -25,7 +27,7 @@ class CmsController extends Controller
 {
     /**
      * Displays homepage.
-     *
+     * http://yii.com/index.php?r=cms
      * @return mixed
      */
     public function actionIndex()
@@ -39,4 +41,21 @@ class CmsController extends Controller
         list($code, $msg) = $model->result2();
     }
 
+    /**
+     *开始跑所有数据库
+     * http://yii.com/index.php?r=cms/start-run
+     */
+    public function actionStartRun()
+    {
+        $res = DbName::find()->all();
+        $arr = [];
+        //遍历每个数据库，推送
+        foreach ($res as $re) {
+            $url = 'http://116.193.169.122/index.php?r=cms&db_name=' . $re->name;
+            $arr[] = $url;
+            Tools::curlGet($url);
+        }
+        echo '<pre>';
+        print_r($arr);
+    }
 }
