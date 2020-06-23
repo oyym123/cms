@@ -24,6 +24,18 @@ class MipFlag extends \yii\db\ActiveRecord
     const TYPE_ARTICLE_FAST = 3; //文章快速
     const TYPE_TAG_FAST = 4;     //标签快速
 
+    /** 获取所有的类型 */
+    public static function getType($key = 'all')
+    {
+        $data = [
+            self::TYPE_ARTICLE => '文章提交',
+            self::TYPE_TAG => '标签提交',
+            self::TYPE_ARTICLE_FAST => '快速文章提交',
+            self::TYPE_TAG_FAST => '快速标签提交',
+        ];
+        return $key === 'all' ? $data : $data[$key];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -51,13 +63,13 @@ class MipFlag extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'db_id' => 'Db ID',
-            'db_name' => 'Db Name',
-            'type' => 'Type',
-            'type_id' => 'Type ID',
-            'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'db_id' => '数据库id',
+            'db_name' => '数据库名称',
+            'type' => '类型',
+            'type_id' => '类型id',
+            'status' => '状态',
+            'created_at' => '创建时间',
+            'updated_at' => '修改时间',
         ];
     }
 

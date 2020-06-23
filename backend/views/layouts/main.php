@@ -36,6 +36,8 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
+        ['label' => 'CMS 推送日志', 'url' => ['/mip-flag/index']],
+        ['label' => 'CMS 数据库', 'url' => ['/db-name/index']],
         ['label' => 'Home', 'url' => ['/site/index']],
     ];
     if (Yii::$app->user->isGuest) {
