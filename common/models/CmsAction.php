@@ -165,7 +165,7 @@ class CmsAction extends \yii\db\ActiveRecord
             return [-1, '不存在该数据库！'];
         }
 
-        $res = CmsAction::find()->all();
+        $res = CmsAction::find()->orderBy('id desc')->all();
         $urls = $errorArr = [];
         $info = [];
 
