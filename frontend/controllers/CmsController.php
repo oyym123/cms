@@ -51,7 +51,7 @@ class CmsController extends Controller
         $arr = [];
         //遍历每个数据库，推送
         foreach ($res as $re) {
-            $url = 'http://116.193.169.122/index.php?r=cms&db_name=' . $re->name;
+            $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
             $arr[] = $url;
             Tools::curlGet($url);
         }
