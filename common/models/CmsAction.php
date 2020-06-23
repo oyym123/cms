@@ -79,7 +79,7 @@ class CmsAction extends \yii\db\ActiveRecord
         }
 
         if (empty($urls)) {
-            Tools::writeLog($domain."没有更新的链接可以提交");
+            Tools::writeLog($domain . "没有更新的链接可以提交");
             return 1;
         }
 
@@ -91,10 +91,10 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->success >= 400) {
-            Tools::writeLog("百度站长推送失败:" . $jsonres);
+            Tools::writeLog($domain . "百度站长推送失败:" . $jsonres);
             return 1;
         } else {
-            Tools::writeLog("百度站长成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog($domain . "百度站长成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     //更新插入 标记已经推送过了
@@ -111,14 +111,14 @@ class CmsAction extends \yii\db\ActiveRecord
         }
 
         if ($remain == 0) {
-            Tools::writeLog("推送次数用完");
+            Tools::writeLog($domain . "推送次数用完");
             return 1;
         } else {
             $urls = array_slice($urls, 1, $remain);
         }
 
         if (empty($urls)) {
-            Tools::writeLog("百度站长成功推送1条");
+            Tools::writeLog($domain . "百度站长成功推送1条");
             return 1;
         }
 
@@ -126,9 +126,9 @@ class CmsAction extends \yii\db\ActiveRecord
         $jsonres = json_decode($resData);
 
         if ($jsonres->error >= 400) {
-            Tools::writeLog("百度站长推送失败:" . $res);
+            Tools::writeLog($domain . "百度站长推送失败:" . $res);
         } else {
-            Tools::writeLog("百度站长成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog($domain . "百度站长成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     continue;
