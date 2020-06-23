@@ -262,7 +262,6 @@ class NewsTags extends \yii\db\ActiveRecord
         print_r($urls);
         echo '<hr/>';
         print_r($errorArr);
-
     }
 
     //mip推送

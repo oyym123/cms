@@ -33,9 +33,9 @@ class CmsController extends Controller
     public function actionIndex()
     {
         $tag = new NewsTags();
-        list($code, $msg) = $tag->result();
+//        list($code, $msg) = $tag->result();
         list($code, $msg) = $tag->result2();
-
+        exit;
         $model = new  CmsAction();
         list($code, $msg) = $model->result();
         list($code, $msg) = $model->result2();
