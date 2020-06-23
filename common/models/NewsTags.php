@@ -166,7 +166,7 @@ class NewsTags extends \yii\db\ActiveRecord
             return [-1, '不存在该数据库！'];
         }
 
-        $res = NewsTags::find()->all();
+        $res = NewsTags::find()->orderBy('tagid desc')->all();
         $urls = $errorArr = [];
         $info = [];
 
