@@ -13,6 +13,8 @@ use Yii;
  * @property int|null $type 1=文章 2=tag
  * @property int|null $type_id 类型id
  * @property int|null $status 0=禁用 1=正常
+ * @property string|null $url
+ * @property int|null $remain
  * @property string|null $created_at
  * @property string|null $updated_at 创建时间
  */
@@ -50,9 +52,9 @@ class MipFlag extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['db_id', 'type', 'type_id', 'status'], 'integer'],
+            [['db_id', 'type', 'type_id', 'status', 'remain'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['db_name'], 'string', 'max' => 255],
+            [['db_name', 'url'], 'string', 'max' => 255],
         ];
     }
 
@@ -67,6 +69,8 @@ class MipFlag extends \yii\db\ActiveRecord
             'db_name' => '数据库名称',
             'type' => '类型',
             'type_id' => '类型id',
+            'url' => '类型id',
+            'remain' => '剩余条数',
             'status' => '状态',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
@@ -92,6 +96,8 @@ class MipFlag extends \yii\db\ActiveRecord
         $model->db_name = $data['db_name'];
         $model->type = $data['type'];
         $model->type_id = $data['type_id'];
+        $model->remain = $data['remain'] ?? 0;
+        $model->url = $data['url'] ?? '';
         $model->created_at = date('Y-m-d H:i:s');
         if (!$model->save()) {
             return $model->getErrors();

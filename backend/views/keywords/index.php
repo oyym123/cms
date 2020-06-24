@@ -30,8 +30,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'keywords',
+            'search_num',
             'sort',
-
             [
                 'label' => '关键词来源',
                 'attribute' => 'form',
@@ -51,7 +51,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'rank',
-            'search_num',
+
             'title',
             //'content:ntext',
             //'note',
