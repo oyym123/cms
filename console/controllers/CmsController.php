@@ -34,7 +34,9 @@ class CmsController extends \yii\console\Controller
                     $arr[] = $url;
                     Tools::curlGet($url);
                 } else {
-
+                    echo '当前时间:' . time();
+                    echo '  时间差:' . $limitTime;
+                    echo PHP_EOL;
                     echo $re->name . '  执行时间：' . $time;
                     echo PHP_EOL;
                 }
