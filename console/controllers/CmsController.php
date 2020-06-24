@@ -27,7 +27,7 @@ class CmsController extends \yii\console\Controller
                 $limitTime = strtotime($time) - time();
 
                 //当到达执行时间时，开始执行
-                if ($limitTime < 63 && $limitTime > 0) { //表示执行
+                if ($limitTime < 90 && $limitTime > 0) { //表示执行
                     print_r($limitTime);
                     Tools::writeLog($re->name . '已执行');
                     $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
