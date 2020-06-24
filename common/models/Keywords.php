@@ -127,7 +127,6 @@ class Keywords extends \yii\db\ActiveRecord
         }
     }
 
-
     /** 爬取爱站网的竞品关键词数据 */
     public static function catchKeyWords()
     {

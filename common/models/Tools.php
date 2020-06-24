@@ -50,27 +50,4 @@ class Tools extends \yii\db\ActiveRecord
         return $output;
     }
 
-    /**
-     * 获取两个字符串之间的子字符串
-     *
-     * @param
-     * @param 返回两个字符串之间的子字符串，不包括分隔符
-     * @param string $ string Haystack
-     * @param string $ start起始分隔符
-     * @param string | null $ end结束分隔符，如果省略则返回字符串的其余部分
-     * @return bool | string $ start和$ end之间的子字符串，如果找不到任何一个字符串，则返回false
-     */
-    public static function subBetween($string, $start, $end = null)
-    {
-        if (($start_pos = strpos($string, $start)) !== false) {
-            if ($end) {
-                if (($end_pos = strpos($string, $end, $start_pos + strlen($start))) !== false) {
-                    return substr($string, $start_pos + strlen($start), $end_pos - ($start_pos + strlen($start)));
-                }
-            } else {
-                return substr($string, $start_pos);
-            }
-        }
-        return false;
-    }
 }
