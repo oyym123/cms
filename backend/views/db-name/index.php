@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
             'id',
             'baidu_token',
+            'mip_time',
             'baidu_password',
             'baidu_account',
             'domain',

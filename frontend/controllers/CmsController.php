@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\CmsAction;
 use common\models\DbName;
+use common\models\Keywords;
 use common\models\NewsTags;
 use common\models\Tools;
 use frontend\models\ResendVerificationEmailForm;
@@ -33,9 +34,9 @@ class CmsController extends Controller
     public function actionIndex()
     {
         $tag = new NewsTags();
-//        list($code, $msg) = $tag->result();
+        list($code, $msg) = $tag->result();
         list($code, $msg) = $tag->result2();
-        exit;
+
         $model = new  CmsAction();
         list($code, $msg) = $model->result();
         list($code, $msg) = $model->result2();
@@ -51,11 +52,28 @@ class CmsController extends Controller
         $arr = [];
         //遍历每个数据库，推送
         foreach ($res as $re) {
+            //定时不为空
+            if (!empty($re->mip_time)) {
+                $date = date('Y-m-d', time());
+                $time = $date . ' ' . $re->mip_time . ':00';
+                $limitTime = strtotime($time) - time();
+                if (strtotime($time) - time() < 61) { //表示执行
+                    echo '';
+                }
+            }
+
             $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
             $arr[] = $url;
-            Tools::curlGet($url);
+//            Tools::curlGet($url);
         }
+
         echo '<pre>';
         print_r($arr);
+    }
+
+    /** 爬取关键词 */
+    public function actionCatchKey()
+    {
+        Keywords::catchKeyWords();
     }
 }

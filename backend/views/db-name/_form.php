@@ -14,6 +14,8 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'baidu_token')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'mip_time')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'baidu_password')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'baidu_account')->textInput(['maxlength' => true]) ?>
@@ -24,9 +26,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->textInput() ?>
 
-<!--    --><?//= $form->field($model, 'updated_at')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'created_at')->textInput() ?>
+    <!--    --><? //= $form->field($model, 'updated_at')->textInput() ?>
+    <!---->
+    <!--    --><? //= $form->field($model, 'created_at')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

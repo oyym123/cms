@@ -36,7 +36,7 @@ class DbName extends \yii\db\ActiveRecord
         return [
             [['status'], 'integer'],
             [['updated_at', 'created_at'], 'safe'],
-            [['baidu_token', 'baidu_password', 'baidu_account', 'domain', 'name'], 'string', 'max' => 255],
+            [['baidu_token','mip_time', 'baidu_password', 'baidu_account', 'domain', 'name'], 'string', 'max' => 255],
         ];
     }
 
@@ -48,7 +48,8 @@ class DbName extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'baidu_token' => '百度 Token',
-            'baidu_password' => '百度 ',
+            'mip_time' => 'mip推送时间',
+            'baidu_password' => '百度密码',
             'baidu_account' => '百度账号',
             'domain' => '域名',
             'name' => '数据库名称',
@@ -71,4 +72,5 @@ class DbName extends \yii\db\ActiveRecord
         $dbs = self::find()->where(['status' => 1])->asArray()->all();
         return ArrayHelper::map($dbs, 'id', 'name');
     }
+
 }
