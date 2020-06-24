@@ -131,10 +131,11 @@ class Keywords extends \yii\db\ActiveRecord
     /** 爬取爱站网的竞品关键词数据 */
     public static function catchKeyWords()
     {
+        set_time_limit(0);
         //爱站网址 mobile =手机
         $aizhanUrl = 'https://baidurank.aizhan.com/mobile/';
         $targetUrl = 'tingclass.net';
-        for ($i = 3; $i < 50; $i++) {
+        for ($i = 5; $i < 50; $i++) {
             $url = $aizhanUrl . $targetUrl . '/-1/0/' . ($i + 1) . '/position/1/';
             $res = Tools::curlGet($url);
 //            file_put_contents('./test.php', $res);
