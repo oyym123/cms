@@ -69,7 +69,7 @@ class MipFlag extends \yii\db\ActiveRecord
             'db_name' => '数据库名称',
             'type' => '类型',
             'type_id' => '类型id',
-            'url' => '类型id',
+            'url' => '链接',
             'remain' => '剩余条数',
             'status' => '状态',
             'created_at' => '创建时间',
