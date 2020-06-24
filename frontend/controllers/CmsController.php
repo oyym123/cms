@@ -48,6 +48,7 @@ class CmsController extends Controller
      */
     public function actionStartRun()
     {
+        //每分钟检测执行一次
         $res = DbName::find()->all();
         $arr = [];
         //遍历每个数据库，推送
@@ -57,14 +58,18 @@ class CmsController extends Controller
                 $date = date('Y-m-d', time());
                 $time = $date . ' ' . $re->mip_time . ':00';
                 $limitTime = strtotime($time) - time();
-                if (strtotime($time) - time() < 61) { //表示执行
-                    echo '';
+
+                //当到达执行时间时，开始执行
+                if ($limitTime < 63 && $limitTime > 0) { //表示执行
+                    print_r($limitTime);
+                    Tools::writeLog($re->name . '已执行');
+                    $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
+                    $arr[] = $url;
+                    Tools::curlGet($url);
+                } else {
+                    echo '执行时间：' . $time;
                 }
             }
-
-            $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
-            $arr[] = $url;
-//            Tools::curlGet($url);
         }
 
         echo '<pre>';
