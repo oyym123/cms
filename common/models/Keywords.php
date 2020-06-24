@@ -134,7 +134,7 @@ class Keywords extends \yii\db\ActiveRecord
         //爱站网址 mobile =手机
         $aizhanUrl = 'https://baidurank.aizhan.com/mobile/';
         $targetUrl = 'tingclass.net';
-        for ($i = 2; $i < 50; $i++) {
+        for ($i = 3; $i < 50; $i++) {
             $url = $aizhanUrl . $targetUrl . '/-1/0/' . ($i + 1) . '/position/1/';
             $res = Tools::curlGet($url);
 //            file_put_contents('./test.php', $res);
@@ -174,9 +174,6 @@ class Keywords extends \yii\db\ActiveRecord
                     $error[] = $keywords[2] . $msg;
                 }
             }
-            echo '<pre>';
-            print_r($error);
-            exit;
         }
     }
 }
