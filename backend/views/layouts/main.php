@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this \yii\web\View */
+
 /* @var $content string */
 
 use backend\assets\AppAsset;
@@ -36,6 +37,7 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
+        ['label' => '关键词', 'url' => ['/keywords/index']],
         ['label' => 'CMS 推送日志', 'url' => ['/mip-flag/index']],
         ['label' => 'CMS 数据库', 'url' => ['/db-name/index']],
         ['label' => 'Home', 'url' => ['/site/index']],
