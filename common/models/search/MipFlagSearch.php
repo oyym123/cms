@@ -17,8 +17,8 @@ class MipFlagSearch extends MipFlag
     public function rules()
     {
         return [
-            [['id', 'db_id', 'type', 'type_id', 'status'], 'integer'],
-            [['db_name', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'db_id', 'type', 'type_id', 'status','remain'], 'integer'],
+            [['db_name', 'created_at', 'updated_at','url'], 'safe'],
         ];
     }
 
@@ -62,12 +62,14 @@ class MipFlagSearch extends MipFlag
             'db_id' => $this->db_id,
             'type' => $this->type,
             'type_id' => $this->type_id,
+            'remain' => $this->remain,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'db_name', $this->db_name]);
+        $query->andFilterWhere(['like', 'url', $this->url]);
 
         return $dataProvider;
     }

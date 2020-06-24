@@ -75,6 +75,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
                 $info[] = [
                     'type_id' => $re->tagid,
+                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
                 ];
             }
         }
@@ -104,6 +105,8 @@ class NewsTags extends \yii\db\ActiveRecord
                         'db_name' => $db->name,
                         'type' => MipFlag::TYPE_TAG,
                         'type_id' => $re['type_id'],
+                        'url' => $re['url'],
+                        'remain' => $jsonres->remain,
                     ];
                     MipFlag::createOne($saveData);
                 }
@@ -140,6 +143,8 @@ class NewsTags extends \yii\db\ActiveRecord
                     'db_name' => $db->name,
                     'type' => MipFlag::TYPE_TAG,
                     'type_id' => $re['type_id'],
+                    'url' => $re['url'],
+                    'remain' => $jsonres->remain,
                 ];
                 MipFlag::createOne($saveData);
             }
@@ -188,6 +193,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
                 $info[] = [
                     'type_id' => $re->tagid,
+                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
                 ];
             }
         }
@@ -217,6 +223,8 @@ class NewsTags extends \yii\db\ActiveRecord
                         'db_name' => $db->name,
                         'type' => MipFlag::TYPE_TAG_FAST,
                         'type_id' => $re['type_id'],
+                        'url' => $re['url'],
+                        'remain' => $jsonres->remain,
                     ];
                     MipFlag::createOne($saveData);
                 }
@@ -253,6 +261,8 @@ class NewsTags extends \yii\db\ActiveRecord
                     'db_name' => $db->name,
                     'type' => MipFlag::TYPE_TAG_FAST,
                     'type_id' => $re['type_id'],
+                    'url' => $re['url'],
+                    'remain' => $jsonres->remain,
                 ];
                 MipFlag::createOne($saveData);
             }

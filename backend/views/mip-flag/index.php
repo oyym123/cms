@@ -48,6 +48,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             'type_id',
+            'url',
+            'remain',
             //'status',
             'created_at',
             //'updated_at',
