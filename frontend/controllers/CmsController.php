@@ -71,7 +71,9 @@ class CmsController extends Controller
         print_r($arr);
     }
 
-    /** 爬取关键词 */
+    /** 爬取关键词
+     * http://116.193.169.122:89/index.php?r=cms/catch-key
+     */
     public function actionCatchKey()
     {
         Keywords::catchKeyWords();
