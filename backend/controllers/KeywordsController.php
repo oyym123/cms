@@ -124,4 +124,13 @@ class KeywordsController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    /**
+     * @return array
+     * 抓取爱站网的数据
+     */
+    public function actionCatch()
+    {
+        Keywords::catchKeyWords();
+    }
 }

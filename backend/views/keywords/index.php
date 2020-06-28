@@ -8,17 +8,23 @@ use yii\widgets\Pjax;
 /* @var $searchModel common\models\search\KeywordsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Keywords';
+$this->title = '关键词';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="keywords-index">
-
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Create Keywords', ['create'], ['class' => 'btn btn-success']) ?>
+        <button id="catch_aizhan" class="btn btn-primary"> 抓取爱站关键词</button>
+        <b id="topic"></b>
+        <br/>
+        <br/>
+        <input type="text" id="catch_value" class="form-control">
     </p>
 
+    <br/>
+    <p>
+        <?= Html::a('创建新的关键词', ['create'], ['class' => 'btn btn-success']) ?>
+    </p>
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -64,3 +70,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php Pjax::end(); ?>
 </div>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script>
+    $("#catch_aizhan").click(function () {
+        if ($("#catch_value").val() == '') {
+            $("#topic").append('<b style="color: red">请输入正确网址<b>');
+        } else {
+            $("#topic").append('<b style="color: red">正在抓取数据，请稍等。。。<b>');
+        }
+
+        $.ajax({
+            type: "GET",
+            url: 'index.php?r=keywords/catch&url=' + $("#catch_value").val(),
+            success: function (html) {
+                console.log(html);
+                if (html != '0') {
+                    $("#topic").append('<b style="color: red">' + html + ' < b > ');
+                }
+            }
+        });
+    });
+</script>

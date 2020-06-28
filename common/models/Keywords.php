@@ -27,9 +27,10 @@ class Keywords extends \yii\db\ActiveRecord
     const FROM_USER = 'user';   //来自人工
     const FROM_ROBOT = 'robot'; //来自机器人
 
-    const TYPE_SHORT = 1;       //短尾词
-    const TYPE_LONG = 2;        //长尾词
-
+    const TYPE_SHORT_MOBILE = 1;       //移动端短尾词
+    const TYPE_LONG_MOBILE = 2;        //移动端长尾词
+    const TYPE_SHORT_PC = 3;           //PC端短尾词
+    const TYPE_LONG_PC = 4;            //PC端长尾词
 
     /** 获取所有来源 */
     public static function getFrom($key = 'all')
@@ -45,8 +46,10 @@ class Keywords extends \yii\db\ActiveRecord
     public static function getType($key = 'all')
     {
         $data = [
-            self::TYPE_SHORT => '短尾词',
-            self::TYPE_LONG => '长尾词',
+            self::TYPE_SHORT_MOBILE => '移动端短尾词',
+            self::TYPE_LONG_MOBILE => '移动端长尾词',
+            self::TYPE_SHORT_PC => 'PC端短尾词',
+            self::TYPE_LONG_PC => 'PC端长尾词',
         ];
         return $key === 'all' ? $data : $data[$key];
     }
@@ -133,8 +136,17 @@ class Keywords extends \yii\db\ActiveRecord
         set_time_limit(0);
         //爱站网址 mobile =手机
         $aizhanUrl = 'https://baidurank.aizhan.com/mobile/';
-        $targetUrl = 'tingclass.net';
-        for ($i = 5; $i < 50; $i++) {
+        $url = \Yii::$app->request->get('url', '');
+
+        if (empty($url)) {
+            echo '0';
+            exit;
+        } else {
+            echo $url;
+        }
+
+        $targetUrl = $url;
+        for ($i = 0; $i < 50; $i++) {
             $url = $aizhanUrl . $targetUrl . '/-1/0/' . ($i + 1) . '/position/1/';
             $res = Tools::curlGet($url);
 //            file_put_contents('./test.php', $res);
@@ -144,36 +156,42 @@ class Keywords extends \yii\db\ActiveRecord
 					</tr>@s', $res, $result);
             $result = array_filter(explode('<td class="title">', $result[0]));
             if (empty($result)) {
-                exit('没有数据了！');
+                exit('抓取完成，没有数据了！');
             }
 
             $error = [];
 //            $result = array_splice($result,0,1);
-
-            foreach ($result as $re) {
-                sleep(1);
+            header("content-Type: text/html; charset=Utf-8");
+            foreach ($result as $key => $re) {
+                if ($key % 5 == 0) {
+                    sleep(1);
+                }
                 preg_match('@第(.*)?位@', $re, $rank1);
                 preg_match('@第(.*)?页@', $re, $rank2);
                 preg_match('@/">(.*)?</td>
 						<td class="owner">@s', $re, $searchNum);
                 preg_match('@<a name="baiduLink" rel="nofollow" target="_blank" href="(.*)?" class="gray" title="(.*)?">@', $re, $info);
                 preg_match('@<a class="gray" rel="nofollow" target="_blank" href="(.*)?" title="(.*)?">@', $re, $keywords);
+
                 $content = Tools::curlGet($info[1]);
+                $content = mb_convert_encoding($content, 'UTF-8');
                 $data = [
                     'rank' => $rank1[1] . ',' . $rank2[1],
                     'search_num' => intval($searchNum[1]),
-                    'type' => self::TYPE_SHORT,
+                    'type' => self::TYPE_SHORT_MOBILE,
                     'keywords' => $keywords[2],
                     'url' => $info[1],
                     'title' => $info[2],
                     'form' => self::FROM_ROBOT,
                     'content' => $content,
                 ];
+
                 list($code, $msg) = self::createOne($data);
                 if ($code < 0) {
                     $error[] = $keywords[2] . $msg;
                 }
             }
+            exit('抓取完成！');
         }
     }
 }
