@@ -43,4 +43,22 @@ class CmsController extends \yii\console\Controller
         }
         print_r($arr);
     }
+
+    /**
+     * 设置标签页
+     */
+    public function actionSetTags()
+    {
+        //每天检测执行一次
+        $res = DbName::find()->all();
+        $arr = [];
+        //遍历每个数据库，推送
+        foreach ($res as $re) {
+            $domain = str_replace('m.', '', $re->domain);
+            $url = 'http://116.193.169.122:89/index.php?r=cms/set-tags&db_name=' . $re->name . '&db_domain=' . $domain;
+            $arr[] = $url;
+            Tools::curlGet($url);
+        }
+        print_r($arr);
+    }
 }

@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\CmsAction;
 use common\models\DbName;
 use common\models\Keywords;
+use common\models\NewsClassTags;
 use common\models\NewsTags;
 use common\models\Tools;
 use frontend\models\ResendVerificationEmailForm;
@@ -83,4 +84,14 @@ class CmsController extends Controller
     {
         Keywords::catchKeyWords();
     }
+
+    /**
+     * tags页面数据展示
+     *
+     */
+    public function actionSetTags()
+    {
+        NewsClassTags::setTags();
+    }
+
 }

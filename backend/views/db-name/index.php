@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\DbNameSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -34,6 +35,14 @@ $this->params['breadcrumbs'][] = $this->title;
             'domain',
             'name',
             //'status',
+            [
+                'label' => '更新tags页面',
+                'attribute' => 'status',
+                'content' => function ($model, $key, $index, $column) {
+                    $domain = str_replace('m.', '', $model->domain);
+                    return '<a href="' . 'http://116.193.169.122:89/index.php?r=cms/set-tags&db_name=' . $model->name . '&db_domain=' . $domain . '" target="_blank">点击更新</a>';
+                }
+            ],
             'updated_at',
             //'created_at',
             ['class' => 'yii\grid\ActionColumn'],
