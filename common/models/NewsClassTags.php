@@ -73,7 +73,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $tagStr .= '<br/>';
         $tagStr .= '<div class="map w120 m0a mt90"><strong>其他</strong></div>';
         $tagStr .= '<br/>';
-        
+
         foreach ($tagsArray as $tag) {
             $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
             $tagStr .= '<br/>';
@@ -81,10 +81,20 @@ class NewsClassTags extends \yii\db\ActiveRecord
 
         $domain = Yii::$app->request->get('domain');
         $path = '/www/wwwroot/' . $domain . '/tags.html';
+
         $res = file_get_contents($path);
+        //复位
         $res = preg_replace('@<div id="content">(.*)?</div>@s', '<div id="content"></div>', $res);
         $str = str_replace('<div id="content"></div>', '<div id="content">' . $tagStr . '</div>', $res);
         file_put_contents($path, $str);
+
+        $path2 = '/www/wwwroot/' . $domain . '/m/tags.html';
+        $res2 = file_get_contents($path2);
+        //复位
+        $res2 = preg_replace('@<div class="tags">(.*)?</div>@s', '<div class="tags"></div>', $res2);
+        $str2 = str_replace('<div class="tags"></div>', '<div class="tags">' . $tagStr . '</div>', $res2);
+        file_put_contents($path2, $str2);
+
         exit;
     }
 }
