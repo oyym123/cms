@@ -37,17 +37,17 @@ class NewsClassTags extends \yii\db\ActiveRecord
     {
         //获取所有的 文章分类
         $class = NewsClass::find()->all();
-        $data = [];
+        $tagsIds = $data = [];
         foreach ($class as $cl) {
             $tags = self::find()->where(['classid' => $cl->classid])->all();
-
             $tagArr = [];
             foreach ($tags as $tag) {
                 $tagName = NewsTags::find()->where(['tagid' => $tag->tagid])->one();
                 $tagArr[] = [
                     'name' => $tagName ? $tagName->tagname : '',
-                    'url' => '/e/tags/?tagid=' . $tag->id
+                    'url' => '/e/tags/?tagid=' . $tag->tagid
                 ];
+                $tagsIds[] = $tag->tagid;
             }
             $data[] = [
                 'class_id' => $cl->classid,
@@ -57,14 +57,26 @@ class NewsClassTags extends \yii\db\ActiveRecord
         }
 
         $tagStr = '';
+        $tagsArray = NewsTags::find()->where(['not in', 'tagid', $tagsIds])->asArray()->all();
+
+
         foreach ($data as $item) {
             $tagStr .= '<br/>';
-            $tagStr .= '<div class="map w120 m0a mt90">' . $item['class_name'] . '</div>';
+            $tagStr .= '<div class="map w120 m0a mt90"><strong>' . $item['class_name'] . '</strong></div>';
             $tagStr .= '<br/>';
             foreach ($item['tags'] as $tag) {
                 $tagStr .= '<a href="' . $tag['url'] . '">' . $tag['name'] . '</a>';
                 $tagStr .= '<br/>';
             }
+        }
+
+        $tagStr .= '<br/>';
+        $tagStr .= '<div class="map w120 m0a mt90"><strong>其他</strong></div>';
+        $tagStr .= '<br/>';
+        
+        foreach ($tagsArray as $tag) {
+            $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
+            $tagStr .= '<br/>';
         }
 
         $domain = Yii::$app->request->get('domain');
