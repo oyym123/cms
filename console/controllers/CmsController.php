@@ -55,7 +55,7 @@ class CmsController extends \yii\console\Controller
         //遍历每个数据库，推送
         foreach ($res as $re) {
             $domain = str_replace('m.', '', $re->domain);
-            $url = 'http://116.193.169.122:89/index.php?r=cms/set-tags&db_name=' . $re->name . '&db_domain=' . $domain;
+            $url = 'http://116.193.169.122:89/index.php?r=cms/set-tags&db_name=' . $re->name . '&domain=' . $domain;
             $arr[] = $url;
             Tools::curlGet($url);
         }
