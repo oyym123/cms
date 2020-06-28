@@ -191,7 +191,7 @@ class Keywords extends \yii\db\ActiveRecord
                     $error[] = $keywords[2] . $msg;
                 }
             }
-            exit('抓取完成！');
         }
+        exit('抓取完成！');
     }
 }
