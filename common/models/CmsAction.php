@@ -177,7 +177,7 @@ class CmsAction extends \yii\db\ActiveRecord
         //获取所有的文章进行
         foreach ($res as $re) {
             //判断是否已经提交过了
-            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_ARTICLE, $re->id);
+            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_ARTICLE_FAST, $re->id);
             if (!empty($flag)) { //表示已经提交过了
                 $errorArr[] = $re->id;
             } else {
