@@ -178,7 +178,7 @@ class NewsTags extends \yii\db\ActiveRecord
         //获取所有的文章进行
         foreach ($res as $re) {
             //判断是否已经提交过了
-            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_TAG, $re->tagid);
+            $flag = MipFlag::checkIsMip($db->id, MipFlag::TYPE_TAG_FAST, $re->tagid);
             if (!empty($flag)) { //表示已经提交过了
                 $errorArr[] = $re->tagid;
             } else {
