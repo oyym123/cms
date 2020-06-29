@@ -65,7 +65,7 @@ class CmsAction extends \yii\db\ActiveRecord
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
-                    $domain = 'https://' . $db->domain;
+                    $domain = $db->detail_domain;
                 } else {
                     $domain = $db->domain;
                 }
@@ -183,7 +183,7 @@ class CmsAction extends \yii\db\ActiveRecord
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
-                    $domain = 'https://' . $db->domain;
+                    $domain = $db->detail_domain;
                 } else {
                     $domain = $db->domain;
                 }

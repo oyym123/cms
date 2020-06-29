@@ -36,7 +36,7 @@ class DbName extends \yii\db\ActiveRecord
         return [
             [['status'], 'integer'],
             [['updated_at', 'created_at'], 'safe'],
-            [['baidu_token','mip_time', 'baidu_password', 'baidu_account', 'domain', 'name'], 'string', 'max' => 255],
+            [['baidu_token', 'mip_time', 'baidu_password', 'baidu_account', 'domain', 'name', 'detail_domain', 'm_domain'], 'string', 'max' => 255],
         ];
     }
 
@@ -51,6 +51,8 @@ class DbName extends \yii\db\ActiveRecord
             'mip_time' => 'mip推送时间',
             'baidu_password' => '百度密码',
             'baidu_account' => '百度账号',
+            'detail_domain' => 'PC域名',
+            'm_domain' => '移动端域名',
             'domain' => '域名',
             'name' => '数据库名称',
             'status' => '状态',

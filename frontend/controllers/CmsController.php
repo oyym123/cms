@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\CmsAction;
 use common\models\DbName;
 use common\models\Keywords;
+use common\models\LongKeywords;
 use common\models\NewsClassTags;
 use common\models\NewsTags;
 use common\models\Tools;
@@ -36,11 +37,11 @@ class CmsController extends Controller
     {
         $tag = new NewsTags();
         list($code, $msg) = $tag->result();
-        list($code, $msg) = $tag->result2();
+//        list($code, $msg) = $tag->result2();
 
         $model = new  CmsAction();
         list($code, $msg) = $model->result();
-        list($code, $msg) = $model->result2();
+//        list($code, $msg) = $model->result2();
     }
 
     /**
@@ -93,5 +94,14 @@ class CmsController extends Controller
     {
         NewsClassTags::setTags();
     }
+
+    /**
+     * 抓取百度长尾词
+     */
+    public function actionCatchBaidu()
+    {
+        LongKeywords::getBaiduKey();
+    }
+
 
 }

@@ -66,7 +66,7 @@ class NewsTags extends \yii\db\ActiveRecord
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
-                    $domain = 'https://' . $db->domain;
+                    $domain = $db->detail_domain;
                 } else {
                     $domain = $db->domain;
                 }
@@ -184,7 +184,7 @@ class NewsTags extends \yii\db\ActiveRecord
             } else {
                 //拼接URL
                 if (strpos($db->domain, 'http') === false) {
-                    $domain = 'https://' . $db->domain;
+                    $domain = $db->detail_domain;
                 } else {
                     $domain = $db->domain;
                 }
@@ -203,7 +203,7 @@ class NewsTags extends \yii\db\ActiveRecord
             return 1;
         }
 
-        //获取第一条 推送，然后获取到生剩余条数，根据剩余条数 再推送
+        //获取第一条 推送，然后获取到剩余条数，根据剩余条数 再推送
         $urlFirst = [$urls[0]];
 
         $resData = $this->pushFast($db->baidu_token, $domain, $urlFirst);
@@ -251,10 +251,18 @@ class NewsTags extends \yii\db\ActiveRecord
             Tools::writeLog($dbName . "百度快速Tag推送失败:" . $res);
         } else {
             Tools::writeLog("百度快速Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            $count = count($info);
             foreach ($info as $key => $re) {
                 if ($key == 0) {
                     continue;
                 }
+
+                if ($key == ($count - 1)) { //记录最后一条记录
+                    $remain = $jsonres->remain;
+                } else {
+                    $remain = 0;
+                }
+
                 //更新插入 标记已经推送过了
                 $saveData = [
                     'db_id' => $db->id,
@@ -262,7 +270,7 @@ class NewsTags extends \yii\db\ActiveRecord
                     'type' => MipFlag::TYPE_TAG_FAST,
                     'type_id' => $re['type_id'],
                     'url' => $re['url'],
-                    'remain' => $jsonres->remain,
+                    'remain' => $remain,
                 ];
                 MipFlag::createOne($saveData);
             }
