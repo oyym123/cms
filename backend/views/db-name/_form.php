@@ -22,6 +22,10 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'detail_domain')->textInput() ?>
+
+    <?= $form->field($model, 'm_domain')->textInput() ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'status')->textInput() ?>

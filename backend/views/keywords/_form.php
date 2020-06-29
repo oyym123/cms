@@ -22,6 +22,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'search_num')->textInput() ?>
 
+
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'note')->textInput(['maxlength' => true]) ?>
