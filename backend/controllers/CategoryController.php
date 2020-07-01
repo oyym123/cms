@@ -250,6 +250,7 @@ class CategoryController extends Controller
             ->where([
                 'status' => Base::STATUS_BASE_NORMAL,
             ])
+            ->andWhere(['>','level',1])
             ->select('id,level,name as text,name,pid2')
             ->andFilterWhere(['like', 'name', $q])
             ->limit(30)

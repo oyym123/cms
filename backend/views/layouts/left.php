@@ -62,6 +62,8 @@
 //                        ]
 //                    ],
                     ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
+                    ['label' => '爱站规则设定', 'icon' => 'fa fa-circle-o', 'url' => ['/aizhan-rules/index']],
+                    ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],
 //                    ['label' => '兔子队列', 'icon' => 'dashboard', 'url' => ['/rabbitemq/index']],
 //                    ['label' => '黑帽文章', 'icon' => 'dashboard', 'url' => ['/black-article/index']],
 //                    ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],

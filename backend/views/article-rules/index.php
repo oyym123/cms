@@ -79,14 +79,14 @@ $this->params['breadcrumbs'][] = $this->title;
             //'use  r_id',
 
 
-            [
-                'label' => '拉取文章',
-                'attribute' => 'status',
-
-                'content' => function ($model, $key, $index, $column) {
-                    return '<a target="_blank" href="/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
-                }
-            ],
+//            [
+//                'label' => '拉取文章',
+//                'attribute' => 'status',
+//
+//                'content' => function ($model, $key, $index, $column) {
+//                    return '<a target="_blank" href="/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
+//                }
+//            ],
 
             //'created_at',
             'updated_at',

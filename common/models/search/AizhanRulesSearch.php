@@ -4,13 +4,12 @@ namespace common\models\search;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Keywords;
-use yii\data\Pagination;
+use common\models\AizhanRules;
 
 /**
- * KeywordsSearch represents the model behind the search form of `common\models\Keywords`.
+ * AizhanRulesSearch represents the model behind the search form of `common\models\AizhanRules`.
  */
-class KeywordsSearch extends Keywords
+class AizhanRulesSearch extends AizhanRules
 {
     /**
      * {@inheritdoc}
@@ -18,8 +17,8 @@ class KeywordsSearch extends Keywords
     public function rules()
     {
         return [
-            [['id', 'sort', 'search_num', 'type','status'], 'integer'],
-            [['keywords', 'form', 'rank', 'title', 'content', 'note', 'url', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'category_id', 'sort', 'status', 'domain_id', 'column_id', 'max_search_num', 'user_id'], 'integer'],
+            [['site_url', 'note', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -41,15 +40,13 @@ class KeywordsSearch extends Keywords
      */
     public function search($params)
     {
-        $query = Keywords::find();
+        $query = AizhanRules::find();
 
         // add conditions that should always apply here
+
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => ['pageSize' => 1000],
         ]);
-
-//        $dataProvider->pagination->defaultPageSize =10;
 
         $this->load($params);
 
@@ -62,21 +59,19 @@ class KeywordsSearch extends Keywords
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'category_id' => $this->category_id,
             'sort' => $this->sort,
-            'search_num' => $this->search_num,
-            'type' => $this->type,
             'status' => $this->status,
+            'domain_id' => $this->domain_id,
+            'column_id' => $this->column_id,
+            'max_search_num' => $this->max_search_num,
+            'user_id' => $this->user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'keywords', $this->keywords])
-            ->andFilterWhere(['like', 'form', $this->form])
-            ->andFilterWhere(['like', 'rank', $this->rank])
-            ->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'content', $this->content])
-            ->andFilterWhere(['like', 'note', $this->note])
-            ->andFilterWhere(['like', 'url', $this->url]);
+        $query->andFilterWhere(['like', 'site_url', $this->site_url])
+            ->andFilterWhere(['like', 'note', $this->note]);
 
         return $dataProvider;
     }

@@ -103,6 +103,7 @@ class Tools extends \yii\db\ActiveRecord
 
         $words2 = array_filter(explode(PHP_EOL, $keywords));
         $arr = [];
+
         foreach ($words2 as $item) {
             $length = mb_strlen($item);
             if ($length >= 2 && $length < 15) { //只获取关键词长度 大于2 并且 小于15的词

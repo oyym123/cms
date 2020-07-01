@@ -35,7 +35,8 @@ return [
             ],
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+//            'errorAction' => 'site/error',
+            'class' => 'common\component\ErrorHandler',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,

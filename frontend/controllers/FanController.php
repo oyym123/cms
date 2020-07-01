@@ -133,7 +133,7 @@ class FanController extends Controller
 //            print_r($res);
 //            exit;
 
-            
+
             $desc = $model['intro'];
 
             $view = Yii::$app->view;
@@ -262,6 +262,7 @@ class FanController extends Controller
 
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
+//            $item['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
             $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
@@ -363,6 +364,7 @@ class FanController extends Controller
             $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
+//                $item['push_time'] = Tools::formatTime(time() - 3600);
                 $item['push_time'] = Tools::formatTime(strtotime($item['push_time']));
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
@@ -567,6 +569,7 @@ class FanController extends Controller
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
             if ($user = FanUser::findOne($model['user_id'])) {
+//                $model['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
                 $model['nickname'] = $user->username;
                 $model['avatar'] = $user->avatar;
             } else {

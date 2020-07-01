@@ -321,17 +321,19 @@ class LongKeywords extends Base
 
         foreach ($allKeyWords as $key => $item) {
             foreach ($item as $k => $value) {
-                $dataSave = [
-                    'name' => $value,
-                    'key_id' => $data['id'],
-                    'type' => $key,
-                    'keywords' => $data['keywords'],
-                ];
+                if (strpos($value, ',') === false) {
+                    $dataSave = [
+                        'name' => $value,
+                        'key_id' => $data['id'],
+                        'type' => $key,
+                        'keywords' => $data['keywords'],
+                    ];
 
-                list($code, $msg) = self::createOne($dataSave);
+                    list($code, $msg) = self::createOne($dataSave);
 
-                if ($code < 0) {
-                    $error[] = $msg;
+                    if ($code < 0) {
+                        $error[] = $msg;
+                    }
                 }
             }
         }
@@ -378,10 +380,11 @@ class LongKeywords extends Base
         ];
 
         self::updateAll($dataSave, ['key_id' => $data['id']]);
-        $msg = self::find()->where(['key_id' => $data['id']])->one();
+//        $msg = self::find()->where(['key_id' => $data['id']])->one();
+        return [1,array_column($keywords, 'name')];
 
-        self::pushReptile($msg);
 
+//      self::pushReptile($msg);
         echo '<pre>';
         print_r($error);
     }
@@ -533,8 +536,6 @@ class LongKeywords extends Base
             $andWhere = [];
         }
 
-        //查询指定20个站 的规则
-        $domainIds = BaiduKeywords::getDomainIds();
 
         $url = Tools::reptileUrl() . '/cms/article';
 
@@ -544,13 +545,17 @@ class LongKeywords extends Base
         $domainIds = BaiduKeywords::getDomainIds();
 
         //查询出所有的规则分类
-        $articleRules = ArticleRules::find()->select('category_id,domain_id,column_id')->where($andWhere)->asArray()->all();
+        $articleRules = ArticleRules::find()
+            ->select('category_id,domain_id,column_id')
+            ->where($andWhere)
+            ->andWhere(['in','id',$domainIds])
+            ->asArray()->all();
 //        echo '<pre>';
 //        print_r($articleRules);exit;
         $itemData = [];
 
         $step = 20;
-        $limit = 45;
+        $limit = 20;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $column = DomainColumn::find()

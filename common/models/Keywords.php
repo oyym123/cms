@@ -21,7 +21,7 @@ use Yii;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class Keywords extends \yii\db\ActiveRecord
+class Keywords extends Base
 {
 
     const FROM_USER = 'user';   //来自人工
@@ -31,6 +31,35 @@ class Keywords extends \yii\db\ActiveRecord
     const TYPE_LONG_MOBILE = 2;        //移动端长尾词
     const TYPE_SHORT_PC = 3;           //PC端短尾词
     const TYPE_LONG_PC = 4;            //PC端长尾词
+
+    public static function getNoAllow()
+    {
+        return [
+            '.',
+            '图片',
+            '照片',
+            '视频',
+            'txt',
+            'pdf',
+            '!',
+            ' ',
+            '#',
+            'ppt',
+            'doc',
+            'mp4',
+            'mp3',
+            '_',
+            ':',
+            '下载',
+            '！',
+            '!',
+            '&',
+            '百度云',
+            '微信',
+            '小说',
+            '微盘'
+        ];
+    }
 
     /** 获取所有来源 */
     public static function getFrom($key = 'all')
@@ -68,7 +97,7 @@ class Keywords extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sort', 'search_num', 'type'], 'integer'],
+            [['sort', 'search_num', 'type', 'status'], 'integer'],
             [['content'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['keywords', 'form', 'rank', 'title', 'note', 'url'], 'string', 'max' => 255],
@@ -91,6 +120,7 @@ class Keywords extends \yii\db\ActiveRecord
             'title' => '网页标题',
             'content' => '内容页数据',
             'note' => '备注',
+            'status' => '状态',
             'url' => '链接',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
@@ -126,72 +156,117 @@ class Keywords extends \yii\db\ActiveRecord
         if (!$model->save(false)) {
             return [-1, $model->getErrors()];
         } else {
-            return [1, 'success'];
+            return [1, $model];
         }
     }
 
     /** 爬取爱站网的竞品关键词数据 */
-    public static function catchKeyWords()
+    public static function catchKeyWords($rulesId = 0)
     {
         set_time_limit(0);
+
+        $noAllow = ['图', '视频', '音乐', ','];
+
         //爱站网址 mobile =手机
         $aizhanUrl = 'https://baidurank.aizhan.com/mobile/';
-        $url = \Yii::$app->request->get('url', '');
-
-        if (empty($url)) {
-            echo '0';
-            exit;
-        } else {
-            echo $url;
-        }
-
-        $targetUrl = $url;
-        for ($i = 0; $i < 50; $i++) {
-            $url = $aizhanUrl . $targetUrl . '/-1/0/' . ($i + 1) . '/position/1/';
+        $rulesAll = AizhanRules::find()->where(['status' => AizhanRules::STATUS_ENABLE])->all();
+        //循环要爬取的网址
+        foreach ($rulesAll as $rules) {
+            //通过第一页 获取到总共有多少页
+            $targetUrl = $rules->site_url;
+            $url = $aizhanUrl . $targetUrl . '/-1/0/1/position/1/';
             $res = Tools::curlGet($url);
-//            file_put_contents('./test.php', $res);
-//            $res = file_get_contents('./test.php');
-            preg_match('@<td class="title">
+            preg_match('@baidurank-pager(.*)?baidurank-content box@s', $res, $result);
+            $result = array_filter(explode('rel="nofollow"', $result[0]));
+            $pageNum = count($result) - 1;
+
+            //获取后面的页数
+            for ($i = $pageNum; $i > 0; $i--) {
+                $url = $aizhanUrl . $targetUrl . '/-1/0/' . $i . '/position/1/';
+                $res = Tools::curlGet($url);
+                preg_match('@<td class="title">
 							<a class="gray"(.*)?</td>
 					</tr>@s', $res, $result);
-            $result = array_filter(explode('<td class="title">', $result[0]));
-            if (empty($result)) {
-                exit('抓取完成，没有数据了！');
-            }
+                $result = array_filter(explode('<td class="title">', $result[0]));
 
-            $error = [];
+                if (empty($result)) {
+                    exit('抓取完成，没有数据了！');
+                }
+
+                $error = [];
 //            $result = array_splice($result,0,1);
-            header("content-Type: text/html; charset=Utf-8");
-            foreach ($result as $key => $re) {
-                if ($key % 5 == 0) {
-                    sleep(1);
-                }
-                preg_match('@第(.*)?位@', $re, $rank1);
-                preg_match('@第(.*)?页@', $re, $rank2);
-                preg_match('@/">(.*)?</td>
+                header("content-Type: text/html; charset=Utf-8");
+                foreach ($result as $key => $re) {
+                    preg_match('@第(.*)?位@', $re, $rank1);
+                    preg_match('@第(.*)?页@', $re, $rank2);
+                    preg_match('@/">(.*)?</td>
 						<td class="owner">@s', $re, $searchNum);
-                preg_match('@<a name="baiduLink" rel="nofollow" target="_blank" href="(.*)?" class="gray" title="(.*)?">@', $re, $info);
-                preg_match('@<a class="gray" rel="nofollow" target="_blank" href="(.*)?" title="(.*)?">@', $re, $keywords);
+                    preg_match('@<a name="baiduLink" rel="nofollow" target="_blank" href="(.*)?" class="gray" title="(.*)?">@', $re, $info);
+                    preg_match('@<a class="gray" rel="nofollow" target="_blank" href="(.*)?" title="(.*)?">@', $re, $keywords);
 
-                $content = Tools::curlGet($info[1]);
-                $content = mb_convert_encoding($content, 'UTF-8');
-                $data = [
-                    'rank' => $rank1[1] . ',' . $rank2[1],
-                    'search_num' => intval($searchNum[1]),
-                    'type' => self::TYPE_SHORT_MOBILE,
-                    'keywords' => $keywords[2],
-                    'url' => $info[1],
-                    'title' => $info[2],
-                    'form' => self::FROM_ROBOT,
-                    'content' => $content,
-                ];
+//                $content = Tools::curlGet($info[1]);
+//                $content = mb_convert_encoding($content, 'UTF-8');
+                    $data = [
+                        'rank' => $rank1[1] . ',' . $rank2[1],
+                        'search_num' => intval($searchNum[1]),
+                        'type' => self::TYPE_SHORT_MOBILE,
+                        'keywords' => $keywords[2],
+                        'url' => $info[1],
+                        'title' => $info[2],
+                        'form' => self::FROM_ROBOT,
+                        'content' => $url,
+                        'note' => $url,
+                    ];
 
-                list($code, $msg) = self::createOne($data);
-                if ($code < 0) {
-                    $error[] = $keywords[2] . $msg;
+                    $flag = 0;
+                    foreach (self::getNoAllow() as $no) {
+                        if (strpos($no, $keywords[2]) !== false) {
+                            $flag = 1;
+                        }
+                    }
+
+                    //当词语中包含一些不应该存在的词 则不保存
+                    if ($flag == 1) {
+                        continue;
+                    }
+
+                    list($code, $msg) = self::createOne($data);
+                    if ($code < 0) {
+                        $error[] = $keywords[2] . $msg;
+                    } else {
+                        //指数在10以下的时候 获取它的下拉词 以及相关搜索词 并且导入到词库
+                        if ($data['search_num'] <= 10) {
+                            sleep(1);
+                            //相关词 导入到长尾词库
+                            list($code, $longKeywords) = LongKeywords::getBaiduKey([
+                                'keywords' => $data['keywords'],
+                                'id' => $msg->id
+                            ], 0);
+
+                            if ($code < 0) {
+                                $error[] = $longKeywords;
+                            } else {
+                                $longKeywords = array_merge([$data['keywords']], $longKeywords);
+
+                                //导入到总词库
+                                list($code1, $msg1) = AllBaiduKeywords::setKeywordsAiZhan([
+                                    'type_id' => $rules->category_id,
+                                    'keywords' => implode(PHP_EOL, $longKeywords)
+                                ]);
+
+                                if ($code1 < 0) {
+                                    $error[] = $msg1;
+                                }
+                            }
+                        }
+                    }
                 }
+                self::dd($error);
             }
+
+            $rules->status = AizhanRules::STATUS_OVER;
+            $rules->updated_at = date('Y-m-d H:i:s');
+            $rules->save(false);
         }
-        exit('抓取完成！');
     }
 }

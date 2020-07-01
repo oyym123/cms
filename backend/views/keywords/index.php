@@ -1,8 +1,9 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use yii\widgets\Pjax;
+
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\search\KeywordsSearch */
@@ -11,20 +12,21 @@ use yii\widgets\Pjax;
 $this->title = '爱站关键词';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="keywords-index">
     <h1><?= Html::encode($this->title) ?></h1>
-    <p>
-        <button id="catch_aizhan" class="btn btn-primary"> 抓取爱站关键词</button>
-        <b id="topic"></b>
-        <br/>
-        <br/>
-        <input type="text" id="catch_value" class="form-control">
-    </p>
-
-    <br/>
-    <p>
-        <?= Html::a('创建新的关键词', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+<!--    <p>-->
+<!--        <button id="catch_aizhan" class="btn btn-primary"> 抓取爱站关键词</button>-->
+<!--        <b id="topic"></b>-->
+<!--        <br/>-->
+<!--        <br/>-->
+<!--        <input type="text" id="catch_value" class="form-control">-->
+<!--    </p>-->
+<!---->
+<!--    <br/>-->
+<!--    <p>-->
+<!--        --><?//= Html::a('创建新的关键词', ['create'], ['class' => 'btn btn-success']) ?>
+<!--    </p>-->
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -35,7 +37,30 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'keywords',
+
+            [
+                'label' => '关  　　　　　  键    　　　　　　　　词',
+                'attribute' => 'keywords',
+                'class' => 'kartik\grid\EditableColumn',
+                'editableOptions' => [
+                    'asPopover' => false,
+                ],
+            ],
+            [
+                'label' => '状    　　　　　    　　　　　态',
+                'attribute' => 'status',
+                'class' => 'kartik\grid\EditableColumn',
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_RADIO_LIST,
+                    'asPopover' => false,
+                    'data' => [0 => '关闭', 1 => '开启'],
+                ],
+                'value' => function ($model) {
+                    return \common\models\Base::getBaseS($model->status);
+                },
+                'filter' => [0 => '关闭', 1 => '开启'],
+            ],
+
             'search_num',
             'sort',
             [
@@ -58,7 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             'rank',
 
-            'title',
+//            'title',
             //'content:ntext',
             //'note',
             'url:url',
@@ -81,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         $.ajax({
             type: "GET",
-            url: 'index.php?r=keywords/catch&url=' + $("#catch_value").val(),
+            url: '/index.php/keywords/catch&url=' + $("#catch_value").val(),
             success: function (html) {
                 console.log(html);
                 if (html != '0') {

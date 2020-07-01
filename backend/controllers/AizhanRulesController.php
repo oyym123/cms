@@ -2,19 +2,19 @@
 
 namespace backend\controllers;
 
-use common\models\Base;
+use common\models\ArticleRules;
+use common\models\Category;
 use Yii;
-use common\models\Keywords;
-use common\models\search\KeywordsSearch;
-use yii\data\Pagination;
+use common\models\AizhanRules;
+use common\models\search\AizhanRulesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\helpers\Json;
+
 /**
- * KeywordsController implements the CRUD actions for Keywords model.
+ * AizhanRulesController implements the CRUD actions for AizhanRules model.
  */
-class KeywordsController extends Controller
+class AizhanRulesController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -32,30 +32,14 @@ class KeywordsController extends Controller
     }
 
     /**
-     * Lists all Keywords models.
+     * Lists all AizhanRules models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new KeywordsSearch();
-
+        $searchModel = new AizhanRulesSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        if (Yii::$app->request->post('hasEditable')) {
-            $id = Yii::$app->request->post('editableKey');
-            $model = Keywords::findOne(['id' => $id]);
-            $output = '';
-            $posted = current($_POST['Keywords']);
-            $post = ['Keywords' => $posted];
-            if ($model->load($post)) {
-                $model->save();
-                isset($posted['keywords']) && $output = $model->keywords;
-                isset($posted['status']) && $output = Base::getBaseS($model->status);
-                // 其他的这里就忽略了，大致可参考这个title
-            }
-            $out = Json::encode(['output'=>$output, 'message'=>'']);
-            return $out;
-        }
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -63,7 +47,7 @@ class KeywordsController extends Controller
     }
 
     /**
-     * Displays a single Keywords model.
+     * Displays a single AizhanRules model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -76,15 +60,31 @@ class KeywordsController extends Controller
     }
 
     /**
-     * Creates a new Keywords model.
+     * Creates a new AizhanRules model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Keywords();
+        $model = new AizhanRules();
+        if ($model->load(Yii::$app->request->post())) {
+            $category = Category::findOne($model->category_id);
+            $rules = ArticleRules::find()->where(['category_id' => $model->category_id])->one();
+            if ($rules) {
+                $model->domain_id = $rules->domain_id;
+                $model->column_id = $rules->column_id;
+            }
+            $site = AizhanRules::find()->where(['site_url' => $model->site_url])->one();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($site) {
+                Yii::$app->getSession()->setFlash('error', '该网址已经存在!');
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
+            $model->note = $category->intro;
+            $model->created_at = date('Y-m-d H:i:s');
+            $model->updated_at = date('Y-m-d H:i:s');
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -94,7 +94,7 @@ class KeywordsController extends Controller
     }
 
     /**
-     * Updates an existing Keywords model.
+     * Updates an existing AizhanRules model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -104,17 +104,26 @@ class KeywordsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $category = Category::findOne($model->category_id);
+            $rules = ArticleRules::find()->where(['category_id' => $model->category_id])->one();
+            if ($rules) {
+                $model->domain_id = $rules->domain_id;
+                $model->column_id = $rules->column_id;
+            }
+            $model->note = $category->intro;
+            $model->created_at = date('Y-m-d H:i:s');
+            $model->updated_at = date('Y-m-d H:i:s');
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Deletes an existing Keywords model.
+     * Deletes an existing AizhanRules model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -128,29 +137,18 @@ class KeywordsController extends Controller
     }
 
     /**
-     * Finds the Keywords model based on its primary key value.
+     * Finds the AizhanRules model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Keywords the loaded model
+     * @return AizhanRules the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Keywords::findOne($id)) !== null) {
+        if (($model = AizhanRules::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
-
-    /**
-     * @return array
-     * 抓取爱站网的数据
-     */
-    public function actionCatch()
-    {
-        Keywords::catchKeyWords();
-    }
-
-
 }

@@ -60,57 +60,57 @@ class BaiduKeywords extends Base
         //查询指定20个站 的规则
         $domainIds = [
 //            3,
-            25,    //arcf.org.cn
-            48,    //jlsds.org.cn
-            72,    //hbrl22.com
+//            25,    //arcf.org.cn
+//            48,    //jlsds.org.cn
+//            72,    //hbrl22.com
             16,    //0ww9.com
-            35,    //hsmengxiao.org.cn
-            38,    //ysjj.org.cn
-            63,    //xjscpt.org
+//            35,    //hsmengxiao.org.cn
+//            38,    //ysjj.org.cn
+//            63,    //xjscpt.org
             60,    //thszxxdyw.org.cn
             30,    //dglanglun.com
             39,    //xljd0571.com
             45,    //whsgtzydzhjjcy.org.cn
-            50,    //sclxfl.org.cn
-            47,    //hncf.org.cn
+//            50,    //sclxfl.org.cn
+//            47,    //hncf.org.cn
             34,    //hebjj.org.cn
-            32,    //jsflxh.org.cn
+//            32,    //jsflxh.org.cn
             20,    //qdmjsw.org.cn
-            53,    //fs120yy.com
-            41,    //cmru.org.cn
-            46,    //cxch.org.cn
-            76,    //xunke.org.cn
+//            53,    //fs120yy.com
+//            41,    //cmru.org.cn
+//            46,    //cxch.org.cn
+//            76,    //xunke.org.cn
             //-------------------------------
-            15,       //ztjyb.com
-            21,       //renjianfojiao.org
-            26,       //xiaozhan.org.cn
-            27,       //liyef.org.cn
-            28,       //yaoburan.com
-            29,       //jianqingyuan.cn
-            33,       //nuanlai.org.cn
-            36,       //hs1563.com
-            37,       //bhia.org.cn
-            42,       //lnifc.org.cn
-            43,       //apsba.org.cn
-            44,       //hljocs.org.cn
-            49,       //szwiser.org.cn
-            52,       //cp6rh.org.cn
-            56,       //ysttwh.org.cn
-            57,       //wgpg.org.cn
-            59,       //liticheku.org.cn
-            62,       //hncd888.com
-            64,       //hbrl11.com
-            65,       //sankou39.com
-            66,       //gdsfjy.org.cn
-            67,       //iotxing.org.cn
-            68,       //icwpi.org.cn
-            70,       //ktown.org.cn
-            74,       //agct.org.cn
-            75,       //7986.org.cn
-            77,       //pyfr.org.cn
-            78,       //jmsgfxx.org.cn
-            79,       //cf315.org.cn
-            80,       //styl.org.cn
+//            15,       //ztjyb.com
+//            21,       //renjianfojiao.org
+//            26,       //xiaozhan.org.cn
+//            27,       //liyef.org.cn
+//            28,       //yaoburan.com
+//            29,       //jianqingyuan.cn
+//            33,       //nuanlai.org.cn
+//            36,       //hs1563.com
+//            37,       //bhia.org.cn
+//            42,       //lnifc.org.cn
+//            43,       //apsba.org.cn
+//            44,       //hljocs.org.cn
+//            49,       //szwiser.org.cn
+//            52,       //cp6rh.org.cn
+//            56,       //ysttwh.org.cn
+//            57,       //wgpg.org.cn
+//            59,       //liticheku.org.cn
+//            62,       //hncd888.com
+//            64,       //hbrl11.com
+//            65,       //sankou39.com
+//            66,       //gdsfjy.org.cn
+//            67,       //iotxing.org.cn
+//            68,       //icwpi.org.cn
+//            70,       //ktown.org.cn
+//            74,       //agct.org.cn
+//            75,       //7986.org.cn
+//            77,       //pyfr.org.cn
+//            78,       //jmsgfxx.org.cn
+//            79,       //cf315.org.cn
+//            80,       //styl.org.cn
         ];
 
         return $domainIds;
@@ -325,7 +325,7 @@ class BaiduKeywords extends Base
         $domainIds = self::getDomainIds();
         //查询出所有的规则分类
         $articleRules = ArticleRules::find()->select('category_id')
-            //->where(['in', 'domain_id', $domainIds])
+            ->where(['in', 'domain_id', $domainIds])
             ->asArray()->all();
         $itemData = [];
 
