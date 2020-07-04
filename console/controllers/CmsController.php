@@ -1,9 +1,10 @@
 <?php
 
-
 namespace console\controllers;
 
+use common\models\BaiduKeywords;
 use common\models\DbName;
+use common\models\LongKeywords;
 use common\models\Tools;
 
 class CmsController extends \yii\console\Controller
@@ -60,5 +61,36 @@ class CmsController extends \yii\console\Controller
             Tools::curlGet($url);
         }
         print_r($arr);
+    }
+
+    /**
+     * 抓取百度关键词
+     */
+    public function actionCatchBd()
+    {
+        set_time_limit(0);
+        (new BaiduKeywords())->getSdkWords();
+    }
+
+    /**
+     * 抓取百度长尾词
+     */
+    public function actionCatchBaidu()
+    {
+        LongKeywords::getKeywords();
+    }
+
+    /** 生成泛目录缓存 */
+    public function cacheFan()
+    {
+        $url = 'https://www.ysjj.org.cn/?index.php&catch_web=1';
+        Tools::curlGet($url);
+    }
+
+    /** 生成泛目录缓存 */
+    public function pushFan()
+    {
+        $url = 'https://www.ysjj.org.cn/?index.php&push=1';
+        Tools::curlGet($url);
     }
 }
