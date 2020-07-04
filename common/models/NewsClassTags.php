@@ -35,6 +35,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
      */
     public static function setTags()
     {
+        $domain = Yii::$app->request->get('domain');
         //获取所有的 文章分类
         $class = NewsClass::find()->all();
         $tagsIds = $data = [];
@@ -61,7 +62,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $tagsArray = NewsTags::find()->where(['not in', 'tagid', $tagsIds])->asArray()->all();
 
         foreach ($data as $item) {
-            $tagStr .= '<a href="' . $_SERVER['HTTP_HOST'] . '/' . $item['class_path'] . '" target="_blank"><dl><dt>' . $item['class_name'] . '</dt><dl></a>';
+            $tagStr .= '<a href="/' . $item['class_path'] . '" target="_blank"><dl><dt>' . $item['class_name'] . '</dt><dd></a>';
             foreach ($item['tags'] as $tag) {
                 $tagStr .= '<a href="' . $tag['url'] . '">' . $tag['name'] . '</a>';
             }
@@ -74,9 +75,9 @@ class NewsClassTags extends \yii\db\ActiveRecord
             $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
         }
 
-        $tagStr .= '</dd></dt></dl>';
+        $tagStr .= '</dd></dl>';
 
-        $domain = Yii::$app->request->get('domain');
+
         $path = '/www/wwwroot/' . $domain . '/tags.html';
 
         $res = file_get_contents($path);
