@@ -15,7 +15,7 @@ class DirCatch extends \yii\db\ActiveRecord
 //        print_r($data);
 //        exit;
 
-        $dirPath = 'G:\每日文章\0外包软文\8.20 第三方 文章';
+        $dirPath = 'G:\每日文章\0外包软文\8.20 第三方 文章\已分发 2队\【8、26】G190817-4 weiSEO一 6-10\G190817-4 weiSEO一 6-10';
         $res = str_replace('\\', '/', $dirPath);
         $data = $this->getAllFileName($res);//调用函数，遍历C盘下的wampserver安装目录
         $resArr = $error = [];
@@ -26,10 +26,22 @@ class DirCatch extends \yii\db\ActiveRecord
             $str = end($arr);
             $title = substr($str, 0, strrpos($str, "."));
             $content = iconv('gbk', 'utf-8', file_get_contents($item));
+            $encode = mb_detect_encoding($str, array("ASCII",'UTF-8',"GB2312","GBK",'BIG5'));
+            $str_encode = mb_convert_encoding($str, 'UTF-8', $encode);
             $keywords = '';
-            $title = preg_replace('@\d(.*)?\\.@', '', $title);
-            $title = preg_replace('@\d(.*)?、@', '', $title);
+            //截取前面10个字符
+            $title = mb_substr($title, 0, 10);
 
+            $title = $this->cleanNum($title);
+
+            print_r($item);
+            exit;
+            $content1 = mb_substr($content, 10);
+            $content2 = mb_substr($content, 0, 10);
+            $content2 = $this->cleanNum($content);
+            $content = $content1 . $content2;
+
+            //按行分句
             if (stripos($content, '关键词') !== false) {
                 preg_match('@关键词(.*?)
 @', $content, $result);
@@ -41,10 +53,16 @@ class DirCatch extends \yii\db\ActiveRecord
             $partContent = array_filter(explode('
 ', $content));
             $a = [];
+
             foreach ($partContent as $value) {
-                if ($value != ' ') {
-                    $a[] = mb_convert_encoding($item, 'utf-8');
+                if ($value != ' ' && !empty($value)) {
+                    $a[] = mb_convert_encoding($value, 'utf-8');
                 }
+            }
+
+            if (empty($content)) {
+                $error[] = '文章内容为空!';
+                continue;
             }
 
             $part = json_encode($a, JSON_UNESCAPED_UNICODE);
@@ -62,7 +80,9 @@ class DirCatch extends \yii\db\ActiveRecord
                 'content' => $content,
                 'created_at' => date('Y-m-d H:i:s'),
             ];
+
             $resArr[] = $dataSave;
+
             list($code, $msg) = WhiteArticle::createOne($dataSave);
 
             if ($code < 0) {
@@ -75,19 +95,18 @@ class DirCatch extends \yii\db\ActiveRecord
         exit;
     }
 
-    /** 将word文档转成html */
-    public function word2html($wfilepath, $htmlname = '1.html')
+
+    /** 去除开头的数字序号 */
+    public function cleanNum($content)
     {
-        $word = new \COM("word.application") or die("Unable to instanciate Word");
-        $word->Visible = 1;
-        $word->Documents->Open($wfilepath);
-        $word->Documents[1]->SaveAs($htmlname, 8);
-        $word->Quit();
-        $word = null;
-        unset($word);
+        $content = preg_replace('@\d(.*)?\\.@', '', $content);
+        $content = preg_replace('@\d(.*)?、@', '', $content);
+        $num = intval($content);
+        $content = str_replace($num, '', $content);
+        return $content;
     }
 
-    /** 获取目录下所有的文件名称  */
+    /** 递归获取目录下所有的文件名称  */
     public function getAllFileName($directory, &$fileArr = [])
     {
 
@@ -108,35 +127,4 @@ class DirCatch extends \yii\db\ActiveRecord
         return $fileArr;
     }
 
-    /**
-     * @param $dir
-     */
-    public function findDir($dir)
-    {
-        $num = 0;    //用来记录目录下的文件个数
-        $dirname = $dir; //要遍历的目录名字
-        $dir_handle = opendir($dirname);
-
-        echo '<table border="1" align="center" width="960px" cellspacing="0" cellpadding="0">';
-        echo '<caption><h2>目录' . $dirname . '下面的内容</h2></caption>';
-        echo '<tr align="left" bgcolor="#cccccc">';
-        echo '<th>文件名</th><th>文件大小</th><th>文件类型</th><th>修改时间</th></tr>';
-        while ($file = readdir($dir_handle)) {
-            if ($file != "." && $file != "..") {
-                $dirFile = $dirname . "/" . $file;
-                if ($num++ % 2 == 0)    //隔行换色
-                    $bgcolor = "#ffffff";
-                else
-                    $bgcolor = "#cccccc";
-                echo '<tr bgcolor=' . $bgcolor . '>';
-                echo '<td>' . $file . '</td>';
-                echo '<td>' . filesize($dirFile) . '</td>';
-                echo '<td>' . filetype($dirFile) . '</td>';
-                echo '<td>' . date("Y/n/t", filemtime($dirFile)) . '</td>';
-                echo '</tr>';
-            }
-        }
-        echo '</table>';
-        closedir($dir_handle);
-    }
 }

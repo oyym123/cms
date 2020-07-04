@@ -67,7 +67,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
             $tagStr .= '</dd></dt></dl>';
         }
 
-        $tagStr .= '<dt>其他</dt><dd>';
+        $tagStr .= '<dl><dt>其他</dt><dd>';
 
         foreach ($tagsArray as $tag) {
             $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
