@@ -52,6 +52,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
             $data[] = [
                 'class_id' => $cl->classid,
                 'class_name' => $cl->classname,
+                'class_path' => $cl->classpath,
                 'tags' => $tagArr
             ];
         }
@@ -60,7 +61,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $tagsArray = NewsTags::find()->where(['not in', 'tagid', $tagsIds])->asArray()->all();
 
         foreach ($data as $item) {
-            $tagStr .= '<dl><dt>' . $item['class_name'] . '</dt><dd>';
+            $tagStr .= '<a href="' . $_SERVER['HTTP_HOST'] . '/' . $item['class_path'] . '" target="_blank"><dl><dt>' . $item['class_name'] . '</dt><dl></a>';
             foreach ($item['tags'] as $tag) {
                 $tagStr .= '<a href="' . $tag['url'] . '">' . $tag['name'] . '</a>';
             }
