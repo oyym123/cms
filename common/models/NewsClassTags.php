@@ -62,18 +62,18 @@ class NewsClassTags extends \yii\db\ActiveRecord
 
         foreach ($data as $item) {
             $tagStr .= '<br/>';
-            $tagStr .= '<div id="content"><dd><strong>' . $item['class_name'] . '</strong><dd></div>';
+            $tagStr .= '<div id="content"><dd><strong>' . $item['class_name'] . '</strong></dd></div>';
 
             foreach ($item['tags'] as $tag) {
-                $tagStr .= '<dl><a href="' . $tag['url'] . '">' . $tag['name'] . '<dl></a>';
+                $tagStr .= '<dl><a href="' . $tag['url'] . '">' . $tag['name'] . '</dl></a>';
             }
         }
 
         $tagStr .= '<br/>';
-        $tagStr .= '<dd><strong>其他</strong><dd></div>';
+        $tagStr .= '<dd><strong>其他</strong></dd></div>';
 
         foreach ($tagsArray as $tag) {
-            $tagStr .= '<dl><a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a><dl>';
+            $tagStr .= '<dl><a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a></dl>';
         }
 
         $domain = Yii::$app->request->get('domain');
