@@ -62,21 +62,18 @@ class NewsClassTags extends \yii\db\ActiveRecord
 
         foreach ($data as $item) {
             $tagStr .= '<br/>';
-            $tagStr .= '<div class="map w120 m0a mt90"><strong>' . $item['class_name'] . '</strong></div>';
-            $tagStr .= '<br/>';
+            $tagStr .= '<div id="content"><dd><strong>' . $item['class_name'] . '</strong><dd></div>';
+
             foreach ($item['tags'] as $tag) {
-                $tagStr .= '<a href="' . $tag['url'] . '">' . $tag['name'] . '</a>';
-                $tagStr .= '<br/>';
+                $tagStr .= '<dl><a href="' . $tag['url'] . '">' . $tag['name'] . '<dl></a>';
             }
         }
 
         $tagStr .= '<br/>';
-        $tagStr .= '<div class="map w120 m0a mt90"><strong>其他</strong></div>';
-        $tagStr .= '<br/>';
+        $tagStr .= '<dd><strong>其他</strong><dd></div>';
 
         foreach ($tagsArray as $tag) {
-            $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
-            $tagStr .= '<br/>';
+            $tagStr .= '<dl><a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a><dl>';
         }
 
         $domain = Yii::$app->request->get('domain');
