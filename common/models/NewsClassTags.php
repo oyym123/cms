@@ -59,22 +59,21 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $tagStr = '';
         $tagsArray = NewsTags::find()->where(['not in', 'tagid', $tagsIds])->asArray()->all();
 
-
         foreach ($data as $item) {
-            $tagStr .= '<br/>';
-            $tagStr .= '<div id="content"><dd><strong>' . $item['class_name'] . '</strong></dd></div>';
-
+            $tagStr .= '<dl><dt>' . $item['class_name'] . '</dt><dd>';
             foreach ($item['tags'] as $tag) {
-                $tagStr .= '<dl><a href="' . $tag['url'] . '">' . $tag['name'] . '</dl></a>';
+                $tagStr .= '<a href="' . $tag['url'] . '">' . $tag['name'] . '</a>';
             }
+            $tagStr .= '</dd></dt></dl>';
         }
 
-        $tagStr .= '<br/>';
-        $tagStr .= '<dd><strong>其他</strong></dd></div>';
+        $tagStr .= '<dt>其他</dt><dd>';
 
         foreach ($tagsArray as $tag) {
-            $tagStr .= '<dl><a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a></dl>';
+            $tagStr .= '<a href="' . '/e/tags/?tagid=' . $tag['tagid'] . '">' . $tag['tagname'] . '</a>';
         }
+
+        $tagStr .= '</dd></dt></dl>';
 
         $domain = Yii::$app->request->get('domain');
         $path = '/www/wwwroot/' . $domain . '/tags.html';
