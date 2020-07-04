@@ -30,13 +30,34 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'm_down_name',
-            'm_seach_name',
-            'm_related_name',
+            'keywords',
+            [
+                'label' => '移动端下拉框',
+                'format' => 'raw',
+                'attribute' => 'm_down_name',
+                'value' => function ($model) {
+                    return implode(' |  ', json_decode($model->m_down_name, true));
+                }
+            ],
+            [
+                'label' => '移动端其他人搜索',
+                'format' => 'raw',
+                'attribute' => 'm_search_name',
+                'value' => function ($model) {
+                    return implode(' |  ', json_decode($model->m_search_name, true));
+                }
+            ],
+            [
+                'label' => '移动端相关搜索',
+                'format' => 'raw',
+                'attribute' => 'm_related_name',
+                'value' => function ($model) {
+                    return implode(' |  ', json_decode($model->m_related_name, true));
+                }
+            ],
             'pc_down_name',
             'pc_search_name',
             'pc_related_name',
-            'keywords',
             'key_id',
             'key_search_num',
             'status',

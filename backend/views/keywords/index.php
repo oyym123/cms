@@ -8,7 +8,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel common\models\search\KeywordsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '关键词';
+$this->title = '爱站关键词';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="keywords-index">

@@ -2,8 +2,11 @@
 
 namespace frontend\controllers;
 
+use common\models\BaiduKeywords;
+use common\models\BaiDuSdk;
 use common\models\CmsAction;
 use common\models\DbName;
+use common\models\DirCatch;
 use common\models\Keywords;
 use common\models\LongKeywords;
 use common\models\NewsClassTags;
@@ -100,8 +103,15 @@ class CmsController extends Controller
      */
     public function actionCatchBaidu()
     {
-        LongKeywords::getBaiduKey();
+        LongKeywords::getKeywords();
     }
 
-
+    /**
+     * 抓取文章目录
+     */
+    public function actionDirCatch()
+    {
+        (new DirCatch())->catchArticle();
+    }
+    
 }
