@@ -37,4 +37,5 @@ class NewsClass extends \yii\db\ActiveRecord
     {
         return self::findAll();
     }
+
 }

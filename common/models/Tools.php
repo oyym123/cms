@@ -50,4 +50,12 @@ class Tools extends \yii\db\ActiveRecord
         return $output;
     }
 
+    //清除html标签
+    public static function cleanHtml($str)
+    {
+        $content = strip_tags($str);
+        $content = str_replace('&#xa0;', PHP_EOL, $content);
+        $content = str_replace('　　', PHP_EOL, $content);
+        return $content;
+    }
 }

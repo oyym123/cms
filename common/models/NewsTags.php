@@ -70,7 +70,7 @@ class NewsTags extends \yii\db\ActiveRecord
                 } else {
                     $domain = $db->domain;
                 }
-
+                
                 $urls[] = $domain . '/e/tags/?tagid=' . $re->tagid;
 
                 $info[] = [
