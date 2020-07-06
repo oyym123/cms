@@ -25,6 +25,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
 {
     const TYPE_DOC_TXT = 10;  //txt获取
     const TYPE_DOC_WORD = 20; //word文档获取
+    const TYPE_MANUALLY_WRITTEN = 30; //人工编写
 
     const STATUS_ENABLE = 10;   //有效
     const STATUS_DISABLE = 20;  //无效
@@ -44,6 +45,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
         $data = [
             self::TYPE_DOC_TXT => 'txt获取',
             self::TYPE_DOC_WORD => 'word文档获取',
+            self::TYPE_MANUALLY_WRITTEN => '手动编写',
         ];
         return $key === 'all' ? $data : $data[$key];
     }
@@ -52,9 +54,9 @@ class WhiteArticle extends \yii\db\ActiveRecord
     public static function getStatus($key = 'all')
     {
         $data = [
-            self::STATUS_ENABLE => '有效',
-            self::STATUS_DISABLE => '无效',
+            self::STATUS_ENABLE => '审核有效',
             self::STATUS_DRAFT => '草稿',
+            self::STATUS_DISABLE => '无效作废',
         ];
         return $key === 'all' ? $data : $data[$key];
     }
@@ -89,7 +91,8 @@ class WhiteArticle extends \yii\db\ActiveRecord
             'cut_word' => '切词',
             'image_urls' => '图片地址',
             'from_path' => '来源地址',
-            'db_id' => '数据库id',
+            'db_id' => '数据库名称',
+            'db_class_id' => '栏目',
             'db_name' => '数据库名称',
             'status' => '状态',
             'push_time' => '发布时间',
@@ -125,7 +128,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
     /** 获取数据库栏目分类数据 */
     public static function getDbClass()
     {
-        $url = 'http://' . $_SERVER['SERVER_ADDR'] . '/index.php?r=cms/get-class&db_name=jk8818com';
+        $url = 'http://' . '116.193.169.122:89' . '/index.php?r=cms/get-class&db_name=thszxxdyw';
         $res = json_decode(Tools::curlGet($url), true);
         $arr = [];
         foreach ($res as $item) {
@@ -145,5 +148,5 @@ class WhiteArticle extends \yii\db\ActiveRecord
         }
         return $arr;
     }
-    
+
 }

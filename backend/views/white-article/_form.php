@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="white-article   -form">
+<div class="white-article-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
@@ -16,23 +16,25 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'type')->textInput() ?>
-
-    <?= $form->field($model, 'key_id')->textInput() ?>
+    <!--    --><? //= $form->field($model, 'key_id')->textInput() ?>
 
     <?= $form->field($model, 'keywords')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'cut_word')->textInput(['maxlength' => true]) ?>
+    <!--    --><? //= $form->field($model, 'cut_word')->textInput(['maxlength' => true]) ?>
 
     <!--    --><? //= $form->field($model, 'image_urls')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'db_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'db_id')->dropDownList(\common\models\DbName::getDbName(), ['prompt' => '--请选择数据库--']) ?>
+
+    <?= $form->field($model, 'db_class_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
+    
+    <?= $form->field($model, 'db_tags_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
 
     <?= $form->field($model, 'from_path')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'word_count')->textInput() ?>
+    <!--    --><? //= $form->field($model, 'word_count')->textInput() ?>
 
-    <!--    --><? //= $form->field($model, 'part_content')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'status')->dropDownList(\common\models\WhiteArticle::getStatus(), ['value' => \common\models\WhiteArticle::STATUS_ENABLE]) ?>
 
     <?= $form->field($model, 'content')->widget('common\widgets\ueditor\Ueditor', [
 //        'options'=>[
@@ -40,14 +42,31 @@ use yii\widgets\ActiveForm;
 //        ]
     ]) ?>
 
-    <?= $form->field($model, 'created_at')->textInput() ?>
+    <!--    --><? //= $form->field($model, 'created_at')->textInput() ?>
 
-    <?= $form->field($model, 'updated_at')->textInput() ?>
+    <!--    --><? //= $form->field($model, 'type')->dropDownList(\common\models\WhiteArticle::getType(), ['value' => \common\models\WhiteArticle::TYPE_MANUALLY_WRITTEN]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('保存', ['class' => 'btn btn-success']) ?>
     </div>
-
     <?php ActiveForm::end(); ?>
-
 </div>
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script>
+    $("#whitearticle-db_id").change(function () {
+        var html = '';
+        $.ajax({
+            url: 'index.php?r=white-article/get-class',
+            type: 'GET',
+            dataType: 'json',
+            data: {db_name: $("#whitearticle-db_id").find("option:selected").text()},
+            success: function (msg) {
+                $.each(msg, function (key, val) {
+                    html += '<option value="' + key + '">' + val + '</option>';
+                });
+                $("#whitearticle-db_class_id").html(html);
+            }
+        })
+    });
+</script>

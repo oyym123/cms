@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'status',
                 'content' => function ($model, $key, $index, $column) {
                     $domain = str_replace('m.', '', $model->domain);
-                    return '<a href="' . 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-tags&db_name=' . $model->name . '&domain=' . $domain . '" target="_blank">点击更新</a>';
+                    return '<a href="' . '/index.php?r=db-name/set-tags&db_name=' . $model->name . '&domain=' . $domain . '" target="_blank">点击更新</a>';
                 }
             ],
             'updated_at',

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\NewsClassTags;
 use Yii;
 use common\models\DbName;
 use common\models\search\DbNameSearch;
@@ -124,4 +125,14 @@ class DbNameController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+    /**
+     * tags页面数据展示
+     *
+     */
+    public function actionSetTags()
+    {
+        NewsClassTags::setTags();
+    }
+
 }

@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use common\models\NewsClass;
+use common\models\NewsClassTags;
 use Yii;
 use common\models\WhiteArticle;
 use common\models\search\WhiteArticleSearch;
@@ -121,7 +123,17 @@ class WhiteArticleController extends Controller
         if (($model = WhiteArticle::findOne($id)) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionGetClass()
+    {
+        $res = NewsClass::find()->where([])->asArray()->all();
+        $arr = [];
+        foreach ($res as $item) {
+            $arr[$item['classid']] = $item['classname'];
+        }
+        echo json_encode($arr);
+        exit;
     }
 }
