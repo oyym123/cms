@@ -9,6 +9,7 @@ use common\models\DbName;
 use common\models\DirCatch;
 use common\models\Keywords;
 use common\models\LongKeywords;
+use common\models\NewsClass;
 use common\models\NewsClassTags;
 use common\models\NewsTags;
 use common\models\Tools;
@@ -68,7 +69,7 @@ class CmsController extends Controller
                 if ($limitTime < 63 && $limitTime > 0) { //表示执行
                     print_r($limitTime);
                     Tools::writeLog($re->name . '已执行');
-                    $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
+                    $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms&db_name=' . $re->name;
                     $arr[] = $url;
                     Tools::curlGet($url);
                 } else {
@@ -82,7 +83,7 @@ class CmsController extends Controller
     }
 
     /** 爬取关键词
-     * http://116.193.169.122:89/index.php?r=cms/catch-key
+     * http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/catch-key
      */
     public function actionCatchKey()
     {
@@ -111,7 +112,22 @@ class CmsController extends Controller
      */
     public function actionDirCatch()
     {
-        (new DirCatch())->catchArticle();
+        (new DirCatch())->catchHtmlArticle();
     }
-    
+
+    /** 获取所有的数据库的class分类 */
+    public function actionGetClass()
+    {
+        $res = NewsClass::find()->where([])->asArray()->all();
+        echo json_encode($res);
+        exit;
+    }
+
+    /** 获取所有的数据库的tags分类 */
+    public function actionGetTags()
+    {
+        $res = NewsClassTags::find()->where([])->asArray()->all();
+        echo json_encode($res);
+        exit;
+    }
 }

@@ -36,7 +36,10 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
+    
     $menuItems = [
+        ['label' => '黑帽文章', 'url' => ['/black-article/index']],
+        ['label' => '白帽文章', 'url' => ['/white-article/index']],
         ['label' => '百度关键词', 'url' => ['/baidu-keywords/index']],
         ['label' => '下拉框关键词', 'url' => ['/long-keywords/index']],
         ['label' => '爱站关键词', 'url' => ['/keywords/index']],
@@ -44,6 +47,7 @@ AppAsset::register($this);
         ['label' => 'CMS 数据库', 'url' => ['/db-name/index']],
         ['label' => 'Home', 'url' => ['/site/index']],
     ];
+
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
@@ -56,6 +60,7 @@ AppAsset::register($this);
             . Html::endForm()
             . '</li>';
     }
+
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => $menuItems,

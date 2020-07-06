@@ -30,7 +30,7 @@ class CmsController extends \yii\console\Controller
                 if ($limitTime < 90 && $limitTime > 0) { //表示执行
                     print_r($limitTime);
                     Tools::writeLog($re->name . '已执行');
-                    $url = 'http://116.193.169.122:89/index.php?r=cms&db_name=' . $re->name;
+                    $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms&db_name=' . $re->name;
                     $arr[] = $url;
                     Tools::curlGet($url);
                 } else {
@@ -56,7 +56,7 @@ class CmsController extends \yii\console\Controller
         //遍历每个数据库，推送
         foreach ($res as $re) {
             $domain = str_replace('m.', '', $re->domain);
-            $url = 'http://116.193.169.122:89/index.php?r=cms/set-tags&db_name=' . $re->name . '&domain=' . $domain;
+            $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-tags&db_name=' . $re->name . '&domain=' . $domain;
             $arr[] = $url;
             Tools::curlGet($url);
         }
