@@ -146,12 +146,16 @@ class DirCatch extends \yii\db\ActiveRecord
 //            print_r($title);
 //            exit;
 
+
             //获取纯文本
             $contentTxt = Tools::cleanHtml($content);
             $partContent = array_filter(explode('
 ', $contentTxt));
-            $a = [];
 
+            //除掉杂乱标签
+            $content = str_replace('&#xa0;', '', $content);
+
+            $a = [];
             foreach ($partContent as $value) {
                 if ($value != ' ' && !empty($value)) {
                     $a[] = mb_convert_encoding($value, 'utf-8');
