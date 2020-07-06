@@ -93,6 +93,9 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $str2 = str_replace('<div class="tags"></div>', '<div class="tags">' . $tagStr . '</div>', $res2);
         file_put_contents($path2, $str2);
 
+        echo '<h1 style="color: green">标签更新成功</h1>';
+        echo '<a href="/"><h2>点击返回</h2></a>';
         exit;
     }
+
 }
