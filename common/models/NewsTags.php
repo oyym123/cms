@@ -59,7 +59,6 @@ class NewsTags extends \yii\db\ActiveRecord
         if (!$model->save()) {
             return [-1, $model->getErrors()];
         }
-
         return [1, $model];
     }
 
