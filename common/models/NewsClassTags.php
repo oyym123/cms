@@ -54,7 +54,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
                 'class_id' => $cl->classid,
                 'class_name' => $cl->classname,
                 'class_path' => $cl->classpath,
-                '   tags' => $tagArr
+                'tags' => $tagArr
             ];
         }
 
