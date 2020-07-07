@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Keywords;
 use Yii;
 use common\models\BaiduKeywords;
 use common\models\search\BaiduKeywordsSearch;
@@ -125,5 +126,25 @@ class BaiduKeywordsController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /** 获取标签 */
+    public function actionGetTags()
+    {
+        $q = Yii::$app->request->get('q','');
 
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!$q) {
+            return $out;
+        }
+
+        $data = Keywords::find()
+            ->select('id, keywords as text')
+            ->andFilterWhere(['like', 'title', $q])
+            ->limit(50)
+            ->asArray()
+            ->all();
+
+        $out['results'] = array_values($data);
+        return $out;
+    }
 }

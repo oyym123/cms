@@ -36,6 +36,33 @@ class NewsTags extends \yii\db\ActiveRecord
         ];
     }
 
+    /** 创建一个tags标签 */
+    public static function createOne($data)
+    {
+        if (empty($data['tagname'])) {
+            return [-1, '没有标签名称'];
+        }
+
+        $tags = self::find()->where(['tagname' => $data['tagname']])->one();
+
+        if (!empty($tags)) {
+            return [-1, '关键词重复'];
+        }
+
+        $model = new NewsTags();
+        $model->tagname = $data['tagname'];
+        $model->tagtitle = $data['tagname'];
+        $model->tagkey = $data['tagname'];
+        $model->tagdes = $data['tagname'];
+        $model->fclast = time();
+
+        if (!$model->save()) {
+            return [-1, $model->getErrors()];
+        }
+
+        return [1, $model];
+    }
+
     /**
      * 获取不同数据库的数据
      *
@@ -70,7 +97,7 @@ class NewsTags extends \yii\db\ActiveRecord
                 } else {
                     $domain = $db->domain;
                 }
-                
+
                 $urls[] = $domain . '/e/tags/?tagid=' . $re->tagid;
 
                 $info[] = [

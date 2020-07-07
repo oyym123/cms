@@ -27,10 +27,39 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'db_id')->dropDownList(\common\models\DbName::getDbName(), ['prompt' => '--请选择数据库--']) ?>
 
     <?= $form->field($model, 'db_class_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
-    
-    <?= $form->field($model, 'db_tags_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
+
+
 
     <?= $form->field($model, 'from_path')->textInput(['maxlength' => true]) ?>
+    <?=
+
+    $form->field($model, 'db_tags_id')->widget(\kartik\select2\Select2::classname(), [
+        'options' => ['placeholder' => '请输入标签 ...'],
+        'pluginOptions' => [
+            'id' => new \yii\web\JsExpression("function(rs) {
+                return rs.taskId;
+            }"),
+            'placeholder' => 'search ...',
+            'multiple' => true,
+            'allowClear' => true,
+            'language' => [
+                'errorLoading' => new \yii\web\JsExpression("function () { return 'Waiting...'; }"),
+            ],
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['baidu-keywords/get-tags']),
+                'dataType' => 'json',
+                'data' => new \yii\web\JsExpression('function(params) {
+                return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new \yii\web\JsExpression('function (markup) {
+             return markup; }'),
+            'templateResult' => new \yii\web\JsExpression('function(res) {
+             return res.text; }'),
+            'templateSelection' => new \yii\web\JsExpression('function (res) {
+             return res.text; }'),
+        ],
+    ]);
+    ?>
 
     <!--    --><? //= $form->field($model, 'word_count')->textInput() ?>
 
