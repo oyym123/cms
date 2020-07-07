@@ -54,7 +54,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
                 'class_id' => $cl->classid,
                 'class_name' => $cl->classname,
                 'class_path' => $cl->classpath,
-                'tags' => $tagArr
+                '   tags' => $tagArr
             ];
         }
 
@@ -98,4 +98,18 @@ class NewsClassTags extends \yii\db\ActiveRecord
         exit;
     }
 
+    /** 将tags插入到选中的数据库中 */
+    public static function createOne($data)
+    {
+        //保存tags索引表
+        $model = new NewsClassTags();
+        $model->tagid = $data['tagid'];
+        $model->classid = $data['classid'];
+        $model->id = $data['id'];
+        $model->newstime = time();
+        $model->mid = 1;
+        if (!$model->save()) {
+            return [-1, $model->getErrors()];
+        }
+    }
 }

@@ -2,8 +2,11 @@
 
 namespace backend\controllers;
 
+use common\models\DbName;
 use common\models\NewsClass;
 use common\models\NewsClassTags;
+use common\models\NewsData;
+use common\models\Tools;
 use Yii;
 use common\models\WhiteArticle;
 use common\models\search\WhiteArticleSearch;
@@ -67,7 +70,6 @@ class WhiteArticleController extends Controller
     public function actionCreate()
     {
         $model = new WhiteArticle();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -87,9 +89,28 @@ class WhiteArticleController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $data = Yii::$app->request->post('WhiteArticle');
+        if ($model->load(Yii::$app->request->post())) {
+            if (empty($data['db_id'])) {
+                echo '请选择数据库';
+                exit;
+            }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $dbName = DbName::find()->where(['id' => $data['db_id']])->one()->name;
+            $data['db_name'] = $dbName;
+            $data['db_tags_id'] = json_encode($data['db_tags_id']);
+
+            //异步发送请求保存数据到CMS数据库
+            $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
+            echo $url;
+            $arr[] = $url;
+            $res = Tools::curlPost($url, $data);
+            echo '<pre>';
+            print_r($res);
+            exit;
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [

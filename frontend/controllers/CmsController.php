@@ -11,6 +11,7 @@ use common\models\Keywords;
 use common\models\LongKeywords;
 use common\models\NewsClass;
 use common\models\NewsClassTags;
+use common\models\NewsData;
 use common\models\NewsTags;
 use common\models\Tools;
 use frontend\models\ResendVerificationEmailForm;
@@ -32,6 +33,9 @@ use frontend\models\ContactForm;
  */
 class CmsController extends Controller
 {
+
+    public $enableCsrfValidation = false;
+
     /**
      * Displays homepage.
      * http://yii.com/index.php?r=cms
@@ -130,4 +134,18 @@ class CmsController extends Controller
         echo json_encode($res);
         exit;
     }
+
+    /** 保存文章到CMS数据库 */
+    public function actionSetArticle()
+    {
+        $res = Yii::$app->request->post();
+        Tools::writeLog($res, 'article.log');
+        list($code, $msg) = NewsData::createOne($res);
+        if ($code < 0) {
+            echo '<pre>';
+            print_r($msg);
+            exit;
+        }
+    }
+
 }
