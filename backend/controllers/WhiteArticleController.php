@@ -91,9 +91,9 @@ class WhiteArticleController extends Controller
         $model = $this->findModel($id);
         $data = Yii::$app->request->post('WhiteArticle');
         if ($model->load(Yii::$app->request->post())) {
-            if (empty($data['db_id'])) {
-                echo '请选择数据库';
-                exit;
+            if (empty($data['db_tags_id'])) {
+                Yii::$app->getSession()->setFlash('error', '请填写标签！');
+                return $this->redirect(['update', 'id' => $model->id]);
             }
 
             $dbName = DbName::find()->where(['id' => $data['db_id']])->one()->name;
@@ -102,12 +102,9 @@ class WhiteArticleController extends Controller
 
             //异步发送请求保存数据到CMS数据库
             $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
-            echo $url;
             $arr[] = $url;
-            $res = Tools::curlPost($url, $data);
-            echo '<pre>';
-            print_r($res);
-            exit;
+            Tools::curlPost($url, $data);
+            
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }

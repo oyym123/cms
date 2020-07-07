@@ -31,6 +31,7 @@ use yii\widgets\ActiveForm;
 
 
     <?= $form->field($model, 'from_path')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'title_img')->fileInput(['maxlength' => true]) ?>
     <?=
 
     $form->field($model, 'db_tags_id')->widget(\kartik\select2\Select2::classname(), [

@@ -91,6 +91,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
             'cut_word' => '切词',
             'image_urls' => '图片地址',
             'from_path' => '来源地址',
+            'title_img' => '标题图片',
             'db_id' => '数据库名称',
             'db_class_id' => '栏目',
             'db_tags_id' => '标签名称',
