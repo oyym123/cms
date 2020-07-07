@@ -89,8 +89,8 @@ class NewsClassTags extends \yii\db\ActiveRecord
         $path2 = '/www/wwwroot/' . $domain . '/m/tags.html';
         $res2 = file_get_contents($path2);
         //复位
-        $res2 = preg_replace('@<div class="tags">(.*)?</div>@s', '<div class="tags"></div>', $res2);
-        $str2 = str_replace('<div class="tags"></div>', '<div class="tags">' . $tagStr . '</div>', $res2);
+        $res2 = preg_replace('@<div class="content">(.*)?</div>@s', '<div class="content"></div>', $res2);
+        $str2 = str_replace('<div class="content"></div>', '<div class="content">' . $tagStr . '</div>', $res2);
         file_put_contents($path2, $str2);
 
         echo '<h1 style="color: green">标签更新成功</h1>';
