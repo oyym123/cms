@@ -45,7 +45,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
             foreach ($tags as $tag) {
                 $tagName = NewsTags::find()->where(['tagid' => $tag->tagid])->one();
                 //去重
-                if (!in_array($tagName, array_column($tagArr, 'name'))) {
+                if (!in_array($tagName->tagname, array_column($tagArr, 'name'))) {
                     $tagArr[] = [
                         'name' => $tagName ? $tagName->tagname : '',
                         'url' => '/e/tags/?tagid=' . $tag->tagid
