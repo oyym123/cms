@@ -43,7 +43,7 @@ class NewsClassTags extends \yii\db\ActiveRecord
             $tags = self::find()->where(['classid' => $cl->classid])->one();
             $tagArr = [];
             foreach ($tags as $tag) {
-                $tagName = NewsTags::find()->where(['tagid' => $tag->tagid])->one();
+                $tagName = NewsTags::find()->where(['tagid' => $tag->tagid])->all();
                 //去重
                 if (!in_array($tagName, array_column($tagArr, 'name'))) {
                     $tagArr[] = [
