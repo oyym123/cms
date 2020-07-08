@@ -39,17 +39,20 @@ class NewsData extends \yii\db\ActiveRecord
 //        print_r($data['WhiteArticle']);
 //        exit;
 
-
         //获取最后一个id
         $lastId = self::find()->orderBy('id desc')->one()->id;
-
+        if (!empty($data['db_tags_id'])) {
+            $data['db_tags_id'] = json_decode($data['db_tags_id'], true);
+        }
+        //获取第一个关键词 作为该文章的关键词
+        $tagname = BaiduKeywords::find()->where(['id' => $data['db_tags_id'][0]])->one()->keywords;
         $model = new NewsData();
         $model->id = $lastId + 1;
         $model->classid = $data['db_class_id'];
         $model->dokey = 1;
-        $model->infotags = '';
-        $model->writer = '何马';
-        $model->befrom = 'Yii2';
+        $model->infotags = $tagname;
+        $model->writer = '小仲马';
+        $model->befrom = '何马英语';
         $model->newstext = $data['content'];
 
         //保存文章
@@ -57,16 +60,26 @@ class NewsData extends \yii\db\ActiveRecord
             return [-1, $model->getErrors()];
         }
 
-        //文章索引保存
+        //保存索引
+        list($indexCode, $indexMsg) = NewsInfoIndex::createOne($data);
+        if ($indexCode < 0) {
+            $error[] = $indexMsg;
+        }
+
+        //获取classname
+        $clasPath = NewsClass::find()->where(['classid' => $data['db_class_id']])->one()->classpath;
+        //获取纯文本
+        $contentTxt = Tools::cleanHtml($data['content']);
+        //文章内容保存
         $info = [
             'classid' => $data['db_class_id'],
             'filename' => $model->id,
-            'titleurl' => '',
-            'keyboard' => '',
-            'title' => '',
-            'titlepic' => '',    //标题图片
+            'titleurl' => '/' . $clasPath . '/' . $model->id . '.html',
+            'keyboard' => $data['title'],
+            'title' => $data['title'],
+            'titlepic' => 'https://www.thszxxdyw.org.cn/d/file/p/2020/06-28/637035e2da1f0a3f541451cb96e2fe0e.jpg',    //标题图片
             'ftitle' => '',
-            'smalltext' => '',   //文章简介
+            'smalltext' => mb_substr($contentTxt, 0, 25),   //文章简介
         ];
 
         list($codeInfo, $msgInfo) = NewsInfo::createOne($info);
@@ -75,12 +88,12 @@ class NewsData extends \yii\db\ActiveRecord
         }
 
         if (!empty($data['db_tags_id'])) {
-            $data['db_tags_id'] = json_decode($data['db_tags_id'], true);
             //保存所有的标签
             foreach ($data['db_tags_id'] as $item) {
                 $tags = [
                     'tagname' => BaiduKeywords::find()->where(['id' => $item])->one()->keywords,
                 ];
+
                 //插入标签
                 list($codeTags, $msgTags) = NewsTags::createOne($tags);
 
@@ -100,10 +113,20 @@ class NewsData extends \yii\db\ActiveRecord
                 }
             }
             if (empty($error)) {
-                return [1, 'success'];
+                return [1, $model->id];
             } else {
                 return [-1, $error];
             }
         }
+    }
+
+    /** 生成静态页面 */
+    public static function setStaticHtml($classId, $newsId)
+    {
+        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/e/heshao/ecmschtml.php?enews=ReNewsHtml&classid=&retype=&startday=&endday=&startid=&endid=&havehtml=1&reallinfotime=1594190732&tbname=news&yii2_msg=1&news_id=' . $newsId . '&classid=' . $classId . '&list_html=1';
+        $res = Tools::curlGet($url);
+        echo '<pre>';
+        print_r($res);
+        exit;
     }
 }
