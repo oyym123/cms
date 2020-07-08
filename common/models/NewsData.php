@@ -101,7 +101,7 @@ class NewsData extends \yii\db\ActiveRecord
                     $error[] = $msgTags;
                 } else { //成功了 则保存索引
                     $classTags = [
-                        'tagid' => $msgTags->tagid,
+                        'tagid' => $msgTags,
                         'classid' => $data['db_class_id'],
                         'id' => $model->id,  //文章id
                     ];

@@ -37,7 +37,7 @@ class NewsTags extends \yii\db\ActiveRecord
     }
 
     /** 创建一个tags标签 */
-    public static function createOne($data)
+    public static function createOne($data, $from = 0)
     {
         if (empty($data['tagname'])) {
             return [-1, '没有标签名称'];
@@ -46,7 +46,11 @@ class NewsTags extends \yii\db\ActiveRecord
         $tags = self::find()->where(['tagname' => $data['tagname']])->one();
 
         if (!empty($tags)) {
-            return [1, $tags->tagid];
+            if ($from == 1) {
+                return [-1, $tags->tagid . ' 已经存在'];
+            } else {
+                return [1, $tags->tagid];
+            }
         }
 
         $model = new NewsTags();
@@ -60,6 +64,29 @@ class NewsTags extends \yii\db\ActiveRecord
             return [-1, $model->getErrors()];
         }
         return [1, $model];
+    }
+
+    /** 导入到数据库中 */
+    public static function import()
+    {
+        $data = BaiduKeywords::find()->select('keywords,m_pv')
+            ->where(['like', 'keywords', '英语'])
+            ->andWhere(['between', 'm_pv', 10, 10000])
+            ->asArray()
+            ->all();
+        $error = [];
+        foreach ($data as $item) {
+            $dataSave = [
+                'tagname' => $item['keywords']
+            ];
+            list($code, $msg) = self::createOne($dataSave, 1);
+            if ($code < 0) {
+                $error[] = $msg;
+            }
+        }
+        echo '<pre>';
+        print_r($error);
+        exit;
     }
 
     /**
