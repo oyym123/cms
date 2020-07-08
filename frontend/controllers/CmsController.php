@@ -146,7 +146,13 @@ class CmsController extends Controller
             print_r($msg);
             exit;
         } else {
-            NewsData::setStaticHtml($res['db_class_id'], $msg,$res['host_name']);
+            NewsData::setStaticHtml($res['db_class_id'], $msg, $res['host_name']);
         }
+    }
+
+    /** 将百度营销关键词导入cms tags */
+    public function actionImportTags()
+    {
+        NewsTags::import();
     }
 }
