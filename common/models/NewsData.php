@@ -112,6 +112,9 @@ class NewsData extends \yii\db\ActiveRecord
                     }
                 }
             }
+
+            return [1, $model->id];
+
             if (empty($error)) {
                 return [1, $model->id];
             } else {
@@ -123,8 +126,13 @@ class NewsData extends \yii\db\ActiveRecord
     /** 生成静态页面 */
     public static function setStaticHtml($classId, $newsId)
     {
+
         $url = 'https://' . $_SERVER['HTTP_HOST'] . '/e/heshao/ecmschtml.php?enews=ReNewsHtml&classid=&retype=&startday=&endday=&startid=&endid=&havehtml=1&reallinfotime=1594190732&tbname=news&yii2_msg=1&news_id=' . $newsId . '&classid=' . $classId . '&list_html=1';
         $res = Tools::curlGet($url);
+        echo '<pre>';
+        print_r($url);
+        echo '<hr/>';
+        print_r($res);exit;
         echo '<pre>';
         print_r($res);
         exit;
