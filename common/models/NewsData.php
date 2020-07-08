@@ -97,7 +97,7 @@ class NewsData extends \yii\db\ActiveRecord
                 //插入标签
                 list($codeTags, $msgTags) = NewsTags::createOne($tags);
 
-                if ($codeTags < -1) {
+                if ($codeTags < 0) {
                     $error[] = $msgTags;
                 } else { //成功了 则保存索引
                     $classTags = [

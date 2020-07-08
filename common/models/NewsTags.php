@@ -46,7 +46,7 @@ class NewsTags extends \yii\db\ActiveRecord
         $tags = self::find()->where(['tagname' => $data['tagname']])->one();
 
         if (!empty($tags)) {
-            return [-1, '关键词重复'];
+            return [1, $tags->tagid];
         }
 
         $model = new NewsTags();
