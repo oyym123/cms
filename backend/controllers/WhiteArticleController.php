@@ -105,9 +105,11 @@ class WhiteArticleController extends Controller
             $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
             $arr[] = $url;
             $res = Tools::curlPost($url, $data);
-            echo '<pre>';
-            print_r($res);
-            exit;
+            if (strpos($res, 'success') === false) { //表示没有成功，则打印错误
+                echo '<pre>';
+                print_r($res);
+                exit;
+            }
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
