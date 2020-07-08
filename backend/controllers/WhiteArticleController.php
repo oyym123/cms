@@ -96,16 +96,18 @@ class WhiteArticleController extends Controller
                 return $this->redirect(['update', 'id' => $model->id]);
             }
 
-            $dbName = DbName::find()->where(['id' => $data['db_id']])->one()->name;
-            $data['db_name'] = $dbName;
+            $dbName = DbName::find()->where(['id' => $data['db_id']])->one();
+            $data['db_name'] = $dbName->name;
             $data['db_tags_id'] = json_encode($data['db_tags_id']);
+            $data['host_name'] = str_replace('m.', 'https://www.', $dbName->domain);
 
             //异步发送请求保存数据到CMS数据库
             $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
             $arr[] = $url;
             $res = Tools::curlPost($url, $data);
             echo '<pre>';
-            print_r($res);exit;
+            print_r($res);
+            exit;
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }

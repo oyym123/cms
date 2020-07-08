@@ -124,15 +124,15 @@ class NewsData extends \yii\db\ActiveRecord
     }
 
     /** 生成静态页面 */
-    public static function setStaticHtml($classId, $newsId)
+    public static function setStaticHtml($classId, $newsId, $hostName)
     {
-
-        $url = 'https://' . $_SERVER['HTTP_HOST'] . '/e/heshao/ecmschtml.php?enews=ReNewsHtml&classid=&retype=&startday=&endday=&startid=&endid=&havehtml=1&reallinfotime=1594190732&tbname=news&yii2_msg=1&news_id=' . $newsId . '&classid=' . $classId . '&list_html=1';
+        $url = $hostName . '/e/heshao/ecmschtml.php?enews=ReNewsHtml&classid=&retype=&startday=&endday=&startid=&endid=&havehtml=1&reallinfotime=1594190732&tbname=news&yii2_msg=1&news_id=' . $newsId . '&classid=' . $classId . '&list_html=1';
         $res = Tools::curlGet($url);
         echo '<pre>';
         print_r($url);
         echo '<hr/>';
-        print_r($res);exit;
+        print_r($res);
+        exit;
         echo '<pre>';
         print_r($res);
         exit;
