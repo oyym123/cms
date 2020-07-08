@@ -145,7 +145,8 @@ class CmsController extends Controller
             echo '<pre>';
             print_r($msg);
             exit;
+        } else {
+            NewsData::setStaticHtml($res['db_class_id'], $msg);
         }
     }
-
 }

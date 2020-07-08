@@ -103,8 +103,9 @@ class WhiteArticleController extends Controller
             //异步发送请求保存数据到CMS数据库
             $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
             $arr[] = $url;
-            Tools::curlPost($url, $data);
-            
+            $res = Tools::curlPost($url, $data);
+            echo '<pre>';
+            print_r($res);exit;
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
