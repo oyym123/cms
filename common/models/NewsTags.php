@@ -69,11 +69,25 @@ class NewsTags extends \yii\db\ActiveRecord
     /** 导入到数据库中 */
     public static function import()
     {
-        $data = BaiduKeywords::find()->select('keywords,m_pv')
-            ->where(['like', 'keywords', '英语'])
-            ->andWhere(['between', 'm_pv', 10, 10000])
-            ->asArray()
-            ->all();
+        $action = Yii::$app->request->get('action');
+
+        $data = [];
+        if ($action == 'baidu') {
+            $data = BaiduKeywords::find()->select('keywords,m_pv')
+                ->where(['like', 'keywords', '英语'])
+                ->andWhere(['between', 'm_pv', 10, 10000])
+                ->asArray()
+                ->all();
+        }
+
+        if ($action == 'aizhan') {
+            $data = Keywords::find()->select('keywords')
+                ->where(['like', 'keywords', '英语'])
+                ->andWhere(['between', 'search_num', 10, 10000])
+                ->asArray()
+                ->all();
+        }
+
         $error = [];
         foreach ($data as $item) {
             $dataSave = [
