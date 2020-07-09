@@ -71,7 +71,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
             [['id', 'type', 'key_id', 'word_count'], 'integer'],
             [['image_urls', 'part_content', 'content'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['title', 'keywords', 'cut_word', 'from_path'], 'string', 'max' => 255],
+            [['title', 'keywords', 'cut_word', 'from_path','title_img'], 'string', 'max' => 255],
             [['title'], 'unique'],
             [['id'], 'unique'],
         ];

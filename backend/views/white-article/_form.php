@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 <div class="white-article-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([ 'options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <!--    --><? //= $form->field($model, 'id')->textInput() ?>
 
@@ -27,11 +27,20 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'db_id')->dropDownList(\common\models\DbName::getDbName(), ['prompt' => '--请选择数据库--']) ?>
 
     <?= $form->field($model, 'db_class_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
-
-
-
     <?= $form->field($model, 'from_path')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'title_img')->fileInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'title_img')->widget(\kartik\file\FileInput::classname(), [
+        'options' => ['multiple' => false],
+        'pluginOptions' => [
+            // 是否展示预览图
+            'initialPreviewAsData' => true,
+            // 是否显示移除按钮，指input上面的移除按钮，非具体图片上的移除按钮
+            'showRemove' => true,
+            // 是否显示上传按钮，指input上面的上传按钮，非具体图片上的上传按钮
+            'showUpload' => false,
+        ],
+    ])->fileInput([]);
+    ?>
+
     <?=
 
     $form->field($model, 'db_tags_id')->widget(\kartik\select2\Select2::classname(), [
