@@ -1,4 +1,5 @@
 <?php
+
 namespace common\widgets\ueditor;
 
 use Yii;
@@ -18,24 +19,24 @@ class Ueditor extends InputWidget
      * 编辑器传参配置(配置查看百度编辑器（ueditor）官方文档)
      */
     public $options = [];
-    
+
     /**
      * 编辑器默认基础配置
      */
     public $_init;
-    
+
     public function init()
     {
         $this->id = $this->hasModel() ? Html::getInputId($this->model, $this->attribute) : $this->id;
-        
+
         $this->_init = [
-            'serverUrl' => Url::to(['ueditor']),
-            'lang' => (strtolower(\Yii::$app->language) == 'en-us') ? 'en' : 'zh-cn',
+            'serverUrl' => Url::to(['/ueditor']),
+            'lang' => (strtolower(\Yii::$app->language) == 'en-us') ? 'zh-cn' : 'zh-cn',
         ];
         $this->options = ArrayHelper::merge($this->_init, $this->options);
         //parent::init();
     }
-    
+
     public function run()
     {
         $this->registerClientScript();
@@ -45,7 +46,7 @@ class Ueditor extends InputWidget
             return Html::textarea($this->id, $this->value, ['id' => $this->id]);
         }
     }
-    
+
     /**
      * 注册Js
      */
