@@ -138,12 +138,15 @@ class BaiduKeywordsController extends Controller
         }
 
         $data = BaiduKeywords::find()
-            ->select('id, keywords as text')
+            ->select('id, keywords as text,m_pv,pc_pv,competition')
             ->andFilterWhere(['like', 'keywords', $q])
             ->limit(50)
             ->asArray()
+            ->orderBy('m_pv desc')
             ->all();
-
+        foreach ($data as &$item) {
+            $item['text'] = '<strong>' . $item['text'] . '</strong><strong style="position:relative;left:140px;color: rebeccapurple">&nbsp;&nbsp;&nbsp;M_PV：' . $item['m_pv'] . '&nbsp;&nbsp;&nbsp;&nbsp;PC_PV：' . $item['m_pv'] . '&nbsp;&nbsp;&nbsp;&nbsp;竞争度：' . $item['competition'] . '%</strong>';
+        }
         $out['results'] = array_values($data);
         return $out;
     }
