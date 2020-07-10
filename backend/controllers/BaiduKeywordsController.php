@@ -129,7 +129,7 @@ class BaiduKeywordsController extends Controller
     /** 获取标签 */
     public function actionGetTags()
     {
-        $q = Yii::$app->request->get('q','');
+        $q = Yii::$app->request->get('q', '');
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
@@ -137,9 +137,9 @@ class BaiduKeywordsController extends Controller
             return $out;
         }
 
-        $data = Keywords::find()
+        $data = BaiduKeywords::find()
             ->select('id, keywords as text')
-            ->andFilterWhere(['like', 'title', $q])
+            ->andFilterWhere(['like', 'keywords', $q])
             ->limit(50)
             ->asArray()
             ->all();

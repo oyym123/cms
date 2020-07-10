@@ -18,7 +18,7 @@ class WhiteArticleSearch extends WhiteArticle
     {
         return [
             [['id', 'type', 'key_id', 'word_count'], 'integer'],
-            [['title', 'keywords', 'cut_word', 'image_urls', 'from_path', 'part_content', 'content', 'created_at', 'updated_at'], 'safe'],
+            [['title', 'keywords', 'cut_word', 'image_urls','history', 'from_path', 'part_content', 'content', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -67,6 +67,7 @@ class WhiteArticleSearch extends WhiteArticle
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
+            ->andFilterWhere(['like', 'history', $this->history])
             ->andFilterWhere(['like', 'keywords', $this->keywords])
             ->andFilterWhere(['like', 'cut_word', $this->cut_word])
             ->andFilterWhere(['like', 'image_urls', $this->image_urls])

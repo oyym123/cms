@@ -38,7 +38,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return \common\models\WhiteArticle::getType($model->type);
                 }
             ],
-//            'key_id',
+            [
+                'label' => '发布历史　　　　',
+                'attribute' => 'history',
+                'content' => function ($model, $key, $index, $column) {
+                    if (!empty($model->history)) {
+                        $history = json_decode($model->history, true);
+                        return 'DB: ' . $history['databases'];
+                    } else {
+                        return '';
+                    }
+                }
+            ],
             'keywords',
             'db_name',
             //'cut_word',

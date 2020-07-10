@@ -22,30 +22,52 @@ class Qiniu
     }
 
     /** 上传验证码 */
-    public function upToken($bucket)
+    public function upToken($bucket, $policy = null)
     {
-        $upToken = $this->auth->uploadToken($bucket);
+        $upToken = $this->auth->uploadToken($bucket, null, 3600, $policy);
         return $upToken;
     }
 
     /** 七牛云上传 */
-    public function fileUpload($name, $bucket = 'aks_img01')
+    public function fileUpload($name, $bucket = 'aks-img01', $from = 0, $clean = 0)
     {
+        if ($clean == 1) {
+            $fileInfo = (new UploadForm())->cleanInfo($_FILES[$name], 'title_img');
+        } else {
+            $fileInfo = $_FILES[$name];
+        }
+
+        header('content-type:text/html;charset=utf-8');
+
+        $allowExt = ['jpeg', 'jpg', 'png', 'gif'];
+        $path = (new UploadForm())->moveFile($fileInfo, './img_tmp', false, $allowExt);
+        $newName = str_replace('./img_tmp/', '', $path);
 
         //初始化 UploadManager 对象并进行文件的上传。
         $uploadMgr = new UploadManager();
         $token = $this->upToken($bucket);
-
         //调用 UploadManager 的 putFile 方法进行文件的上传。
-        list($ret, $err) = $uploadMgr->putFile($token, 'tes998.jpeg', $_FILES[$name]['tmp_name']);
-
-        echo '<pre>';
+        list($ret, $err) = $uploadMgr->putFile($token, 'wordImg/' . $newName, $path);
 
         if ($err !== null) {
-            echo $_FILES[$name]['tmp_name'];
+            echo $newName;
             print_r($err);
+            exit;
         } else {
-            print_r($ret);
+            //传完七牛云删除临时图片
+            unlink($path);
+            if ($from == 1) {
+                return [
+                    'state' => 'SUCCESS',
+                    'url' => Yii::$app->params['QiNiuHost'] . 'wordImg/' . $newName
+                ];
+            } else {
+                echo json_encode([
+                    'state' => 'SUCCESS',
+                    'url' => Yii::$app->params['QiNiuHost'] . 'wordImg/' . $newName
+                ]);
+                exit;
+            }
         }
     }
 }
