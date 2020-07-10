@@ -101,6 +101,7 @@ class WhiteArticleController extends Controller
                 //标题图片处理
                 $imgInfo = (new Qiniu())->fileUpload('WhiteArticle', 'aks-img01', 1, 1);
                 $model->title_img = $imgInfo['url'];
+                $data['title_img'] = $imgInfo['url'];
             }
 
             //当文章有效时，则发布
