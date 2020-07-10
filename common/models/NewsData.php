@@ -69,6 +69,7 @@ class NewsData extends \yii\db\ActiveRecord
         $clasPath = NewsClass::find()->where(['classid' => $data['db_class_id']])->one()->classpath;
         //获取纯文本
         $contentTxt = Tools::cleanHtml($data['content']);
+
         //文章内容保存
         $info = [
             'classid' => $data['db_class_id'],
@@ -78,7 +79,7 @@ class NewsData extends \yii\db\ActiveRecord
             'title' => $data['title'],
             'titlepic' => !empty($data['title_img']) ? $data['title_img'] : 'https://www.thszxxdyw.org.cn/d/file/p/2020/06-28/637035e2da1f0a3f541451cb96e2fe0e.jpg',    //标题图片
             'ftitle' => '',
-            'smalltext' => mb_substr($contentTxt, 0, 25),   //文章简介
+            'smalltext' => mb_substr($contentTxt, 0, rand(45, 70)),   //文章简介
         ];
 
         list($codeInfo, $msgInfo) = NewsInfo::createOne($info);
