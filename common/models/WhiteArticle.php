@@ -67,11 +67,11 @@ class WhiteArticle extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'title', 'db_id', 'db_class_id', 'db_tags_id', 'content'], 'required'],
+            [['id', 'title', 'db_id', 'db_class_id', 'db_tags_id', 'content', 'status'], 'required'],
             [['id', 'type', 'key_id', 'word_count'], 'integer'],
             [['image_urls', 'part_content', 'content'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['title', 'keywords', 'cut_word', 'from_path','title_img'], 'string', 'max' => 255],
+            [['title', 'keywords', 'cut_word', 'from_path', 'title_img'], 'string', 'max' => 255],
             [['title'], 'unique'],
             [['id'], 'unique'],
         ];
@@ -97,6 +97,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
             'db_tags_id' => '标签名称',
             'db_tags_name' => '标签名称',
             'db_name' => '数据库名称',
+            'history' => '发布历史',
             'status' => '状态',
             'push_time' => '发布时间',
             'word_count' => '词语统计',

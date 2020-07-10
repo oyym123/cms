@@ -41,16 +41,15 @@ class NewsData extends \yii\db\ActiveRecord
 
         //获取最后一个id
         $lastId = self::find()->orderBy('id desc')->one()->id;
-        if (!empty($data['db_tags_id'])) {
-            $data['db_tags_id'] = json_decode($data['db_tags_id'], true);
+        if (!empty($data['db_tags_name'])) {
+            $data['db_tags_name'] = json_decode($data['db_tags_name'], true);
         }
-        //获取第一个关键词 作为该文章的关键词
-        $tagname = BaiduKeywords::find()->where(['id' => $data['db_tags_id'][0]])->one()->keywords;
+
         $model = new NewsData();
         $model->id = $lastId + 1;
         $model->classid = $data['db_class_id'];
         $model->dokey = 1;
-        $model->infotags = $tagname;
+        $model->infotags = $data['db_tags_name'][0];
         $model->writer = '小仲马';
         $model->befrom = '何马英语';
         $model->newstext = $data['content'];
@@ -77,7 +76,7 @@ class NewsData extends \yii\db\ActiveRecord
             'titleurl' => '/' . $clasPath . '/' . $model->id . '.html',
             'keyboard' => $data['title'],
             'title' => $data['title'],
-            'titlepic' => 'https://www.thszxxdyw.org.cn/d/file/p/2020/06-28/637035e2da1f0a3f541451cb96e2fe0e.jpg',    //标题图片
+            'titlepic' => !empty($data['title_img']) ? $data['title_img'] : 'https://www.thszxxdyw.org.cn/d/file/p/2020/06-28/637035e2da1f0a3f541451cb96e2fe0e.jpg',    //标题图片
             'ftitle' => '',
             'smalltext' => mb_substr($contentTxt, 0, 25),   //文章简介
         ];
@@ -87,11 +86,11 @@ class NewsData extends \yii\db\ActiveRecord
             $error[] = $msgInfo;
         }
 
-        if (!empty($data['db_tags_id'])) {
+        if (!empty($data['db_tags_name'])) {
             //保存所有的标签
-            foreach ($data['db_tags_id'] as $item) {
+            foreach ($data['db_tags_name'] as $item) {
                 $tags = [
-                    'tagname' => BaiduKeywords::find()->where(['id' => $item])->one()->keywords,
+                    'tagname' => $item,
                 ];
 
                 //插入标签

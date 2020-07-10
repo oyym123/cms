@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 <div class="white-article-form">
 
-    <?php $form = ActiveForm::begin([ 'options' => ['enctype' => 'multipart/form-data']]); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <!--    --><? //= $form->field($model, 'id')->textInput() ?>
 
@@ -31,6 +31,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'title_img')->widget(\kartik\file\FileInput::classname(), [
         'options' => ['multiple' => false],
         'pluginOptions' => [
+            'initialPreview' => [$model->title_img],
             // 是否展示预览图
             'initialPreviewAsData' => true,
             // 是否显示移除按钮，指input上面的移除按钮，非具体图片上的移除按钮
@@ -38,11 +39,10 @@ use yii\widgets\ActiveForm;
             // 是否显示上传按钮，指input上面的上传按钮，非具体图片上的上传按钮
             'showUpload' => false,
         ],
-    ])->fileInput([]);
+    ])->fileInput(['value' => 'http://img.thszxxdyw.org.cn/wordImg/110efd17d7d47188f43d1e597c076b65.jpg']);
     ?>
 
     <?=
-
     $form->field($model, 'db_tags_id')->widget(\kartik\select2\Select2::classname(), [
         'options' => ['placeholder' => '请输入标签 ...'],
         'pluginOptions' => [

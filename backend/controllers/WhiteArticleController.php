@@ -2,10 +2,12 @@
 
 namespace backend\controllers;
 
+use common\models\BaiduKeywords;
 use common\models\DbName;
 use common\models\NewsClass;
 use common\models\NewsClassTags;
 use common\models\NewsData;
+use common\models\Publish;
 use common\models\Qiniu;
 use common\models\Tools;
 use common\models\UploadForm;
@@ -91,44 +93,46 @@ class WhiteArticleController extends Controller
      */
     public function actionUpdate($id)
     {
-
         $model = $this->findModel($id);
-
         $data = Yii::$app->request->post('WhiteArticle');
+
         if ($model->load(Yii::$app->request->post())) {
-            if (empty($data['db_tags_id'])) {
-                Yii::$app->getSession()->setFlash('error', '请填写标签！');
-                return $this->redirect(['update', 'id' => $model->id]);
+            if (!empty($_FILES['WhiteArticle']['name']['title_img'])) {
+                //标题图片处理
+                $imgInfo = (new Qiniu())->fileUpload('WhiteArticle', 'aks-img01', 1, 1);
+                $model->title_img = $imgInfo['url'];
             }
 
-            $dbName = DbName::find()->where(['id' => $data['db_id']])->one();
-            $data['db_name'] = $dbName->name;
-            $data['db_tags_id'] = json_encode($data['db_tags_id']);
-            $data['host_name'] = str_replace('m.', 'https://www.', $dbName->domain);
+            //当文章有效时，则发布
+            if ($data['status'] == WhiteArticle::STATUS_ENABLE) {
+                if (empty($data['db_tags_id'])) {
+                    Yii::$app->getSession()->setFlash('error', '请填写标签！');
+                    return $this->redirect(['update', 'id' => $model->id]);
+                }
 
-            $model1 = new UploadForm();
+                //获取第一个关键词 作为该文章的关键词
+                $tagname = BaiduKeywords::find()->select('keywords')->where(['in', 'id', $data['db_tags_id']])->all();
+                $data['db_tags_name'] = array_column($tagname, 'keywords');
 
-//                $model1->file = UploadedFile::getInstance($model1, 'title_img');
+                Publish::pushArticle($data);
 
-            $file = UploadedFile::getInstance($model1, "WhiteArticle[title_img]");
-            echo '<pre>';
-            print_r($file);
-            exit;
-            if ($model->file && $model->validate()) {
-                return $model->file;
+                if (empty($model->history)) {
+                    $oldHistory = [];
+                } else {
+                    //记录发布历史
+                    $oldHistory = json_decode($model->history, true);
+                }
+
+                $dbName = DbName::find()->where(['id' => $data['db_id']])->one();
+                $nowData = [
+                    'databases' => $dbName->name,
+                    'db_class_id' => $data['db_class_id'],
+                ];
+
+                $newHistory = array_merge($oldHistory, $nowData);
+                $model->history = json_encode($newHistory);
             }
-            (new Qiniu())->fileUpload('title_img');
 
-
-            //异步发送请求保存数据到CMS数据库
-            $url = 'http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/set-article';
-            $arr[] = $url;
-            $res = Tools::curlPost($url, $data);
-            if (strpos($res, 'success') === false) { //表示没有成功，则打印错误
-                echo '<pre>';
-                print_r($res);
-                exit;
-            }
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
