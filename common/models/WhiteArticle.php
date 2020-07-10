@@ -27,9 +27,10 @@ class WhiteArticle extends \yii\db\ActiveRecord
     const TYPE_DOC_WORD = 20; //word文档获取
     const TYPE_MANUALLY_WRITTEN = 30; //人工编写
 
-    const STATUS_ENABLE = 10;   //有效
-    const STATUS_DISABLE = 20;  //无效
-    const STATUS_DRAFT = 30;    //草稿
+    const STATUS_INIT = 10;   //初始模板
+    const STATUS_DRAFT = 20;   //草稿
+    const STATUS_ENABLE = 30;  //审核有效
+    const STATUS_DISABLE = 40;    //无效作废
 
     /**
      * {@inheritdoc}
@@ -54,8 +55,9 @@ class WhiteArticle extends \yii\db\ActiveRecord
     public static function getStatus($key = 'all')
     {
         $data = [
-            self::STATUS_ENABLE => '审核有效',
+            self::STATUS_INIT => '初始模板',
             self::STATUS_DRAFT => '草稿',
+            self::STATUS_ENABLE => '审核有效',
             self::STATUS_DISABLE => '无效作废',
         ];
         return $key === 'all' ? $data : $data[$key];

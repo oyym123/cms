@@ -17,8 +17,8 @@ class WhiteArticleSearch extends WhiteArticle
     public function rules()
     {
         return [
-            [['id', 'type', 'key_id', 'word_count'], 'integer'],
-            [['title', 'keywords', 'cut_word', 'image_urls','history', 'from_path', 'part_content', 'content', 'created_at', 'updated_at'], 'safe'],
+            [['id', 'type', 'key_id', 'status', 'word_count'], 'integer'],
+            [['title', 'keywords', 'cut_word', 'image_urls', 'history', 'from_path', 'part_content', 'content', 'created_at', 'updated_at'], 'safe'],
         ];
     }
 
@@ -62,6 +62,7 @@ class WhiteArticleSearch extends WhiteArticle
             'type' => $this->type,
             'key_id' => $this->key_id,
             'word_count' => $this->word_count,
+            'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
