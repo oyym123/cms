@@ -57,6 +57,10 @@ class BaiduKeywordsSearch extends BaiduKeywords
             return $dataProvider;
         }
 
+        if (!empty(\Yii::$app->request->get('m_pv_min')) && !empty(\Yii::$app->request->get('m_pv_max'))) {
+            $query->andFilterWhere(['between', 'm_pv', \Yii::$app->request->get('m_pv_min'), \Yii::$app->request->get('m_pv_max')]);
+        }
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
