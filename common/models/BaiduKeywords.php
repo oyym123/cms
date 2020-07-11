@@ -171,8 +171,12 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             }
 
             sleep(1);
-
             $data = (new BaiDuSdk())->getKeyWords($initWord);
+            if ($data === false) {
+                $error[] = $initWord . '  没有请求请成功！';
+                continue;
+            }
+
             foreach ($data as $item) {
                 $saveData = [
                     'pc_pv' => $item['pcPV'],
@@ -188,6 +192,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                     'competition' => $item['competition'],
                     'json_info' => json_encode($item, JSON_UNESCAPED_UNICODE),
                 ];
+
                 //保存所有的关键词
                 list($code, $msg) = self::createOne($saveData);
                 if ($code < 0) {
@@ -264,6 +269,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 $error[] = $msg;
             }
         }
+
         if (!empty($error)) {
             return [-1, $error];
         } else {
