@@ -95,13 +95,25 @@ class WhiteArticleController extends Controller
     {
         $model = $this->findModel($id);
         $data = Yii::$app->request->post('WhiteArticle');
-
         if ($model->load(Yii::$app->request->post())) {
+            $imgView = '?imageView2/1/w/240/h/180';
             if (!empty($_FILES['WhiteArticle']['name']['title_img'])) {
                 //标题图片处理
                 $imgInfo = (new Qiniu())->fileUpload('WhiteArticle', 'aks-img01', 1, 1);
-                $model->title_img = $imgInfo['url'];
-                $data['title_img'] = $imgInfo['url'];
+                $model->title_img = $imgInfo['url'] . $imgView;
+                $data['title_img'] = $imgInfo['url'] . $imgView;
+            } else {
+                //当内容中有图片时，那么选择内容中的第一张图 并且将标题加上去alt     大小：240 * 180
+                if (strpos($data['content'], '<img src="')) {
+                    preg_match_all('@<img src="(.*?)"@', $data['content'], $imgData);
+                    $data['title_img'] = $imgData[1][0] . $imgView;
+                    //加上alt
+                    $data['content'] = preg_replace('@src="@', 'alt="' . $data['title'] . '" src="', $data['content']);
+                    $data['content'] = str_replace('title=""', '', $data['content']);
+                    $model->title_img = $data['title_img'];
+                } else {
+                    $data['title_img'] = $model->title_img ?: '';
+                }
             }
 
             //当文章有效时，则发布
@@ -111,7 +123,6 @@ class WhiteArticleController extends Controller
                     return $this->redirect(['update', 'id' => $model->id]);
                 }
 
-                //获取第一个关键词 作为该文章的关键词
                 $tagname = BaiduKeywords::find()->select('keywords')->where(['in', 'id', $data['db_tags_id']])->all();
                 $data['db_tags_name'] = array_column($tagname, 'keywords');
 
@@ -183,6 +194,5 @@ class WhiteArticleController extends Controller
         echo json_encode($arr);
         exit;
     }
-
 
 }
