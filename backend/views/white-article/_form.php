@@ -39,7 +39,7 @@ use yii\widgets\ActiveForm;
             // 是否显示上传按钮，指input上面的上传按钮，非具体图片上的上传按钮
             'showUpload' => false,
         ],
-    ])->fileInput(['value' => 'http://img.thszxxdyw.org.cn/wordImg/110efd17d7d47188f43d1e597c076b65.jpg']);
+    ])->fileInput();
     ?>
 
     <?=
@@ -70,6 +70,7 @@ use yii\widgets\ActiveForm;
         ],
     ]);
     ?>
+
 
     <!--    --><? //= $form->field($model, 'word_count')->textInput() ?>
 

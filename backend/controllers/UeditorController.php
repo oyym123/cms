@@ -19,12 +19,9 @@ class UeditorController extends Controller
         }
 
         if ($action == 'getToken') {
-            $policy = array(
-                'callbackUrl' => 'http://172.30.251.210/callback.php',
-                'callbackBody' => '{"fname":"$(fname)", "fkey":"$(key)", "desc":"$(x:desc)", "uid":' . $uid . '}'
-            );
 
-            $res = (new Qiniu())->upToken('aks-img01', $policy);
+
+            $res = (new Qiniu())->upToken('aks-img01');
             return json_encode([
                 'state' => 'SUCCESS',
                 'token' => $res
@@ -33,6 +30,15 @@ class UeditorController extends Controller
 
         if ($action == 'uploadimage') {
             $res = (new Qiniu())->fileUpload('file');
+        }
+
+        if ($action == 'listimage') {
+            return json_encode([
+                'state' => 'SUCCESS',
+                'list' => ['http://img.thszxxdyw.org.cn/wordImg/08c86f81406d074e59f2eae5c1a9b4a6.jpg'],
+                'start' => 0,
+                'total' => 1
+            ]);
         }
     }
 
