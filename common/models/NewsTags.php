@@ -63,7 +63,7 @@ class NewsTags extends \yii\db\ActiveRecord
         if (!$model->save()) {
             return [-1, $model->getErrors()];
         }
-        return [1, $model];
+        return [1, $model->tagid];
     }
 
     /** 导入到数据库中 */
