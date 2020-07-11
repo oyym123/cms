@@ -153,12 +153,15 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     {
         set_time_limit(0);
         //所有的种词
-        $initWords = ['外教一对一', '英语一对一', '英语培训', '少儿英语', '小学英语', '初中英语', '高中英语', '大学英语', '成人英语', '英语听力', '英语语法', '英语作文', '英语单词', '雅思英语', '托福英语'];
+        $initWords1 = ['外教一对一', '英语一对一', '英语培训', '少儿英语', '小学英语', '初中英语', '高中英语', '大学英语', '成人英语', '英语听力', '英语语法', '英语作文', '英语单词', '雅思英语', '托福英语'];
         $error = [];
-        $initWords = self::find()->select('keywords')->asArray()->all();
-        $initWords = array_column($initWords, 'keywords');
-        $oneInfo = self::find()->select('from_keywords')->asArray()->distinct()->all();
+
+        //获取所有来源词
+        $oneInfo = self::find()->select('from_keywords')->asArray()->distinct('from_keywords')->all();
         $fromKeyArr = array_column($oneInfo, 'from_keywords');
+
+        $initWords = self::find()->select('keywords')->where(['not in', 'keywords', $fromKeyArr])->asArray()->all();
+        $initWords = array_column($initWords, 'keywords');
 
         //用种词调用相关词查询接口 最多只能查询到300个
         foreach ($initWords as $key => $initWord) {
@@ -185,10 +188,9 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                     'competition' => $item['competition'],
                     'json_info' => json_encode($item, JSON_UNESCAPED_UNICODE),
                 ];
-
                 //保存所有的关键词
                 list($code, $msg) = self::createOne($saveData);
-                if ($code < -1) {
+                if ($code < 0) {
 //                    $error[] = $msg;
                 }
             }
@@ -196,5 +198,76 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 
         echo '<pre>';
         print_r($error);
+    }
+
+    /**
+     * 新增关键词 并且调用百度营销词接口获取相应的参数
+     */
+    public static function setKeywords($keywords)
+    {
+        $keywords = Tools::cleanKeywords($keywords);
+        $error = [];
+        foreach ($keywords as $item) {
+            //判重 不可有所有重复的关键词 减少接口请求次数
+            $oldInfo = self::find()->where(['keywords' => $item])->one();
+            if (!empty($oldInfo)) {
+                $error[] = $item . '  已经重复了！';
+                continue;
+            }
+
+            $data = (new BaiDuSdk())->getRank($item);
+            if ($data === false) {
+                $error[] = $item . '  没有请求请成功！';
+                continue;
+            }
+
+            $info = $data[0];
+
+            $saveData = [
+                'show_reasons' => '后台添加',
+                'm_pv' => $info['mobile']['pv'],
+                'm_show' => $info['mobile']['show'],
+                'm_ctr' => $info['mobile']['ctr'],
+                'm_click' => $info['mobile']['click'],
+                'm_rec_bid' => $info['mobile']['recBid'],
+                'm_charge' => $info['mobile']['charge'],
+                'm_rank' => $info['mobile']['rank'],
+                'm_show_rate' => $info['mobile']['showRate'],
+                'all_cpc' => $info['all']['cpc'],
+                'all_ctr' => $info['all']['ctr'],
+                'all_click' => $info['all']['cpc'],
+                'all_pv' => $info['all']['pv'],
+                'all_charge' => $info['all']['charge'],
+                'all_show' => $info['all']['show'],
+                'all_rank' => $info['all']['rank'],
+                'all_show_rate' => $info['all']['showRate'],
+                'all_rec_bid' => $info['all']['recBid'],
+                'pc_ctr' => $info['pc']['ctr'],
+                'pc_show' => $info['pc']['show'],
+                'pc_pv' => $info['pc']['pv'],
+                'pc_rank' => $info['pc']['rank'],
+                'pc_show_rate' => $info['pc']['showRate'],
+                'pc_click' => $info['pc']['click'],
+                'bid' => $info['bid'],
+                'word_package' => '',
+                'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'keywords' => $info['word'],
+                'from_keywords' => '',
+                'similar' => '',
+                'competition' => $info['competition'],
+                'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
+            ];
+
+            //保存所有的关键词
+            list($code, $msg) = self::createOne($saveData);
+            if ($code < 0) {
+                $error[] = $msg;
+            }
+        }
+        if (!empty($error)) {
+            return [-1, $error];
+        } else {
+            return [1, 'success'];
+        }
     }
 }

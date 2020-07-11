@@ -71,12 +71,16 @@ use yii\widgets\ActiveForm;
     ]);
     ?>
 
+    <p>
+        <?= Html::a('添加新tags', ['baidu-keywords/create'], ['class' => 'btn btn-success', 'target' => '_blank']) ?>
+    </p>
 
     <!--    --><? //= $form->field($model, 'word_count')->textInput() ?>
 
     <?= $form->field($model, 'status')->dropDownList(\common\models\WhiteArticle::getStatus(), ['value' => \common\models\WhiteArticle::STATUS_ENABLE]) ?>
 
     <?= $form->field($model, 'content')->widget('common\widgets\ueditor\Ueditor', [
+            'value' => 1
 //        'options'=>[
 //            'initialFrameWidth' => 850,
 //        ]

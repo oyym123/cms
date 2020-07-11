@@ -86,6 +86,14 @@ class CmsController extends Controller
         print_r($arr);
     }
 
+    /**
+     * 抓取百度营销词
+     */
+    public function actionCatchYin()
+    {
+        (new BaiduKeywords())->getSdkWords();
+    }
+
     /** 爬取关键词
      * http://' . $_SERVER['SERVER_ADDR'] . ':89/index.php?r=cms/catch-key
      */

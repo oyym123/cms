@@ -46,9 +46,11 @@ class BaiDuSdk extends sms_service_KRService
         $request->setWords(array($kret));
         $response = $this->getEstimatedDataByBid($request);
         $head = $this->getJsonHeader();
-        echo "status getEstimatedDataByBid:" . json_encode($head) . "\n";
-//        assert(SUCCESS == $head->desc && 0 == $head->status);
-        return $response->data;
+        if (SUCCESS == $head->desc && 0 == $head->status) {
+            return $response->data;
+        } else {
+            return false;
+        }
     }
 
     public function getEstimatedDataTest($keywords)
@@ -112,14 +114,15 @@ class BaiDuSdk extends sms_service_KRService
     /**
      * 获取关键词的竞争排名
      */
-    public function getRank()
+    public function getRank($keyword)
     {
-        $datas = $this->getEstimatedDataByBidTest("外教");
-
-        echo '<pre>';
-        print_r($datas);exit;
-        $arr = json_decode(json_encode($datas), TRUE);
-        return $arr;
+        $datas = $this->getEstimatedDataByBidTest($keyword);
+        if ($datas === false) {
+            return false;
+        } else {
+            $arr = json_decode(json_encode($datas), TRUE);
+            return $arr;
+        }
     }
 
 }
