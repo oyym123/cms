@@ -171,6 +171,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             }
 
             sleep(1);
+
             $data = (new BaiDuSdk())->getKeyWords($initWord);
             if ($data === false) {
                 $error[] = $initWord . '  没有请求请成功！';
