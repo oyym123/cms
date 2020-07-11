@@ -19,10 +19,12 @@ class BaiDuSdk extends sms_service_KRService
         $this->setIsJson(true);
         $response = $this->getKRByQuery($request);
         $head = $this->getJsonHeader();
+        if (SUCCESS == $head->desc && 0 == $head->status) {
+            return $response->data;
+        } else {
+            return false;
+        }
 
-//        echo "status getKRByQuery:" . json_encode($head) . "\n";
-//        assert(SUCCESS == $head->desc && 0 == $head->status);
-        return $response->data;
     }
 
     public function getKRCustomTest()
@@ -107,8 +109,13 @@ class BaiDuSdk extends sms_service_KRService
     public function getKeyWords($keywords)
     {
         $datas = $this->getKRByQueryTest($keywords);
-        $arr = json_decode(json_encode($datas), TRUE);
-        return $arr;
+        if ($datas === false) {
+            return false;
+        } else {
+            $arr = json_decode(json_encode($datas), TRUE);
+            return $arr;
+        }
+
     }
 
     /**

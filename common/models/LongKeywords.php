@@ -144,6 +144,7 @@ class LongKeywords extends \yii\db\ActiveRecord
     public static function getKeywords()
     {
         set_time_limit(0);
+        
         //获取所有的短尾关键词
         $keywords = Keywords::find()->select('id,keywords,search_num')->where([
             'between', 'search_num', 10, 200
