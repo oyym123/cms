@@ -102,7 +102,7 @@ class WhiteArticle extends \yii\db\ActiveRecord
             'history' => '发布历史',
             'status' => '状态',
             'push_time' => '发布时间',
-            'word_count' => '词语统计',
+            'word_count' => '文章字数',
             'part_content' => '内容分块',
             'content' => '内容',
             'created_at' => '创建时间',

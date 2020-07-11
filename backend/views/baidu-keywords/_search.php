@@ -18,15 +18,27 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <?php
+    echo '<label class="control-label" for="longkeywordssearch-key_search_num">最小m_pv</label>';
+    echo '<input type="text" id="longkeywordssearch-key_search_num" class="form-control" name="m_pv_min" value="">';
+    echo '<br/>';
+    ?>
 
-    <?= $form->field($model, 'keywords') ?>
+    <?php
+    echo '<label class="control-label" for="longkeywordssearch-key_search_num">最大m_pv</label>';
+    echo '<input type="text" id="longkeywordssearch-key_search_num" class="form-control" name="m_pv_max" value="">';
+    echo '<br/>';
+    ?>
 
-    <?= $form->field($model, 'from_keywords') ?>
-
-    <?= $form->field($model, 'pc_show_rate') ?>
-
-    <?= $form->field($model, 'pc_rank') ?>
+<!--    --><?//= $form->field($model, 'id') ?>
+<!---->
+<!--    --><?//= $form->field($model, 'keywords') ?>
+<!---->
+<!--    --><?//= $form->field($model, 'from_keywords') ?>
+<!---->
+<!--    --><?//= $form->field($model, 'pc_show_rate') ?>
+<!---->
+<!--    --><?//= $form->field($model, 'pc_rank') ?>
 
     <?php // echo $form->field($model, 'pc_cpc') ?>
 
