@@ -36,11 +36,11 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    
+
     $menuItems = [
         ['label' => '黑帽文章', 'url' => ['/black-article/index']],
         ['label' => '白帽文章', 'url' => ['/white-article/index']],
-        ['label' => '百度关键词', 'url' => ['/baidu-keywords/index']],
+        ['label' => '百度营销词 & tags', 'url' => ['/baidu-keywords/index']],
         ['label' => '下拉框关键词', 'url' => ['/long-keywords/index']],
         ['label' => '爱站关键词', 'url' => ['/keywords/index']],
         ['label' => 'CMS 推送日志', 'url' => ['/mip-flag/index']],

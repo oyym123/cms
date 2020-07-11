@@ -41,6 +41,29 @@ class Ueditor extends InputWidget
     {
         $this->registerClientScript();
         if ($this->hasModel()) {
+
+            //前面转换
+            $upArr = [
+                '一，', '二，', '三，', '四，', '五，',
+                '一,', '二,', '三,', '四,', '五,',
+                '1，', '2，', '3，', '4，', '5，',
+                '1,', '2,', '3,', '4,', '5,'
+            ];
+
+            //后面转换
+            $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
+            $replaceArrUp = $replaceArrDown = [];
+
+            foreach ($upArr as $item) {
+                $replaceArrUp[] = '<br>' . $item;
+            }
+
+            $this->model->content = str_replace($upArr, $replaceArrUp, $this->model->content);
+
+            foreach ($downArr as $item) {
+                $replaceArrDown[] = $item . '<br>';
+            }
+            $this->model->content = str_replace($downArr, $replaceArrDown, $this->model->content);
             return Html::activeTextarea($this->model, $this->attribute, ['id' => $this->id]);
         } else {
             return Html::textarea($this->id, $this->value, ['id' => $this->id]);

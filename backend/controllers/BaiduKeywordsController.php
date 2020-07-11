@@ -66,9 +66,16 @@ class BaiduKeywordsController extends Controller
     public function actionCreate()
     {
         $model = new BaiduKeywords();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $data = Yii::$app->request->post();
+            list($code, $msg) = BaiduKeywords::setKeywords($data['BaiduKeywords']['keywords']);
+            if ($code < 0) {
+                Yii::$app->getSession()->setFlash('error', json_encode($msg, JSON_UNESCAPED_UNICODE));
+                return $this->redirect(['create']);
+            } else {
+                Yii::$app->getSession()->setFlash('success', '全部保存成功!');
+                return $this->redirect(['create']);
+            }
         }
 
         return $this->render('create', [

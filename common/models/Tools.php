@@ -67,4 +67,12 @@ class Tools extends \yii\db\ActiveRecord
         $content = str_replace('　　', PHP_EOL, $content);
         return $content;
     }
+
+    /** 清理关键词空格，逗号等等 */
+    public static function cleanKeywords($keywords)
+    {
+        //中文逗号替换成英文 逗号替换为空
+        $keywords = str_replace(['，', ' '], [',', ''], $keywords);
+        return explode(',', $keywords);
+    }
 }

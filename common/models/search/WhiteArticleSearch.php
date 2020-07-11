@@ -2,6 +2,7 @@
 
 namespace common\models\search;
 
+use common\models\BaiduKeywords;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\WhiteArticle;
@@ -62,7 +63,7 @@ class WhiteArticleSearch extends WhiteArticle
             'type' => $this->type,
             'key_id' => $this->key_id,
             'word_count' => $this->word_count,
-            'status' => $this->status,
+            'status' => $this->status ? $this->status : WhiteArticle::STATUS_INIT,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
