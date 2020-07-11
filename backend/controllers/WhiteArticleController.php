@@ -127,12 +127,7 @@ class WhiteArticleController extends Controller
                     Yii::$app->getSession()->setFlash('error', '请填写栏目分类！');
                     return $this->redirect(['update', 'id' => $model->id]);
                 }
-
-                if (empty($data['db_db_id'])) {
-                    Yii::$app->getSession()->setFlash('error', '请填写数据库名称！');
-                    return $this->redirect(['update', 'id' => $model->id]);
-                }
-
+                
                 $tagname = BaiduKeywords::find()->select('keywords')->where(['in', 'id', $data['db_tags_id']])->all();
                 $data['db_tags_name'] = array_column($tagname, 'keywords');
 
