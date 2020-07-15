@@ -41,6 +41,11 @@ class CatchDataController extends Controller
     /** 将本地抓取的数据实时传到线上 */
     public function actionUploadArticle()
     {
-        WhiteArticle::createOne(Yii::$app->request->post());
+        list($code, $msg) = WhiteArticle::createOne(Yii::$app->request->post());
+        if ($code < 0) {
+            exit($msg);
+        } else {
+            exit('success ' . $msg->id);
+        }
     }
 }
