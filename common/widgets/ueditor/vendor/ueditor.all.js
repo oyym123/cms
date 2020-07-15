@@ -29460,7 +29460,6 @@ UE.ui = baidu.editor.ui = {};
         return editor;
     };
 
-
     UE.delEditor = function (id) {
         var editor;
         if (editor = instances[id]) {

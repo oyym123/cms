@@ -42,7 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => '文章状态',
                 'attribute' => 'status',
                 'filter' => \common\models\WhiteArticle::getStatus(),
-                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null],
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null,'value'=>'all'],
                 'content' => function ($model, $key, $index, $column) {
                     return \common\models\WhiteArticle::getStatus($model->status);
                 }

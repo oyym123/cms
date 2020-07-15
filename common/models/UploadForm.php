@@ -94,14 +94,16 @@ class UploadForm extends Model
         if (!is_uploaded_file($fileInfo ['tmp_name'])) {
             exit ('文件不是通过HTTP POST方式上传上来的');
         }
+
         //$uploadPath='uploads';
         //如果没有这个文件夹，那么就创建一个
         if (!file_exists($uploadPath)) {
             mkdir($uploadPath, 0777, true);
             chmod($uploadPath, 0777);
         }
+
         //新文件名唯一
-        $uniName = md5(uniqid(microtime(true), true)) . '.' . $ext;
+        $uniName = Tools::uniqueName($ext);
         $destination = $uploadPath . '/' . $uniName;
         //@符号是为了不让客户看到错误信息
         if (!@move_uploaded_file($fileInfo['tmp_name'], $destination)) {

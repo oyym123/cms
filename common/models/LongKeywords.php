@@ -146,14 +146,23 @@ class LongKeywords extends \yii\db\ActiveRecord
         set_time_limit(0);
 
         //获取所有的短尾关键词
-        $keywords = Keywords::find()->select('id,keywords,search_num')->where([
-            'between', 'search_num', 10, 200
-        ])->limit(5000)->asArray()->all();
+//        $keywords = BaiduKeywords::find()->select('id,keywords,search_num')->where([
+//            'between', 'search_num', 10, 200
+//        ])->limit(5000)->asArray()->all();
 
+        $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
+            ->where(['like', 'keywords', '英语'])
+            ->andWhere(['between', 'm_pv', 10, 10000])
+//            ->limit(2)
+            ->asArray()
+            ->all();
+
+//        echo '<pre>';
+//        print_r($keywords);exit;
         $error = $sameArr = [];
         foreach ($keywords as $keyword) {
             //不可重复获取百度关键词
-            $oldInfo = self::find()->select('id')->where(['key_id' => $keyword['id']])->one();
+            $oldInfo = self::find()->select('keywords')->where(['keywords' => $keyword['keywords']])->one();
             if (empty($oldInfo)) {
                 list($code, $msg) = self::getBaiduKey($keyword);
                 if ($code < 0) {
