@@ -38,7 +38,7 @@ return [
     "snapscreenInsertAlign"=> "none", /* 插入的图片浮动方式 */
     
     /* 抓取远程图片配置 */
-    "catcherLocalDomain"=> ["127.0.0.1", "localhost", "img.baidu.com"],
+    "catcherLocalDomain"=> ["127.0.0.1", "localhost", "https://pic.sogou.com/pics?query=%E8%8B%B1%E8%AF%AD&w=05009900"],
     "catcherActionName"=> "catchimage", /* 执行抓取远程图片的action名称 */
     "catcherFieldName"=> "source", /* 提交的图片列表表单名称 */
     "catcherPathFormat"=> "/ueditor/php/upload/image/{yyyy}{mm}{dd}/{time}{rand:6}", /* 上传保存路径,可以自定义保存路径和文件名格式 */

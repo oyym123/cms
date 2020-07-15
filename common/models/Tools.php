@@ -75,4 +75,10 @@ class Tools extends \yii\db\ActiveRecord
         $keywords = str_replace(['，', ' '], [',', ''], $keywords);
         return explode(',', $keywords);
     }
+
+    /** 生成唯一名称 */
+    public static function uniqueName($ext)
+    {
+        return md5(uniqid(microtime(true), true)) . '.' . $ext;
+    }
 }

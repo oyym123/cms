@@ -2,6 +2,7 @@
 
 namespace common\widgets\ueditor;
 
+use common\models\WhiteArticle;
 use Yii;
 use yii\web\View;
 use yii\helpers\Html;
@@ -39,33 +40,59 @@ class Ueditor extends InputWidget
 
     public function run()
     {
-        $this->registerClientScript();
         if ($this->hasModel()) {
+            if ($this->model->type == WhiteArticle::TYPE_DOC_TXT) {
+                //前面转换
+                $upArr = [
+                    '一，', '二，', '三，', '四，', '五，',
+                    '一、', '二、', '三、', '四、', '五、',
+                    '一,', '二,', '三,', '四,', '五,',
+                    '1、', '2、', '3、', '4、', '5、',
+                    '1，', '2，', '3，', '4，', '5，',
+                    '1,', '2,', '3,', '4,', '5,'
+                ];
 
-            //前面转换
-            $upArr = [
-                '一，', '二，', '三，', '四，', '五，',
-                '一、', '二、', '三、', '四、', '五、',
-                '一,', '二,', '三,', '四,', '五,',
-                '1、', '2、', '3、', '4、', '5、',
-                '1，', '2，', '3，', '4，', '5，',
-                '1,', '2,', '3,', '4,', '5,'
-            ];
+                //后面转换
+                $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
+                $replaceArrUp = $replaceArrDown = [];
 
-            //后面转换
-            $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
-            $replaceArrUp = $replaceArrDown = [];
+                foreach ($upArr as $item) {
+                    $replaceArrUp[] = '<br>' . $item;
+                }
 
-            foreach ($upArr as $item) {
-                $replaceArrUp[] = '<br>' . $item;
+                $this->model->content = str_replace($upArr, $replaceArrUp, $this->model->content);
+
+                foreach ($downArr as $item) {
+                    $replaceArrDown[] = $item . '<br>';
+                }
+                $this->model->content = str_replace($downArr, $replaceArrDown, $this->model->content);
+                $this->registerClientScript();
             }
 
-            $this->model->content = str_replace($upArr, $replaceArrUp, $this->model->content);
+            if ($this->model->type == WhiteArticle::TYPE_SOUGOU_WEIXIN) {
 
-            foreach ($downArr as $item) {
-                $replaceArrDown[] = $item . '<br>';
+                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
+                if (strpos($this->model->content, '<div id="js_article" class="rich_media">') !== false) {
+                    $content = $this->model->content;
+                    preg_match('@<div id="js_article" class="rich_media">(.*)?   <div class="function_mod function_mod_index"@s', $content, $contentInfo);
+                    $content = str_replace('data-src="', 'src="', $contentInfo[0]);
+                    $this->model->content = $content;
+                }
+                $this->registerClientScript($this->model);
             }
-            $this->model->content = str_replace($downArr, $replaceArrDown, $this->model->content);
+
+            if ($this->model->type == WhiteArticle::TYPE_DOC_WORD) {
+                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
+                $this->model->content = preg_replace("@(.*)?</head><body>@", '', $this->model->content);
+                $images = json_decode($this->model->image_urls, true);
+                if (!empty($images)) {
+                    foreach ($images as $img) {
+                        $this->model->content = str_replace($img, \Yii::$app->params['QiNiuHost'] . 'wordImg/' . $img, $this->model->content);
+                    }
+                }
+                $this->registerClientScript($this->model);
+            }
+
             return Html::activeTextarea($this->model, $this->attribute, ['id' => $this->id]);
         } else {
             return Html::textarea($this->id, $this->value, ['id' => $this->id]);
@@ -75,11 +102,26 @@ class Ueditor extends InputWidget
     /**
      * 注册Js
      */
-    protected function registerClientScript()
+    protected function registerClientScript($model = null)
     {
         UEditorAsset::register($this->view);
         $options = Json::encode($this->options);
-        $script = "UE.getEditor('" . $this->id . "', " . $options . ")";
+        if ($model && $model->status != WhiteArticle::STATUS_INIT) {
+            //主要功能 ：判断是否渲染
+            $script = "  UE.delEditor('" . $this->id . "', " . $options . "); 
+                     ue= UE.getEditor('" . $this->id . "', " . $options . ")                     
+                     ue.ready(function() {
+                     console.log(ue.hasContents());
+                         if(ue.hasContents()==false){     
+                               ue.addListener(\"ready\", function () {
+        　                   　// editor准备好之后才可以使用
+                              ue.setContent('" . $model->content . "');
+                                }); 
+                          }
+                        }); ";
+        } else {
+            $script = "ue= UE.getEditor('" . $this->id . "', " . $options . ")";
+        }
         $this->view->registerJs($script, View::POS_READY);
     }
 }
