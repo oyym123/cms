@@ -23,14 +23,12 @@ class WebDriver extends RemoteWebDriver
         $capabilities = DesiredCapabilities::chrome();
 
         $driver = RemoteWebDriver::create($host, $capabilities);
-        $options = new WebDriverOptions();
 
-        $options->addCookie();
 
         $driver->manage()->window()->maximize();
         $error = [];
 
-        $driver->get('https://weixin.sogou.com/weixin?query=%E8%8B%B1%E8%AF%AD&_sug_type_=&sut=1906&lkt=0%2C0%2C0&s_from=input&_sug_=y&type=2&sst0=1594356371082&page=3&ie=utf8&w=01019900&dr=1');
+        $driver->get('https://weixin.sogou.com/weixin?query=%E8%8B%B1%E8%AF%AD&_sug_type_=&sut=1906&lkt=0%2C0%2C0&s_from=input&_sug_=y&type=2&sst0=1594356371082&page=4&ie=utf8&w=01019900&dr=1');
 
         sleep(2);
 
@@ -169,6 +167,7 @@ class WebDriver extends RemoteWebDriver
         //同步到线上
         $onlineUrl = \Yii::$app->params['OnlineDomain'] . '/index.php?r=catch-data/upload-article';
         Tools::curlPost($onlineUrl, $dataSave);
+
 
         list($codeArticle, $msgArticle) = WhiteArticle::createOne($dataSave);
         if ($codeArticle < 0) {
