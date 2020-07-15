@@ -3,6 +3,7 @@
 
 namespace frontend\controllers;
 
+use common\models\Tools;
 use Yii;
 use common\models\WebDriver;
 use common\models\WhiteArticle;
@@ -10,6 +11,8 @@ use yii\web\Controller;
 
 class CatchDataController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     public function actionIndex()
     {
         echo '<h1>欢迎来到 爬虫世界！</h1>';
@@ -18,6 +21,7 @@ class CatchDataController extends Controller
     /** webdriver 工具爬取数据 */
     public function actionSgdata()
     {
+
         WebDriver::getSgwx();
     }
 
@@ -32,6 +36,7 @@ class CatchDataController extends Controller
         $url = 'https://mp.weixin.qq.com/s?src=11&timestamp=1594697024&ver=2459&signature=uZXJQpOqhZ5eMCEE73PlBXHMdKjqdpa7GLqRxyO7Usexa5nWSSItRkpaG*MZWtpPNYr5GdlQeJovgfEDRnahe0635oCCJXZ3KviDnmAjCVWE0H5R48D45jamws*JMDJv&new=1';
         WebDriver::saveArticle($url, $data);
     }
+
 
     /** 将本地抓取的数据实时传到线上 */
     public function actionUploadArticle()
