@@ -122,6 +122,14 @@ class WhiteArticle extends \yii\db\ActiveRecord
             return [-1, $data['title'] . '   已经重复了'];
         }
 
+        if (empty($data['title'])) {
+            return [-1, $data['title'] . '   标题不能为空'];
+        }
+
+        if (empty($data['content'])) {
+            return [-1, '   内容不能为空'];
+        }
+
         $model = new WhiteArticle();
         foreach ($data as $key => $item) {
             $model->$key = $item;
@@ -130,6 +138,8 @@ class WhiteArticle extends \yii\db\ActiveRecord
         $model->created_at = date('Y-m-d H:i:s');
         if (!$model->save(false)) {
             return [-1, $model->getErrors()];
+        } else {
+            return [1, $model];
         }
     }
 

@@ -166,8 +166,8 @@ class WebDriver extends RemoteWebDriver
 
         //同步到线上
         $onlineUrl = \Yii::$app->params['OnlineDomain'] . '/index.php?r=catch-data/upload-article';
-        Tools::curlPost($onlineUrl, $dataSave);
-
+        $onlineLog = Tools::curlPost($onlineUrl, $dataSave);
+        Tools::writeLog(['线上保存日志：' => $onlineLog]);
 
         list($codeArticle, $msgArticle) = WhiteArticle::createOne($dataSave);
         if ($codeArticle < 0) {
