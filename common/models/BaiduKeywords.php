@@ -50,6 +50,10 @@ use Yii;
  */
 class BaiduKeywords extends \yii\db\ActiveRecord
 {
+    const CATCH_STATUS_ENABLE = 10; //正常
+    const CATCH_STATUS_START = 20;  //可抓取
+    const CATCH_STATUS_OVER = 30;  //搜狗抓取挖完毕
+    
     /**
      * {@inheritdoc}
      */

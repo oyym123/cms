@@ -1,25 +1,15 @@
 <?php
 
 
-namespace frontend\controllers;
+namespace console\controllers;
+
 
 use common\models\BaiduKeywords;
 use common\models\Tools;
-use common\models\ZuoWenWang;
-use Yii;
 use common\models\WebDriver;
-use common\models\WhiteArticle;
-use yii\web\Controller;
 
-class CatchDataController extends Controller
+class CatchDataController extends \yii\console\Controller
 {
-    public $enableCsrfValidation = false;
-
-    public function actionIndex()
-    {
-        echo '<h1>欢迎来到 爬虫世界！</h1>';
-    }
-
     /** webdriver 工具爬取数据 */
     public function actionSgdata()
     {
@@ -36,12 +26,11 @@ class CatchDataController extends Controller
 
         $errors = [];
 
-
         //标记关键词已被爬取完毕 后续不再被爬取
-//        $keyword->catch_status = BaiduKeywords::CATCH_STATUS_OVER;
-//        $keyword->save();
+        $keyword->catch_status = BaiduKeywords::CATCH_STATUS_OVER;
+        $keyword->save();
 
-        Tools::writeLog(['开始抓取：' => $keyword->keywords]);
+        Tools::writeLog(['开始抓取：' => $keyword->keywords],'sgwx.txt');
 
         for ($i = 1; $i <= 10; $i++) {
             list($code, $msg) = WebDriver::getSgwx($keyword->keywords, $i, $keyword->id);
@@ -50,8 +39,7 @@ class CatchDataController extends Controller
             }
         }
 
-
-        $this->actionStartCatch();
+        $this->actionSgdata();
         exit;
     }
 
@@ -60,23 +48,5 @@ class CatchDataController extends Controller
     {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/index.php?r=catch-data/sgdata';
         Tools::curlGet($url);
-    }
-
-    /** 将本地抓取的数据实时传到线上 */
-    public function actionUploadArticle()
-    {
-        list($code, $msg) = WhiteArticle::createOne(Yii::$app->request->post());
-        if ($code < 0) {
-            exit($msg);
-        } else {
-            exit('success ' . $msg->id);
-        }
-    }
-
-
-    /** 作文网数据爬取 & 翻译 */
-    public function actionZww()
-    {
-        ZuoWenWang::catchData();
     }
 }
