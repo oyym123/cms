@@ -3,6 +3,7 @@
 
 namespace common\models;
 
+use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\WebDriverBy;
@@ -15,38 +16,50 @@ class WebDriver extends RemoteWebDriver
 
     }
 
-    public static function getSgwx()
+    public static function getSgwx($keywords, $page, $keywordsId)
     {
         set_time_limit(0);
         $host = 'http://localhost:4444/wd/hub';
+        $options = new ChromeOptions();
+
+        //启用无头模式
+//        $options->addArguments(["--test-type", "--start-maximized"]);
+//        $options->addArguments(["--test-type", "--ignore-certificate-errors"]);
+//        $options->addArguments(["headless"]);
+//        $options->addArguments([
+//            '--window-size=1920,1080',
+//        ]);
+
 
         $capabilities = DesiredCapabilities::chrome();
+//        $capabilities->setCapability(ChromeOptions::CAPABILITY_W3C, $options);
 
-        $driver = RemoteWebDriver::create($host, $capabilities);
+        $driver = RemoteWebDriver::create($host, $capabilities, 50000);
+        $driver->manage()->window()->minimize();
 
-
-        $driver->manage()->window()->maximize();
         $error = [];
+        $keywordsUrl = urlencode($keywords);
 
-        $driver->get('https://weixin.sogou.com/weixin?query=%E8%8B%B1%E8%AF%AD&_sug_type_=&sut=1906&lkt=0%2C0%2C0&s_from=input&_sug_=y&type=2&sst0=1594356371082&page=4&ie=utf8&w=01019900&dr=1');
-
-        sleep(2);
-
-        $elements = $driver->findElements(WebDriverBy::className('txt-box'));
+        //爬取前10页的数据 【没有登入的状态最多访问前10页】
+        $driver->get('https://weixin.sogou.com/weixin?query=' . $keywordsUrl . '&_sug_type_=&sut=1906&lkt=0%2C0%2C0&s_from=input&_sug_=y&type=2&sst0=1594356371082&page=' . $page . '&ie=utf8&w=01019900&dr=1');
 
         //获取标题与简介
+        $elements = $driver->findElements(WebDriverBy::className('txt-box'));
         foreach ($elements as $key => $element) {
-            $infoUrl = $driver->findElement(WebDriverBy::id('sogou_vr_11002601_img_' . $key));
-            $infoIntro = $driver->findElement(WebDriverBy::id('sogou_vr_11002601_summary_' . $key));
-            $infoImg = $driver->findElement(WebDriverBy::tagName('img'))->getAttribute('src');
+            sleep(3);
+            try {
+                $infoUrl = $driver->findElement(WebDriverBy::id('sogou_vr_11002601_img_' . $key));
+                $infoIntro = $driver->findElement(WebDriverBy::id('sogou_vr_11002601_summary_' . $key));
+                $infoImg = $driver->findElement(WebDriverBy::tagName('img'))->getAttribute('src');
+            } catch (\Exception $e) {
+                return [-1, '找不到列表元素'];
+            }
 
             $data = [
                 'url' => $infoUrl->getAttribute('href'),
                 'img' => $infoImg,
                 'text' => $infoIntro->getText(),
             ];
-
-            Tools::writeLog($data);
 
             sleep(1);
 
@@ -66,11 +79,8 @@ class WebDriver extends RemoteWebDriver
 
             sleep(2);
 
-            Tools::writeLog([$realDetailUrl]);
-
-
             //保存文章页
-            list($code, $msg) = self::saveArticle($realDetailUrl, $data, $driver->getTitle());
+            list($code, $msg) = self::saveArticle($realDetailUrl, $data, $driver->getTitle(), $keywords, $page, $key, $keywordsId);
 
             //切换回列表页
             $driver->switchTo()->window($handles[0]);
@@ -82,11 +92,16 @@ class WebDriver extends RemoteWebDriver
         }
 
         $driver->quit();
-        Tools::writeLog($error);
+        Tools::writeLog(['errors' => $error]);
+        if (!empty($error)) {
+            return [-1, $error];
+        } else {
+            return [1, $keywords . '  抓取成功!'];
+        }
     }
 
     /** 保存文章 */
-    public static function saveArticle($url, $data, $title)
+    public static function saveArticle($url, $data, $title, $keywords, $page, $rank, $keywordsId)
     {
         //判重 不可重复标题
         $oldInfo = WhiteArticle::find()->where(['title' => $title])->one();
@@ -115,12 +130,17 @@ class WebDriver extends RemoteWebDriver
         array_shift($arrTxt);
         $part = json_encode($arrTxt, JSON_UNESCAPED_UNICODE);
 
-        //标题图片存储七牛云
-        list($codeImg, $msgImg) = (new Qiniu())->fetchFile($data['img'], \Yii::$app->params['QiNiuBucketImg'], Tools::uniqueName('png'));
-        if ($codeImg < 0) {
-            $error[] = $msgImg . '  上传七牛云失败';
-            $msgImg = $data['img'];
+        try {
+            //标题图片存储七牛云
+            list($codeImg, $msgImg) = (new Qiniu())->fetchFile($data['img'], \Yii::$app->params['QiNiuBucketImg'], Tools::uniqueName('png'));
+            if ($codeImg < 0) {
+                $error[] = $msgImg;
+                $msgImg = $data['img'];
+            }
+        } catch (\Exception $e) {
+            return [-1, '上传七牛云图片失败！'];
         }
+
 
         //内容中图片获取url
         preg_match('@data-src="https://mmbiz\.qpic\.cn(.*)?" data@', $content, $imgData);
@@ -132,7 +152,7 @@ class WebDriver extends RemoteWebDriver
         }
 
         //将图片传至七牛云
-        if (1) {     //是否传到七牛云标识 不传则使用原先文章中的图片地址
+        if (0) {     //是否传到七牛云标识 不传则使用原先文章中的图片地址
             $msgImgsArr = [];
             foreach ($imgArr as $item) {
                 list($codeImgs, $msgImgs) = (new Qiniu())->fetchFile($item, \Yii::$app->params['QiNiuBucketImg'], Tools::uniqueName('png'));
@@ -151,9 +171,9 @@ class WebDriver extends RemoteWebDriver
         $dataSave = [
             'title' => $title,
             'type' => WhiteArticle::TYPE_SOUGOU_WEIXIN,
-            'key_id' => 0,
+            'key_id' => $keywordsId,
             'intro' => $data['text'],
-            'keywords' => '',
+            'keywords' => $keywords,
             'cut_word' => '',
             'image_urls' => $msgImgsArr ? json_encode($msgImgsArr) : '',
             'from_path' => $url,
@@ -164,14 +184,16 @@ class WebDriver extends RemoteWebDriver
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
-        //同步到线上
-        $onlineUrl = \Yii::$app->params['OnlineDomain'] . '/index.php?r=catch-data/upload-article';
-        $onlineLog = Tools::curlPost($onlineUrl, $dataSave);
-        Tools::writeLog(['线上保存日志：' => $onlineLog]);
 
         list($codeArticle, $msgArticle) = WhiteArticle::createOne($dataSave);
+
         if ($codeArticle < 0) {
             $error[] = $msgArticle;
+        } else {
+            //同步到线上
+            $onlineUrl = \Yii::$app->params['OnlineDomain'] . '/index.php?r=catch-data/upload-article';
+            $onlineLog = Tools::curlPost($onlineUrl, $dataSave);
+            Tools::writeLog(['线上保存日志关键词：' . $keywords . '   第' . $page . '页 第' . $rank . '行' => $onlineLog]);
         }
 
         if (!empty($error)) {

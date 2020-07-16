@@ -88,6 +88,10 @@ class NewsTags extends \yii\db\ActiveRecord
                 ->all();
         }
 
+        if ($action == 'other_db') {
+            $data = KeywordLongAll::cleanData();
+        }
+
         $error = [];
         foreach ($data as $item) {
             $dataSave = [

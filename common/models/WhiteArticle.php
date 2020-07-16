@@ -23,10 +23,11 @@ use Yii;
  */
 class WhiteArticle extends \yii\db\ActiveRecord
 {
-    const TYPE_DOC_TXT = 10;  //txt获取
-    const TYPE_DOC_WORD = 20; //word文档获取
-    const TYPE_MANUALLY_WRITTEN = 30; //人工编写
-    const TYPE_SOUGOU_WEIXIN = 40; //搜狗微信
+    const TYPE_DOC_TXT = 10;               //txt获取
+    const TYPE_DOC_WORD = 20;              //word文档获取
+    const TYPE_MANUALLY_WRITTEN = 30;      //人工编写
+    const TYPE_SOUGOU_WEIXIN = 40;         //搜狗微信
+    const TYPE_ZUO_WEN_WANG = 50;          //作文网文章
 
     const STATUS_INIT = 10;   //初始模板
     const STATUS_DRAFT = 20;   //草稿
@@ -45,10 +46,11 @@ class WhiteArticle extends \yii\db\ActiveRecord
     public static function getType($key = 'all')
     {
         $data = [
+            self::TYPE_SOUGOU_WEIXIN => '搜狗微信',
+            self::TYPE_ZUO_WEN_WANG => '作文网文章',
             self::TYPE_DOC_TXT => 'txt获取',
             self::TYPE_DOC_WORD => 'word文档获取',
             self::TYPE_MANUALLY_WRITTEN => '手动编写',
-            self::TYPE_SOUGOU_WEIXIN => '搜狗微信',
         ];
         return $key === 'all' ? $data : $data[$key];
     }

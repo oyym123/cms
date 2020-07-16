@@ -41,6 +41,7 @@ class Ueditor extends InputWidget
     public function run()
     {
         if ($this->hasModel()) {
+            $imgView = '?imageView2/1/w/240/h/180';
             if ($this->model->type == WhiteArticle::TYPE_DOC_TXT) {
                 //前面转换
                 $upArr = [
