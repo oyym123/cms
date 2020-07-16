@@ -96,7 +96,7 @@ class CmsAction extends \yii\db\ActiveRecord
 
         $jsonres = json_decode($resData);
 
-        if ($jsonres->success >= 400) {
+        if ($jsonres->error >= 400) {
             Tools::writeLog($domain . "百度站长推送失败:" . $jsonres);
             return 1;
         } else {
