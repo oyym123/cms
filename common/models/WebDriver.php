@@ -52,6 +52,7 @@ class WebDriver extends RemoteWebDriver
                 $infoIntro = $driver->findElement(WebDriverBy::id('sogou_vr_11002601_summary_' . $key));
                 $infoImg = $driver->findElement(WebDriverBy::tagName('img'))->getAttribute('src');
             } catch (\Exception $e) {
+                $driver->quit();
                 return [-1, '找不到列表元素'];
             }
 

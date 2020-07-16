@@ -43,7 +43,7 @@ class CmsAction extends \yii\db\ActiveRecord
     {
         $request = Yii::$app->request;
         $dbName = $request->get('db_name');
-        
+
         if (empty($dbName)) {
             $dbName = $request->post('db_name');
         }
