@@ -92,7 +92,7 @@ class WebDriver extends RemoteWebDriver
         }
 
         $driver->quit();
-        Tools::writeLog(['errors' => $error]);
+        Tools::writeLog(['errors' => $error],'sgwx.txt');
         if (!empty($error)) {
             return [-1, $error];
         } else {
@@ -193,7 +193,7 @@ class WebDriver extends RemoteWebDriver
             //同步到线上
             $onlineUrl = \Yii::$app->params['OnlineDomain'] . '/index.php?r=catch-data/upload-article';
             $onlineLog = Tools::curlPost($onlineUrl, $dataSave);
-            Tools::writeLog(['线上保存日志关键词：' . $keywords . '   第' . $page . '页 第' . $rank . '行' => $onlineLog]);
+            Tools::writeLog(['线上保存日志关键词：' . $keywords . '   第' . $page . '页 第' . $rank . '行' => $onlineLog],'sgwx.txt');
         }
 
         if (!empty($error)) {

@@ -30,7 +30,7 @@ class CatchDataController extends \yii\console\Controller
         $keyword->catch_status = BaiduKeywords::CATCH_STATUS_OVER;
         $keyword->save();
 
-        Tools::writeLog(['开始抓取：' => $keyword->keywords]);
+        Tools::writeLog(['开始抓取：' => $keyword->keywords],'sgwx.txt');
 
         for ($i = 1; $i <= 10; $i++) {
             list($code, $msg) = WebDriver::getSgwx($keyword->keywords, $i, $keyword->id);
