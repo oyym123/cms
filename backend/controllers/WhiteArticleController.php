@@ -105,7 +105,7 @@ class WhiteArticleController extends Controller
                     $model->title_img = $imgInfo['url'] . $imgView;
                     $data['title_img'] = $imgInfo['url'] . $imgView;
                 } else {
-                    if (strpos($model->title_img, Yii::$app->params['img.thszxxdyw.org.cn']) !== false) {
+                    if (strpos($model->title_img, 'img.thszxxdyw.org.cn') !== false) {
                         $data['title_img'] = $model->title_img ?: '';
                     } else {
                         //当内容中有图片时，那么选择内容中的第一张图 并且将标题加上去alt     大小：240 * 180
