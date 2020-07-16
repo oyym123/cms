@@ -129,10 +129,11 @@ class NewsData extends \yii\db\ActiveRecord
         $url = $hostName . '/e/heshao/ecmschtml.php?enews=ReNewsHtml&classid=&retype=&startday=&endday=&startid=&endid=&havehtml=1&reallinfotime=1594190732&tbname=news&yii2_msg=1&news_id=' . $newsId . '&classid=' . $classId . '&list_html=1';
         $res = Tools::curlGet($url);
         $tag = new CmsAction();
-        
         //进行文章消息推送
         list($code, $msg) = $tag->result();
-
+        if ($code < 0) {
+            Tools::writeLog([$msg]);
+        }
         echo '<pre>';
         print_r($url);
         echo '<hr/>';
