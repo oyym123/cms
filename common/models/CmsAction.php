@@ -100,6 +100,7 @@ class CmsAction extends \yii\db\ActiveRecord
             Tools::writeLog($domain . "百度站长推送失败:" . $jsonres);
             return 1;
         } else {
+            Tools::writeLog([$jsonres]);
             Tools::writeLog($domain . "百度站长成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
             foreach ($info as $key => $re) {
                 if ($key == 0) {
