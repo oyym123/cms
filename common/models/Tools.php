@@ -59,7 +59,8 @@ class Tools extends \yii\db\ActiveRecord
         return $output;
     }
 
-    public static function curlNewGet($url){
+    public static function curlNewGet($url)
+    {
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -71,8 +72,7 @@ class Tools extends \yii\db\ActiveRecord
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-            ),
+            CURLOPT_HTTPHEADER => array(),
         ));
 
         $response = curl_exec($curl);
@@ -104,5 +104,21 @@ class Tools extends \yii\db\ActiveRecord
         return md5(uniqid(microtime(true), true)) . '.' . $ext;
     }
 
+    /**
+     * redis存储
+     * 标记
+     */
+    public static function redisResSet($key, $v)
+    {
+        $redis = \Yii::$app->redis;
+        if ($data = $redis->get($key)) {
+            $res = json_decode($v, true);
+            $result = json_encode(array_merge($res, $v));
+            $redis->set($key, $result);
+        } else {
+            $redis->set($key, $v);
+        }
+        return $v;
+    }
 
 }

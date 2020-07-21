@@ -12,9 +12,12 @@ class ZuoWenWang extends \yii\db\ActiveRecord
     {
         $dirArr = ['xiaoxue', 'chuzhong', 'gaozhong', 'huati', 'danyuan', 'sucai'];
         $url = 'http://www.zuowen.com/xiaoxue/';
-        $redis = Yii::$app->redis;
 
-        $redis->set('test_demo2', 'xiaoxue');
+        $key = 'xiaoxue_test';
+
+        $value = json_encode(['id' => '', 'name' => 'demo1', 'status' => 1]);
+
+        Tools::redisResSet($key, $value);
         exit;
 
 //      $homePage = Tools::curlGet($url);
@@ -30,7 +33,6 @@ class ZuoWenWang extends \yii\db\ActiveRecord
             if ($key >= 1) {
                 if (strpos($item, '>全部</a>') === false) {
                     $item = preg_replace('@/">(.*)?@s', '', $item);
-
                     //获取到第一页列表
                     $listInfo = Tools::curlNewGet($item);
                     $listInfo = iconv('gbk', 'UTF-8', $listInfo);
@@ -38,6 +40,7 @@ class ZuoWenWang extends \yii\db\ActiveRecord
                     $newInfoArr = explode('<div class="artbox_l_t">', $newList[0]);
 
                     sleep(1);
+
                     foreach ($newInfoArr as $key => $value) {
                         if ($key == 0) {
                             continue;
@@ -54,6 +57,13 @@ class ZuoWenWang extends \yii\db\ActiveRecord
 
         echo '<pre>';
         var_export($allUrl);
+    }
+
+
+    /** 获取所有的列表 */
+    public function getList()
+    {
+
     }
 
     /** 保存文章网数据 */

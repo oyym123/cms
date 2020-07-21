@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "black_article".
  *
  * @property int $id
- * @property string|null $title 标题 
+ * @property string|null $title 标题
  * @property int|null $type 1=文档导入 2=其他途径
  * @property int|null $type_id 来源id
  * @property int|null $key_id 关键词id
@@ -164,9 +164,48 @@ class BlackArticle extends \yii\db\ActiveRecord
         $url = 'http://' . $_SERVER['SERVER_ADDR'] . '/index.php?r=cms/get-class&db_name=jk8818com';
         $res = Tools::curlGet($url);
         $arr = [];
+
         foreach ($res as $item) {
             $arr[$item['classid']] = $item['classname'];
         }
         return $arr;
+    }
+
+    /** 批量推送到线上数据库 */
+    public function pushArticle()
+    {
+        //获取可发布的数据
+        $res = self::find()->where([
+            'status' => self::STATUS_INIT,
+            'type' => self::TYPE_ZUO_WEN_WANG
+        ])->asArray()->limit(1)->all();
+        $error = [];
+
+        foreach ($res as $key => $value) {
+            $model = BlackArticle::findOne($value['id']);
+            $data = [
+                'title' => '小学英语作文:' . $value['title'],
+                'keywords' => '小学英语作文',
+                'db_id' => 2,
+                'db_class_id' => 2,
+                'from_path' => $value['from_path'],
+                'title_img' => $value['title_img'],
+                'db_tags_id' => [1181],   //标签是小学英语作文
+                'status' => self::STATUS_ENABLE,
+                'content' => $value['content'],
+                'db_tags_name' => ['小学英语作文'],
+                'flag' => 1
+            ];
+
+            list($code, $msg) = Publish::pushBlackArticle($data);
+            if ($code < 0) {
+                $error[] = ['msg' => $msg, 'data' => $data];
+            }
+
+            //状态变更
+            $model->status = self::STATUS_ENABLE;
+            $model->save();
+        }
+        Tools::writeLog($error);
     }
 }

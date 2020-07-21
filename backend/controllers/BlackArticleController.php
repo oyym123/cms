@@ -104,7 +104,7 @@ class BlackArticleController extends Controller
                 } else {
                     if ($model->type == BlackArticle::TYPE_SOUGOU_WEIXIN) {
                         $data['title_img'] = $model->title_img;
-                    }else {
+                    } else {
                         //当内容中有图片时，那么选择内容中的第一张图 并且将标题加上去alt     大小：240 * 180
                         if (strpos($data['content'], '<img src="')) {
                             preg_match_all('@<img src="(.*?)"@', $data['content'], $imgData);
@@ -118,7 +118,6 @@ class BlackArticleController extends Controller
                         }
                     }
                 }
-
 
                 if (empty($data['db_tags_id'])) {
                     Yii::$app->getSession()->setFlash('error', '请填写标签！');
