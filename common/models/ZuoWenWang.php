@@ -3,14 +3,22 @@
 
 namespace common\models;
 
+use Yii;
 
 class ZuoWenWang extends \yii\db\ActiveRecord
 {
     /** 爬取作文网数据 */
-    public static function catchData()
+    public function catchData()
     {
         $dirArr = ['xiaoxue', 'chuzhong', 'gaozhong', 'huati', 'danyuan', 'sucai'];
         $url = 'http://www.zuowen.com/xiaoxue/';
+
+        $key = 'xiaoxue_test';
+
+        $value = json_encode(['id' => '', 'name' => 'demo1', 'status' => 1]);
+
+        Tools::redisResSet($key, $value);
+        exit;
 
 //      $homePage = Tools::curlGet($url);
         $homePage = file_get_contents('zuowenwang.html');
@@ -25,12 +33,14 @@ class ZuoWenWang extends \yii\db\ActiveRecord
             if ($key >= 1) {
                 if (strpos($item, '>全部</a>') === false) {
                     $item = preg_replace('@/">(.*)?@s', '', $item);
+                    //获取到第一页列表
                     $listInfo = Tools::curlNewGet($item);
                     $listInfo = iconv('gbk', 'UTF-8', $listInfo);
                     preg_match('@<div class="artlist">(.*)?<div class="artpage">@s', $listInfo, $newList);
                     $newInfoArr = explode('<div class="artbox_l_t">', $newList[0]);
 
                     sleep(1);
+
                     foreach ($newInfoArr as $key => $value) {
                         if ($key == 0) {
                             continue;
@@ -47,6 +57,123 @@ class ZuoWenWang extends \yii\db\ActiveRecord
 
         echo '<pre>';
         var_export($allUrl);
+    }
+
+
+    /** 获取所有的列表 */
+    public function getList()
+    {
+
+    }
+
+    /** 保存文章网数据 */
+    public function saveData()
+    {
+        set_time_limit(0);
+        $error = [];
+        $data = $this->getData();
+
+        foreach ($data as $k => $url) {
+            $oldUrl = BlackArticle::find()->where(['from_path' => $url])->one();
+            if (!empty($oldUrl)) {
+                $error[] = '已经爬取过';
+                continue;
+            }
+
+            $res = Tools::curlGet($url);
+            $res = iconv('gbk', 'UTF-8', $res);
+            preg_match('@<h1 class="h_title">(.*)?</h1>@', $res, $infoTitle);
+            preg_match('@<div class="con_content">(.*)?<p style="@s', $res, $infoContentMatch);
+            $infoContent = preg_replace('@<br/></p><p style="(.*)?@', '', $infoContentMatch[1]);
+            $title = preg_replace('@(.*)?：@', '', $infoTitle[1]);
+            $title = preg_replace('@_(.*)@', '', $title);
+
+            //判重 不可重复标题
+            $oldInfo = BlackArticle::find()->where(['title' => $title])->one();
+
+            if (empty($title)) {
+                $error[] = '标题为空';
+                continue;
+            }
+
+            if (!empty($oldInfo)) {
+                $error[] = $title . '   已经重复了';
+                continue;
+            }
+
+            $msgImgsArr = [];
+
+            //清理标签 切词
+            $infoContent = strip_tags($infoContent);
+
+            $infoContent = str_replace('　　', '&nbsp; &nbsp; &nbsp;', $infoContent);
+            $txtArr = array_filter(explode('&nbsp; &nbsp; &nbsp;', $infoContent));
+            array_shift($txtArr);
+            $str = implode('{*}', $txtArr);
+            $img = '';
+            if (empty($txtArr)) {
+                $error[] = $title . '没有内容';
+                continue;
+            }
+
+            //根据文章含义抓取图片
+            list($imgCode, $imgMsg) = Images::catchPixabay($title);
+
+            if ($imgCode > 0) {
+                $img = $imgMsg;
+                $contentStr = '<br><img src="' . $img . '" ><br><br>';
+            } else {
+                $contentStr = '';
+            }
+
+            $part = json_encode($txtArr, JSON_UNESCAPED_UNICODE);
+
+            //有道翻译
+            $ret = (new YouDaoApi())->startRequest($str);
+            $ret = json_decode($ret, true);
+
+            $enRes = explode('{*}', $ret['translation'][0]);
+
+            //英文词分词
+            $enPart = json_encode($enRes, JSON_UNESCAPED_UNICODE);
+            $allPart = [];
+
+            foreach ($enRes as $key => $value) {
+                $allPart[] = $value . '<br>' . $txtArr[$key];
+                $contentStr .= $value . '<br>' . $txtArr[$key] . '<br><br>';
+            }
+
+            //中英文分词
+            $allPart = json_encode($allPart, JSON_UNESCAPED_UNICODE);
+
+            sleep(3);
+
+            $dataSave = [
+                'title' => $title,
+                'type' => BlackArticle::TYPE_ZUO_WEN_WANG,
+                'key_id' => 0,
+                'intro' => $infoTitle[1],
+                'keywords' => $title,
+                'cut_word' => '',
+                'image_urls' => $msgImgsArr ? json_encode($msgImgsArr) : '',
+                'from_path' => $url,
+                'word_count' => mb_strlen($contentStr),
+                'part_content' => $part,
+                'en_part_content' => $enPart,
+                'all_part_content' => $allPart,
+                'title_img' => $img,
+                'content' => $contentStr,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+
+            list($codeArticle, $msgArticle) = BlackArticle::createOne($dataSave);
+            if ($codeArticle < 0) {
+                $error[] = $msgArticle;
+            }
+        }
+
+        echo '<pre>';
+        print_r($error);
     }
 
     /** 所有的小学作文第一页 */

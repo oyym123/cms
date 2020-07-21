@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\models\BaiduKeywords;
+use common\models\BlackArticle;
 use common\models\DbName;
 use common\models\LongKeywords;
 use common\models\Tools;
@@ -81,16 +82,24 @@ class CmsController extends \yii\console\Controller
     }
 
     /** 生成泛目录缓存 */
-    public function cacheFan()
+    public function actionCacheFan()
     {
         $url = 'https://www.ysjj.org.cn/?index.php&catch_web=1';
         Tools::curlGet($url);
     }
 
     /** 生成泛目录缓存 */
-    public function pushFan()
+    public function actionPushFan()
     {
         $url = 'https://www.ysjj.org.cn/?index.php&push=1';
         Tools::curlGet($url);
+    }
+
+    /** 推送黑帽文章
+     * cms/push-black-article
+     */
+    public function actionPushBlackArticle()
+    {
+        (new BlackArticle())->pushArticle();
     }
 }
