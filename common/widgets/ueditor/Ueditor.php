@@ -2,7 +2,7 @@
 
 namespace common\widgets\ueditor;
 
-use common\models\WhiteArticle;
+use common\models\BlackArticle;
 use Yii;
 use yii\web\View;
 use yii\helpers\Html;
@@ -42,7 +42,11 @@ class Ueditor extends InputWidget
     {
         if ($this->hasModel()) {
             $imgView = '?imageView2/1/w/240/h/180';
-            if ($this->model->type == WhiteArticle::TYPE_DOC_TXT) {
+            if ($this->model->type == BlackArticle::TYPE_ZUO_WEN_WANG) {
+                $this->registerClientScript($this->model);
+            }
+
+            if ($this->model->type == BlackArticle::TYPE_DOC_TXT) {
                 //前面转换
                 $upArr = [
                     '一，', '二，', '三，', '四，', '五，',
@@ -70,8 +74,7 @@ class Ueditor extends InputWidget
                 $this->registerClientScript();
             }
 
-            if ($this->model->type == WhiteArticle::TYPE_SOUGOU_WEIXIN) {
-
+            if ($this->model->type == BlackArticle::TYPE_SOUGOU_WEIXIN) {
                 $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
                 if (strpos($this->model->content, '<div id="js_article" class="rich_media">') !== false) {
                     $content = $this->model->content;
@@ -82,7 +85,7 @@ class Ueditor extends InputWidget
                 $this->registerClientScript($this->model);
             }
 
-            if ($this->model->type == WhiteArticle::TYPE_DOC_WORD) {
+            if ($this->model->type == BlackArticle::TYPE_DOC_WORD) {
                 $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
                 $this->model->content = preg_replace("@(.*)?</head><body>@", '', $this->model->content);
                 $images = json_decode($this->model->image_urls, true);
@@ -107,7 +110,7 @@ class Ueditor extends InputWidget
     {
         UEditorAsset::register($this->view);
         $options = Json::encode($this->options);
-        if ($model && $model->status != WhiteArticle::STATUS_INIT) {
+        if ($model && $model->status != BlackArticle::STATUS_INIT) {
             //主要功能 ：判断是否渲染
             $script = "  UE.delEditor('" . $this->id . "', " . $options . "); 
                      ue= UE.getEditor('" . $this->id . "', " . $options . ")                     

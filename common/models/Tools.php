@@ -103,4 +103,6 @@ class Tools extends \yii\db\ActiveRecord
     {
         return md5(uniqid(microtime(true), true)) . '.' . $ext;
     }
+
+
 }

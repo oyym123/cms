@@ -75,11 +75,15 @@ class Qiniu
     public function fetchFile($url, $bucket, $key)
     {
         $uploadMgr = new BucketManager($this->auth);
-        list($ret, $error) = $uploadMgr->fetch($url, $bucket, 'wordImg/' . $key);
-        if ($error !== null) {
-            return [-1, $error];
-        } else {
-            return [1, Yii::$app->params['QiNiuHost'] . 'wordImg/' . $key];
+        try {
+            list($ret, $error) = $uploadMgr->fetch($url, $bucket, 'wordImg/' . $key);
+            if ($error !== null) {
+                return [-1, $error];
+            } else {
+                return [1, Yii::$app->params['QiNiuHost'] . 'wordImg/' . $key];
+            }
+        } catch (\Exception $e) {
+            return [-1, '上传错误'];
         }
     }
 }

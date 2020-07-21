@@ -10,4 +10,6 @@ return [
     'QiNiuSecretKey' => 'Q-juNSlonLCnBfvGpF9NJwaYUn7FS9y0MTKECIAr',
     'QiNiuHost' => 'http://img.thszxxdyw.org.cn/',
     'QiNiuBucketImg' => 'aks-img01',
+    'YouDaoAppKey' => '3c405b325744c3f6',
+    'YouDaoSecKey' => 'yoZ2a3k94QRzlXiFq8mvLjGxJStgquOB',
 ];

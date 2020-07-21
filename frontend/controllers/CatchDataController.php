@@ -72,11 +72,10 @@ class CatchDataController extends Controller
             exit('success ' . $msg->id);
         }
     }
-
-
+    
     /** 作文网数据爬取 & 翻译 */
     public function actionZww()
     {
-        ZuoWenWang::catchData();
+        (new ZuoWenWang())->catchData();
     }
 }

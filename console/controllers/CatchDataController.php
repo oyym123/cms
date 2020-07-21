@@ -7,6 +7,7 @@ namespace console\controllers;
 use common\models\BaiduKeywords;
 use common\models\Tools;
 use common\models\WebDriver;
+use common\models\ZuoWenWang;
 
 class CatchDataController extends \yii\console\Controller
 {
@@ -30,7 +31,7 @@ class CatchDataController extends \yii\console\Controller
         $keyword->catch_status = BaiduKeywords::CATCH_STATUS_OVER;
         $keyword->save();
 
-        Tools::writeLog(['开始抓取：' => $keyword->keywords],'sgwx.txt');
+        Tools::writeLog(['开始抓取：' => $keyword->keywords], 'sgwx.txt');
 
         for ($i = 1; $i <= 10; $i++) {
             list($code, $msg) = WebDriver::getSgwx($keyword->keywords, $i, $keyword->id);
@@ -48,5 +49,11 @@ class CatchDataController extends \yii\console\Controller
     {
         $url = 'http://' . $_SERVER['HTTP_HOST'] . '/index.php?r=catch-data/sgdata';
         Tools::curlGet($url);
+    }
+
+    /** 作文网数据爬取 & 翻译 */
+    public function actionZww()
+    {
+        (new ZuoWenWang())->saveData();
     }
 }

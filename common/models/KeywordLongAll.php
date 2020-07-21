@@ -59,7 +59,7 @@ class KeywordLongAll extends \yii\db\ActiveRecord
     {
         $data = self::find()->select('keywors_name as keywords')
             ->andWhere(['like', 'keywors_name', '英语'])
-            ->andWhere(['between', 'day30_m_rijun', 10, 1000000])
+            ->andWhere(['between', 'day30_m_rijun', 1, 10])
             ->asArray()
             ->all();
         return $data;

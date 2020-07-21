@@ -19,8 +19,6 @@ class UeditorController extends Controller
         }
 
         if ($action == 'getToken') {
-
-
             $res = (new Qiniu())->upToken('aks-img01');
             return json_encode([
                 'state' => 'SUCCESS',
