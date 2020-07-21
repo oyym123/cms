@@ -29,6 +29,7 @@ class Publish extends \yii\db\ActiveRecord
         }
     }
 
+    /** 发布黑帽文章 */
     public static function pushBlackArticle($data)
     {
         $dbName = DbName::find()->where(['id' => $data['db_id']])->one();
