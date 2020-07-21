@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\BaiduKeywords;
 use common\models\BaiDuSdk;
+use common\models\BlackArticle;
 use common\models\CmsAction;
 use common\models\DbName;
 use common\models\DirCatch;
@@ -162,5 +163,13 @@ class CmsController extends Controller
     public function actionImportTags()
     {
         NewsTags::import();
+    }
+
+    /** 推送黑帽文章
+     * cms/push-black-article
+     */
+    public function actionPushBlackArticle()
+    {
+        (new BlackArticle())->pushArticle();
     }
 }

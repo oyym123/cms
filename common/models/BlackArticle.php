@@ -179,13 +179,15 @@ class BlackArticle extends \yii\db\ActiveRecord
             'status' => self::STATUS_INIT,
             'type' => self::TYPE_ZUO_WEN_WANG
         ])->asArray()->limit(1)->all();
+
         $error = [];
 
         foreach ($res as $key => $value) {
             $model = BlackArticle::findOne($value['id']);
+            list($titleTag, $tagsName) = $this->setTags($value['intro']);
             $data = [
-                'title' => '小学英语作文:' . $value['title'],
-                'keywords' => '小学英语作文',
+                'title' => $titleTag . '英语作文:' . $value['title'],
+                'keywords' => $titleTag . '英语作文',
                 'db_id' => 2,
                 'db_class_id' => 2,
                 'from_path' => $value['from_path'],
@@ -193,7 +195,7 @@ class BlackArticle extends \yii\db\ActiveRecord
                 'db_tags_id' => [1181],   //标签是小学英语作文
                 'status' => self::STATUS_ENABLE,
                 'content' => $value['content'],
-                'db_tags_name' => ['小学英语作文'],
+                'db_tags_name' => [$tagsName],
                 'flag' => 1
             ];
 
@@ -201,11 +203,30 @@ class BlackArticle extends \yii\db\ActiveRecord
             if ($code < 0) {
                 $error[] = ['msg' => $msg, 'data' => $data];
             }
-
             //状态变更
             $model->status = self::STATUS_ENABLE;
             $model->save();
         }
+
+        print_r($error);
+        exit;
         Tools::writeLog($error);
+    }
+
+    /** 随机设置标签 */
+    public function setTags($intro)
+    {
+        $keyArr = ['一年级', '二年级', '三年级', '四年级', '五年级', '六年级'];
+        $titleTag = '小学';
+        $tagsName = '小学';
+        foreach ($keyArr as $value) {
+            if (strpos($intro, $value) !== false) {
+                //获取随机tags
+                $tags = BaiduKeywords::find()->where(['like', 'keywords', $value])->orderBy('RAND()')->one();
+                $tagsName = $tags ? $tags->keywords : '小学';
+                $titleTag = $value;
+            }
+        }
+        return [$titleTag, $tagsName];
     }
 }
