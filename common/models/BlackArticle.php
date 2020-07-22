@@ -186,8 +186,9 @@ class BlackArticle extends \yii\db\ActiveRecord
             $model = BlackArticle::findOne($value['id']);
             list($titleTag, $tagsName) = $this->setTags($value['intro']);
 
+            sleep(2);
             $data = [
-                'title' => $titleTag . '英语作文:'  . $value['title'],
+                'title' => $titleTag . '英语作文:' . $value['title'],
                 'keywords' => $titleTag . '英语作文',
                 'db_id' => 2,
                 'db_class_id' => 2,
