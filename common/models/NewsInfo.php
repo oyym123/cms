@@ -34,14 +34,20 @@ class NewsInfo extends \yii\db\ActiveRecord
     /** 将数据库中的文章插入到 选中的数据库中 */
     public static function createOne($data)
     {
+        if (isset($data['flag'])) {
+            $randTime = Tools::randomDate('20200501', '', false);
+        } else {
+            $randTime = time();
+        }
+
         $model = new NewsInfo();
         $model->classid = $data['classid'];
         $model->filename = $data['filename'];
         $model->userid = 1;
         $model->username = 'heshao';
         $model->ispic = 1;
-        $model->truetime = time();
-        $model->lastdotime = time();
+        $model->truetime = $randTime;
+        $model->lastdotime = $randTime;
         $model->havehtml = 1;
         $model->titleurl = $data['titleurl'];
         $model->stb = 1;
@@ -49,7 +55,7 @@ class NewsInfo extends \yii\db\ActiveRecord
         $model->restb = 1;
         $model->keyboard = $data['keyboard'];
         $model->title = $data['title'];
-        $model->newstime = time();
+        $model->newstime = $randTime;
         $model->titlepic = $data['titlepic'];
         $model->ftitle = $data['ftitle'];
         $model->smalltext = $data['smalltext'];
