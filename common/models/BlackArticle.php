@@ -178,15 +178,16 @@ class BlackArticle extends \yii\db\ActiveRecord
         $res = self::find()->where([
             'status' => self::STATUS_INIT,
             'type' => self::TYPE_ZUO_WEN_WANG
-        ])->asArray()->limit(1)->all();
+        ])->asArray()->limit(1000)->all();
 
         $error = [];
 
         foreach ($res as $key => $value) {
             $model = BlackArticle::findOne($value['id']);
             list($titleTag, $tagsName) = $this->setTags($value['intro']);
+
             $data = [
-                'title' => $titleTag . '英语作文:' . $value['title'],
+                'title' => $titleTag . '英语作文:'  . $value['title'],
                 'keywords' => $titleTag . '英语作文',
                 'db_id' => 2,
                 'db_class_id' => 2,
@@ -195,7 +196,7 @@ class BlackArticle extends \yii\db\ActiveRecord
                 'db_tags_id' => [1181],   //标签是小学英语作文
                 'status' => self::STATUS_ENABLE,
                 'content' => $value['content'],
-                'db_tags_name' => [$tagsName],
+                'db_tags_name' => ['小学英语'],
                 'flag' => 1
             ];
 
@@ -205,7 +206,7 @@ class BlackArticle extends \yii\db\ActiveRecord
             }
             //状态变更
             $model->status = self::STATUS_ENABLE;
-            $model->save();
+            $model->save(false);
         }
 
         print_r($error);

@@ -61,9 +61,10 @@ class KeywordLongAll extends \yii\db\ActiveRecord
             ->andWhere(['like', 'keywors_name', '英语'])
             ->andWhere(['between', 'day30_m_rijun', 0, 1])
             ->asArray()
-            ->offset(0)
-            ->limit(70000)
+            ->offset(70000)
+            ->limit(90000)
             ->all();
+
         return $data;
     }
 }

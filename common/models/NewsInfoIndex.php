@@ -34,12 +34,18 @@ class NewsInfoIndex extends \yii\db\ActiveRecord
     /** 将数据库中的文章插入到 选中的数据库中 */
     public static function createOne($data)
     {
+        if (isset($data['flag'])) {
+            $randTime = Tools::randomDate('20200501', '', false);
+        } else {
+            $randTime = time();
+        }
+
         $model = new NewsInfoIndex();
         $model->classid = $data['db_class_id'];
         $model->checked = 1;
-        $model->newstime = time() - rand(1111, 99999);
-        $model->truetime = time();
-        $model->lastdotime = time();
+        $model->newstime = $randTime;
+        $model->truetime = $randTime;
+        $model->lastdotime = $randTime;
         $model->havehtml = 1;
         if (!$model->save()) {
             return [-1, $model->getErrors()];
