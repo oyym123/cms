@@ -111,14 +111,22 @@ class Tools extends \yii\db\ActiveRecord
     public static function redisResSet($key, $v)
     {
         $redis = \Yii::$app->redis;
-        if ($data = $redis->get($key)) {
-            $res = json_decode($v, true);
-            $result = json_encode(array_merge($res, $v));
-            $redis->set($key, $result);
-        } else {
-            $redis->set($key, $v);
-        }
-        return $v;
+        $redis->set($key, $v);
     }
 
+    /**
+     * php生成某个范围内的随机时间
+     * @param $begintime  起始时间 格式为 Y-m-d H:i:s
+     * @param $endtime    结束时间 格式为 Y-m-d H:i:s
+     * @param $is         是否是时间戳 格式为 Boolean
+     * 飞鸟慕鱼博客
+     * http://www.feiniaomy.com
+     */
+    public static function randomDate($begintime, $endtime = "", $is = true)
+    {
+        $begin = strtotime($begintime);
+        $end = $endtime == "" ? time() : strtotime($endtime);
+        $timestamp = rand($begin, $end);
+        return $is ? date("Y-m-d H:i:s", $timestamp) : $timestamp;
+    }
 }

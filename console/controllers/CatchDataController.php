@@ -56,4 +56,9 @@ class CatchDataController extends \yii\console\Controller
     {
         (new ZuoWenWang())->saveData();
     }
+
+    public function actionCatchZw()
+    {
+        (new ZuoWenWang())->catchData();
+    }
 }
