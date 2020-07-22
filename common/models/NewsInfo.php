@@ -35,7 +35,7 @@ class NewsInfo extends \yii\db\ActiveRecord
     public static function createOne($data)
     {
 
-        $randTime = Tools::randomDate('20200501', '', false);
+        $randTime = time();
 
 
         $model = new NewsInfo();
