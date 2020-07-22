@@ -82,6 +82,10 @@ class NewsData extends \yii\db\ActiveRecord
             'smalltext' => mb_substr($contentTxt, 0, rand(45, 70)),   //文章简介
         ];
 
+        if (isset($data['flag'])) {
+            $info['flag'] = 1;
+        }
+
         list($codeInfo, $msgInfo) = NewsInfo::createOne($info);
         if ($codeInfo < 0) {
             $error[] = $msgInfo;
