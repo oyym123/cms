@@ -34,11 +34,9 @@ class NewsInfo extends \yii\db\ActiveRecord
     /** 将数据库中的文章插入到 选中的数据库中 */
     public static function createOne($data)
     {
-        if (isset($data['flag'])) {
-            $randTime = Tools::randomDate('20200501', '', false);
-        } else {
-            $randTime = time();
-        }
+
+        $randTime = Tools::randomDate('20200501', '', false);
+
 
         $model = new NewsInfo();
         $model->classid = $data['classid'];

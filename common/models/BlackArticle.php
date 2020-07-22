@@ -178,7 +178,7 @@ class BlackArticle extends \yii\db\ActiveRecord
         $res = self::find()->where([
             'status' => self::STATUS_INIT,
             'type' => self::TYPE_ZUO_WEN_WANG
-        ])->asArray()->limit(1000)->all();
+        ])->asArray()->limit(1)->all();
 
         $error = [];
 
