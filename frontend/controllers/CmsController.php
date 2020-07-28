@@ -8,6 +8,7 @@ use common\models\BlackArticle;
 use common\models\CmsAction;
 use common\models\DbName;
 use common\models\DirCatch;
+use common\models\KeywordLongAll;
 use common\models\Keywords;
 use common\models\LongKeywords;
 use common\models\NewsClass;
@@ -15,6 +16,7 @@ use common\models\NewsClassTags;
 use common\models\NewsData;
 use common\models\NewsTags;
 use common\models\Tools;
+use common\models\ZuoWenWang;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
@@ -171,5 +173,24 @@ class CmsController extends Controller
     public function actionPushBlackArticle()
     {
         (new BlackArticle())->pushArticle();
+    }
+
+    public function actionSetLong()
+    {
+        $data = [];
+
+        $res = file_get_contents('./test01.txt');
+        $data = explode(PHP_EOL, $res);
+
+        foreach ($data as $datum) {
+            KeywordLongAll::createOne(['keywors_name' => $datum]);
+        }
+    }
+
+    /** 作文网数据爬取 & 翻译 */
+    public function actionZww()
+    {
+        $url = 'http://www.zuowen.com/e/20200526/5ecd1d79af916.shtml';
+        (new ZuoWenWang())->saveData([$url]);
     }
 }

@@ -34,7 +34,7 @@ class NewsInfo extends \yii\db\ActiveRecord
     /** 将数据库中的文章插入到 选中的数据库中 */
     public static function createOne($data)
     {
- 
+
         $randTime = time();
 
         $model = new NewsInfo();

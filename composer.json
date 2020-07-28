@@ -22,7 +22,11 @@
         "qiniu/php-sdk": "^7.2",
         "kartik-v/yii2-widget-fileinput": "^1.0",
         "php-webdriver/webdriver": "^1.8",
-        "yiisoft/yii2-redis": "^2.0"
+        "yiisoft/yii2-redis": "^2.0",
+        "php-amqplib/php-amqplib": "^2.11",
+        "yiisoft/yii2-smarty": "^2.0",
+        "dmstr/yii2-adminlte-asset": "^2.6",
+        "mdmsoft/yii2-admin": "~2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

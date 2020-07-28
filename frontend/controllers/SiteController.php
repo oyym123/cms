@@ -1,25 +1,31 @@
 <?php
+
 namespace frontend\controllers;
 
+use common\models\BlackArticle;
+use common\models\DomainColumn;
+use common\models\LoginForm;
+use common\models\Tools;
+use frontend\models\ContactForm;
+use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResendVerificationEmailForm;
+use frontend\models\ResetPasswordForm;
+use frontend\models\SignupForm;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\data\Pagination;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
-use yii\filters\VerbFilter;
-use yii\filters\AccessControl;
-use common\models\LoginForm;
-use frontend\models\PasswordResetRequestForm;
-use frontend\models\ResetPasswordForm;
-use frontend\models\SignupForm;
-use frontend\models\ContactForm;
 
 /**
  * Site controller
  */
 class SiteController extends Controller
 {
+
     /**
      * {@inheritdoc}
      */
@@ -74,7 +80,31 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        //url 规则制定
+        $res = \common\models\Fan::getRules();
+
+        //url转换 分页
+        $url = Yii::$app->request->url;
+        if (strpos($url, 'index_') && preg_match('/\d+/', $url, $arr)) {
+            $_GET['page'] = $arr[0];
+        }
+
+        $this->layout = "fan1/home";
+        $query = BlackArticle::find()->limit(10);
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count()]);
+
+        $models = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->asArray()->all();
+
+
+        $render = Tools::jumpDomain('/fan/fan1/m_static/index', '/fan/fan1/static/index', $_SERVER['HTTP_HOST']);
+        return $this->render($render, [
+            'column' => DomainColumn::getColumn(),
+            'models' => $models,
+            'pages' => $pages,
+        ]);
     }
 
     /**
@@ -93,7 +123,6 @@ class SiteController extends Controller
             return $this->goBack();
         } else {
             $model->password = '';
-
             return $this->render('login', [
                 'model' => $model,
             ]);
@@ -216,8 +245,8 @@ class SiteController extends Controller
      * Verify email address
      *
      * @param string $token
-     * @throws BadRequestHttpException
      * @return yii\web\Response
+     * @throws BadRequestHttpException
      */
     public function actionVerifyEmail($token)
     {

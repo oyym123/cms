@@ -83,7 +83,7 @@ class Qiniu
                 return [1, Yii::$app->params['QiNiuHost'] . 'wordImg/' . $key];
             }
         } catch (\Exception $e) {
-            return [-1, '上传错误'];
+            return [-1, $e->getMessage()];
         }
     }
 }

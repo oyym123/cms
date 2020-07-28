@@ -15,7 +15,7 @@ class ZuoWenWang extends \yii\db\ActiveRecord
         $url = 'http://www.zuowen.com/xiaoxue/';
 
 //        $key = 'xiaoxue_test';
-//
+
         $homePage = Tools::curlGet($url);
 
 //        $homePage = file_get_contents('zuowenwang.html');
@@ -26,9 +26,10 @@ class ZuoWenWang extends \yii\db\ActiveRecord
         $dirLinkArr = explode('<a target="_blank" href="', $link[0]);
         $allUrl = $newArr = [];
         $redisKey = 'catch_data_xiaoxue';
+
         foreach ($dirLinkArr as $key => $item) {
             if (strpos($item, '>全部</a>') === false) {
-                if ($key == 1) {
+                if ($key >= 15) {
                     $item = preg_replace('@/">(.*)?@s', '', $item);
                     $value = $this->getList($redisKey, $item);
                     $allUrl[] = $value;
@@ -41,15 +42,14 @@ class ZuoWenWang extends \yii\db\ActiveRecord
     public function getList($redisKey, $url)
     {
         $allUrl = [];
-        for ($i = 1; $i < 100; $i++) {
+        for ($i = 1; $i < 70; $i++) {
             if ($i == 1) {
                 $item = $url;
             } else {
                 $item = $url . '/index_' . $i . '.shtml';
             }
 
-            sleep(2);
-
+            echo '第' . $i . '页  ' . $item;
             //获取列表页
             $listInfo = Tools::curlNewGet($item);
 
@@ -66,7 +66,20 @@ class ZuoWenWang extends \yii\db\ActiveRecord
                     preg_match('@<a href="(.*)?" title="@s', $value, $newValue);
                     if (!empty($newValue)) {
                         $allUrl[] = $newValue[1];
+                        echo '第' . $key . '行  ';
+
+//                        $saveData = [
+//                            ''
+//                        ];
+
+                        //保存
+//                      SiteUrl::createOne($saveData);
+
+                        //塞入队列
+                        $this->saveData([$newValue[1]]);
+
                         file_put_contents('demo.txt', $newValue[1] . PHP_EOL, FILE_APPEND);
+                        sleep(3);
                     }
                 }
             } else {
@@ -77,36 +90,51 @@ class ZuoWenWang extends \yii\db\ActiveRecord
     }
 
     /** 保存文章网数据 */
-    public function saveData()
+    public function saveData($data)
     {
         set_time_limit(0);
         $error = [];
-        $data = file_get_contents('demo.txt');
-        $data = array_filter(explode(PHP_EOL, $data));
+//        $data = file_get_contents('demo.txt');
+//        $data = array_filter(explode(PHP_EOL, $data));
 
         if ($data) {
             foreach ($data as $k => $url) {
                 $oldUrl = BlackArticle::find()->where(['from_path' => $url])->one();
                 if (!empty($oldUrl)) {
-                    $error[] = '已经爬取过';
+                    $error[] = $url . '已经爬取过';
                     continue;
                 }
 
                 $res = Tools::curlGet($url);
                 $res = iconv('gbk', 'UTF-8', $res);
+
                 preg_match('@<h1 class="h_title">(.*)?</h1>@', $res, $infoTitle);
+
+                $infoContentMatch = [];
                 preg_match('@<div class="con_content">(.*)?<p style="@s', $res, $infoContentMatch);
                 $infoContent = preg_replace('@<br/></p><p style="(.*)?@', '', $infoContentMatch[1]);
+
+                //表示爬取不到内容
+                if (strlen($infoContent) < 50) {
+                    preg_match('@<div class="con_content">(.*)?</div>
+                <!-- -->@s', $res, $infoContentMatch);
+                    $infoContent = $infoContentMatch[1];
+                }
+
+                //清理标签 切词
+                $infoContent = strip_tags($infoContent);
+                $infoContent = preg_replace('@<br/></p><p style="(.*)?@', '', $infoContent);
                 $title = preg_replace('@(.*)?：@', '', $infoTitle[1]);
                 $title = preg_replace('@_(.*)@', '', $title);
-
-                //判重 不可重复标题
-                $oldInfo = BlackArticle::find()->where(['title' => $title])->one();
+                $infoContent = str_replace(['作文网专稿 未经允许不得转载', '&rdquo;', '&ldquo;', '&quot;', '&amp;ldquo;', '&amp;quot;', '&hellip;', '&amp;&hellip;'], '', $infoContent);
 
                 if (empty($title)) {
                     $error[] = '标题为空';
                     continue;
                 }
+
+                //判重 不可重复标题
+                $oldInfo = BlackArticle::find()->where(['title' => $title])->one();
 
                 if (!empty($oldInfo)) {
                     $error[] = $title . '   已经重复了';
@@ -117,22 +145,27 @@ class ZuoWenWang extends \yii\db\ActiveRecord
 
                 //清理标签 切词
                 $infoContent = strip_tags($infoContent);
-
                 $infoContent = str_replace('　　', '&nbsp; &nbsp; &nbsp;', $infoContent);
-                $txtArr = array_filter(explode('&nbsp; &nbsp; &nbsp;', $infoContent));
+                $infoContent = str_replace('&nbsp; &nbsp;', '　　', $infoContent);
+                $txtArr = array_filter(explode('　　', $infoContent));
+
                 array_shift($txtArr);
                 $str = implode('{*}', $txtArr);
+                $str = str_replace('&nbsp;', '', $str);
                 $img = '';
+
                 if (empty($txtArr)) {
-                    $error[] = $title . '没有内容';
+                    $error[] = $url . '  ' . $title . '没有内容';
                     continue;
                 }
 
-                list($titleTag, $tagsName) = $this->setTags($infoTitle[1]);
-                $title = $titleTag . '英语作文:' . $title;
+                $imgTitle = preg_replace('@(.*)?:@', '', $title);
 
                 //根据文章含义抓取图片
-                list($imgCode, $imgMsg) = Images::catchPixabay($title);
+                list($imgCode, $imgMsg) = Images::catchPixabay($imgTitle);
+
+                list($titleTag, $tagsName) = $this->setTags($infoTitle[1]);
+                $title = $titleTag . '英语作文:' . $title;
 
                 if ($imgCode > 0) {
                     $img = $imgMsg;
@@ -161,8 +194,6 @@ class ZuoWenWang extends \yii\db\ActiveRecord
                 //中英文分词
                 $allPart = json_encode($allPart, JSON_UNESCAPED_UNICODE);
 
-                sleep(3);
-
                 $dataSave = [
                     'title' => $title,
                     'type' => BlackArticle::TYPE_ZUO_WEN_WANG,
@@ -186,9 +217,8 @@ class ZuoWenWang extends \yii\db\ActiveRecord
                     $error[] = $msgArticle;
                 }
             }
-
-
         }
+
         echo '<pre>';
         print_r($error);
     }
@@ -209,5 +239,4 @@ class ZuoWenWang extends \yii\db\ActiveRecord
         }
         return [$titleTag, $tagsName];
     }
-
 }

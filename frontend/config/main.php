@@ -1,4 +1,5 @@
 <?php
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -36,6 +37,23 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+                'wen' => '/fan',
+                'wen/<id:\d+>.html' => '/fan/detail',
+                'wen/index_<id:\d+>.html' => '/fan',
+                
+                'j' => '/fan',
+                'j/<id:\d+>.html' => '/fan/detail',
+                'j/index_<id:\d+>.html' => '/fan',
+                
+                'index_<id:\d+>.html' => '/site/index',
+                //end 正则注释识别 勿删
+            ],
+        ],
+
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,

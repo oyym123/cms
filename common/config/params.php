@@ -12,4 +12,15 @@ return [
     'QiNiuBucketImg' => 'aks-img01',
     'YouDaoAppKey' => '3c405b325744c3f6',
     'YouDaoSecKey' => 'yoZ2a3k94QRzlXiFq8mvLjGxJStgquOB',
+    'rabbitmqConfig' => [
+        'host' => '127.0.0.1',
+        'port' => 5672,
+        'user' => 'guest',
+        'pwd' => 'guest',
+        'vhost' => '/',
+    ],
+    'MqConfig' => [
+        'exchange' => 'kd_sms_send_ex',
+        'queue' => 'kd_sms_send_q'
+    ],
 ];
