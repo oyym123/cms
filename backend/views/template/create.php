@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\Template */
 
-$this->title = 'Create Template';
+$this->title = '创建模板';
 $this->params['breadcrumbs'][] = ['label' => 'Templates', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

@@ -9,7 +9,6 @@
             </div>
             <div class="pull-left info">
                 <p>Alexander Pierce</p>
-
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
         </div>
@@ -24,7 +23,6 @@
               </span>
             </div>
         </form>
-
 
         <!-- /.search form -->
 
@@ -52,20 +50,18 @@
                     ['label' => '泛目录', 'icon' => 'dashboard', 'url' => ['#'],
                         'items' => [
                             ['label' => '域名', 'icon' => 'file-code-o', 'url' => ['/domain/index']],
-                            ['label' => '类目', 'icon' => 'file-code-o', 'url' => ['/domain-column/index']],
+                            ['label' => '栏目', 'icon' => 'file-code-o', 'url' => ['/domain-column/index']],
                             ['label' => '模板', 'icon' => 'file-code-o', 'url' => ['/template/index']],
                             ['label' => '模组', 'icon' => 'file-code-o', 'url' => ['/domain-tpl/index']],
                             ['label' => '类型', 'icon' => 'file-code-o', 'url' => ['/category/index']],
-                            ['label' => '方法', 'icon' => 'file-code-o', 'url' => ['/article-way/index']],
+                            ['label' => '手法', 'icon' => 'file-code-o', 'url' => ['/article-way/index']],
                             ['label' => '规则', 'icon' => 'file-code-o', 'url' => ['/article-rules/index']],
                             ['label' => '文章', 'icon' => 'file-code-o', 'url' => ['/push-article/index']],
                         ]
                     ],
-
                     ['label' => '兔子队列', 'icon' => 'dashboard', 'url' => ['/rabbitemq/index']],
                     ['label' => '黑帽文章', 'icon' => 'dashboard', 'url' => ['/black-article/index']],
                     ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],
-
                     ['label' => '关键词', 'icon' => 'dashboard', 'url' => ['#'],
                         'items' => [
                             ['label' => '百度营销词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
@@ -83,5 +79,4 @@
         ) ?>
 
     </section>
-
 </aside>

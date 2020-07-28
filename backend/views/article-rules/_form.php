@@ -83,7 +83,7 @@ use yii\widgets\ActiveForm;
     $("#articlerules-domain_id").change(function () {
         var html = '';
         $.ajax({
-            url: 'index.php?r=article-rules/get-class',
+            url: '/index.php/article-rules/get-class',
             type: 'GET',
             dataType: 'json',
             data: {domain_id: $("#articlerules-domain_id").find("option:selected").val()},
