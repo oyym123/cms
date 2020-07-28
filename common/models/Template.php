@@ -18,13 +18,25 @@ use Yii;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class Template extends \yii\db\ActiveRecord
+class Template extends Base
 {
 
     const TYPE_HOME = 1;            //首页
     const TYPE_LIST = 2;            //列表页
     const TYPE_DETAIL = 3;          //详情页
     const TYPE_CUSTOMIZE = 4;       //自定义页面
+
+    /** 获取所有的类型 */
+    public static function getType($key = 'all')
+    {
+        $data = [
+            self::TYPE_HOME => '首页',
+            self::TYPE_LIST => '列表页',
+            self::TYPE_DETAIL => '详情页',
+            self::TYPE_CUSTOMIZE => '自定义页面',
+        ];
+        return $key === 'all' ? $data : $data[$key];
+    }
 
     /**
      * {@inheritdoc}
@@ -56,7 +68,7 @@ class Template extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => '名称',
-            'content' => '网页内容',
+            'content' => '网页内容【smarty  | php渲染】',
             'type' => '类型',
             'en_name' => '唯一英文名称',
             'intro' => '简介',

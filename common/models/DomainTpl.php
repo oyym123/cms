@@ -45,14 +45,14 @@ class DomainTpl extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'domain_id' => 'Domain ID',
-            'template_id' => 'Template ID',
-            'column_id' => 'Column ID',
-            'type' => 'Type',
-            'status' => 'Status',
-            'user_id' => 'User ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'domain_id' => '域名',
+            'column_id' => '分类',
+            'template_id' => '模板',
+            'type' => '类型',
+            'status' => '状态',
+            'user_id' => '创建者',
+            'created_at' => '创建时间',
+            'updated_at' => '修改时间',
         ];
     }
 
