@@ -133,8 +133,9 @@ class Images extends \yii\db\ActiveRecord
                 list($code, $msg) = self::createOne($data);
                 return [1, $msgImg];
             } catch (\Exception $e) {
+                Tools::writeLog(['error' => $e->getMessage()], 'img.txt');
                 //当上传七牛云发生错误的时候则将原数据URL存入
-                return [-1, '数据错误'];
+                return [-1, $e->getMessage()];
             }
         }
         return [-1, '没有数据'];

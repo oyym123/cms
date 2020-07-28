@@ -38,6 +38,16 @@ AppAsset::register($this);
     ]);
 
     $menuItems = [
+        ['label' => '泛目录域名', 'url' => ['/domain/index']],
+        ['label' => '泛目录类目', 'url' => ['/domain-column/index']],
+        ['label' => '模板', 'url' => ['/template/index']],
+        ['label' => '类目模板', 'url' => ['/domain-tpl/index']],
+        ['label' => '泛目录类型', 'url' => ['/category/index']],
+        ['label' => '泛目录方法', 'url' => ['/article-way/index']],
+        ['label' => '泛目录规则', 'url' => ['/article-rules/index']],
+        ['label' => '泛目录文章', 'url' => ['/push-article/index']],
+
+        ['label' => '队列', 'url' => ['/rabbitemq/index']],
         ['label' => '黑帽文章', 'url' => ['/black-article/index']],
         ['label' => '白帽文章', 'url' => ['/white-article/index']],
         ['label' => '百度营销词 & tags', 'url' => ['/baidu-keywords/index']],

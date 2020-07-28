@@ -129,4 +129,153 @@ class Tools extends \yii\db\ActiveRecord
         $timestamp = rand($begin, $end);
         return $is ? date("Y-m-d H:i:s", $timestamp) : $timestamp;
     }
+
+    /**
+     * 判断是否手机访问,火狐模拟器返回fasle，chrome模拟器返回true
+     * 火狐需要在模拟器右边的“自定义 User Agent”包含下面代码判断的关键字才行，比如:Mozilla/5.0 android,或直接android
+     * @return boolean
+     */
+    public static function isFromMobile()
+    {
+        // 如果有HTTP_X_WAP_PROFILE则一定是移动设备
+        if (isset ($_SERVER['HTTP_X_WAP_PROFILE'])) {
+            return true;
+        }
+        // 如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
+        if (isset ($_SERVER['HTTP_VIA'])) {
+            // 找不到为flase,否则为true
+            return stristr($_SERVER['HTTP_VIA'], "wap") ? true : false;
+        }
+        // 判断手机发送的客户端标志,兼容性有待提高,把常见的类型放到前面
+        if (isset ($_SERVER['HTTP_USER_AGENT'])) {
+            $clientkeywords = array(
+                'android',
+                'iphone',
+                'samsung',
+                'ucweb',
+                'wap',
+                'mobile',
+                'nokia',
+                'sony',
+                'ericsson',
+                'mot',
+                'htc',
+                'sgh',
+                'lg',
+                'sharp',
+                'sie-',
+                'philips',
+                'panasonic',
+                'alcatel',
+                'lenovo',
+                'ipod',
+                'blackberry',
+                'meizu',
+                'netfront',
+                'symbian',
+                'windowsce',
+                'palm',
+                'operamini',
+                'operamobi',
+                'openwave',
+                'nexusone',
+                'cldc',
+                'midp'
+            );
+            // 从HTTP_USER_AGENT中查找手机浏览器的关键字
+            if (preg_match("/(" . implode('|', $clientkeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) {
+                return true;
+            }
+        }
+
+        // 协议法，因为有可能不准确，放到最后判断
+        if (isset ($_SERVER['HTTP_ACCEPT'])) {
+            // 如果只支持wml并且不支持html那一定是移动设备
+            // 如果支持wml和html但是wml在html之前则是移动设备
+            if ((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) && (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获取顶级域名
+     * @param $url
+     * @return string
+     */
+    public static function getDoMain($url)
+    {
+        if (empty($url)) {
+            return '';
+        }
+        if (strpos($url, 'http://') !== false) {
+            $url = str_replace('http://', '', $url);
+        }
+        if (strpos($url, 'https://') !== false) {
+            $url = str_replace('https://', '', $url);
+        }
+        $n = 0;
+        for ($i = 1; $i <= 3; $i++) {
+            $n = strpos($url, '/', $n);
+            $i != 3 && $n++;
+        }
+
+        $nn = strpos($url, '?');
+        $mix_num = min($n, $nn);
+        if ($mix_num > 0 || !empty($mix_num)) {
+            //防止链接带有点 （.） 导致出错
+            $url = mb_substr($url, 0, $mix_num);
+        }
+        $data = explode('.', $url);
+
+        $co_ta = count($data);
+        //判断是否是双后缀
+        $no_tow = true;
+        $host_cn = 'com.cn,net.cn,org.cn,gov.cn';
+        $host_cn = explode(',', $host_cn);
+        foreach ($host_cn as $val) {
+            if (strpos($url, $val)) {
+                $no_tow = false;
+            }
+        }
+        //截取域名后的目录
+        $del = strpos($data[$co_ta - 1], '/');
+        if ($del > 0 || !empty($del)) {
+            $data[$co_ta - 1] = mb_substr($data[$co_ta - 1], 0, $del);
+        }
+        //如果是返回FALSE ，如果不是返回true
+        if ($no_tow == true) {
+            $host = $data[$co_ta - 2] . '.' . $data[$co_ta - 1];
+        } else {
+            $host = $data[$co_ta - 3] . '.' . $data[$co_ta - 2] . '.' . $data[$co_ta - 1];
+        }
+
+        return $host;
+    }
+
+    /** 跳转到相对应的域名 视图
+     * 移动端跳转m.domain
+     * PC端跳转 www.domain domain
+     *
+     */
+    public static function jumpDomain($mRender, $pRender, $url)
+    {
+        if (Tools::isFromMobile() && (strpos($url, 'm.') !== false)) {  //表示来自mobile端的域名 则跳转到移动端视图
+            $render = $mRender;
+        } elseif (Tools::isFromMobile() && (strpos($url, 'm.') === false)) {  //表示 来PC的域名 得先进行跳转 mobile
+            $res = Tools::getDoMain($url);
+            //截取域名 跳转到移动端
+            Header('Location: http://m.' . $res . \Yii::$app->request->url);
+            exit;
+        } else {
+            $render = $pRender;
+        }
+
+        //表示m端的域名
+        if (strpos($url, 'm.') !== false) {
+            $render = $mRender;
+        }
+        return $render;
+    }
 }

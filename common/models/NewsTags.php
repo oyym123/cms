@@ -23,7 +23,7 @@ class NewsTags extends \yii\db\ActiveRecord
 
     public static function getDb()
     {
-        return Yii::$app->get('db2');
+        return Yii::$app->get('db');
     }
 
     /**
@@ -70,7 +70,6 @@ class NewsTags extends \yii\db\ActiveRecord
     public static function import()
     {
         $action = Yii::$app->request->get('action');
-
         $data = [];
         if ($action == 'baidu') {
             $data = BaiduKeywords::find()->select('keywords,m_pv')
@@ -92,7 +91,18 @@ class NewsTags extends \yii\db\ActiveRecord
             $data = KeywordLongAll::cleanData();
         }
 
+        if ($action == 'import') {
+            $res = file_get_contents('./test01.txt');
+            $import = explode(PHP_EOL, $res);
+            foreach ($import as $datum) {
+                $data[] = [
+                    'keywords' => $datum
+                ];
+            }
+        }
+
         $error = [];
+
         foreach ($data as $item) {
             $dataSave = [
                 'tagname' => $item['keywords']
@@ -102,6 +112,7 @@ class NewsTags extends \yii\db\ActiveRecord
                 $error[] = $msg;
             }
         }
+
         echo '<pre>';
         print_r($error);
         exit;

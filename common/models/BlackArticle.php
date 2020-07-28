@@ -29,6 +29,7 @@ class BlackArticle extends \yii\db\ActiveRecord
     const TYPE_MANUALLY_WRITTEN = 30;      //人工编写
     const TYPE_SOUGOU_WEIXIN = 40;         //搜狗微信
     const TYPE_ZUO_WEN_WANG = 50;          //作文网文章
+    const TYPE_JIAO_YU = 60;               //教育类文章
 
     const STATUS_INIT = 10;   //初始模板
     const STATUS_DRAFT = 20;   //草稿
@@ -178,7 +179,7 @@ class BlackArticle extends \yii\db\ActiveRecord
         $res = self::find()->where([
             'status' => self::STATUS_INIT,
             'type' => self::TYPE_ZUO_WEN_WANG
-        ])->asArray()->limit(1)->all();
+        ])->asArray()->limit(1000)->all();
 
         $error = [];
 
@@ -187,14 +188,21 @@ class BlackArticle extends \yii\db\ActiveRecord
             list($titleTag, $tagsName) = $this->setTags($value['intro']);
 
             sleep(2);
+
+            if (strpos($value['title'], ':') !== false) {
+                $title = $value['title'];
+            } else {
+                $title = $titleTag . '英语作文:' . $value['title'];
+            }
+
             $data = [
-                'title' => $titleTag . '英语作文:' . $value['title'],
+                'title' => $title,
                 'keywords' => $titleTag . '英语作文',
                 'db_id' => 2,
                 'db_class_id' => 2,
                 'from_path' => $value['from_path'],
                 'title_img' => $value['title_img'],
-                'db_tags_id' => [1181],   //标签是小学英语作文
+                'db_tags_id' => [1181],            //标签是小学英语作文
                 'status' => self::STATUS_ENABLE,
                 'content' => $value['content'],
                 'db_tags_name' => ['小学英语'],
@@ -202,9 +210,11 @@ class BlackArticle extends \yii\db\ActiveRecord
             ];
 
             list($code, $msg) = Publish::pushBlackArticle($data);
+
             if ($code < 0) {
                 $error[] = ['msg' => $msg, 'data' => $data];
             }
+
             //状态变更
             $model->status = self::STATUS_ENABLE;
             $model->save(false);

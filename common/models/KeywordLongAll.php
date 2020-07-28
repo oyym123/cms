@@ -54,6 +54,22 @@ class KeywordLongAll extends \yii\db\ActiveRecord
         ];
     }
 
+
+    /** 导入数据 */
+    public static function createOne($data)
+    {
+        $model = new KeywordLongAll();
+        $model->keywors_name = $data['keywors_name'];
+        $model->day30_pingjun = 0;
+        $model->day30_pc_and_m = 0;
+        $model->day30_pc_rijun = 0;
+        $model->day30_m_rijun = 0;
+        $model->jingzheng = 0;
+        $model->weidu = '';
+        $model->tag = '';
+        $model->save(false);
+    }
+
     /** 清洗数据 */
     public static function cleanData()
     {
@@ -61,10 +77,10 @@ class KeywordLongAll extends \yii\db\ActiveRecord
             ->andWhere(['like', 'keywors_name', '英语'])
             ->andWhere(['between', 'day30_m_rijun', 0, 1])
             ->asArray()
-            ->offset(70000)
-            ->limit(90000)
+            ->orderBy('day30_pingjun desc')
+            ->offset(0)
+            ->limit(10000)
             ->all();
-
         return $data;
     }
 }
