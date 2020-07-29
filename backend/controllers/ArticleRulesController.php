@@ -87,11 +87,13 @@ class ArticleRulesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $post = Yii::$app->request->post()['ArticleRules'];
+        if ($model->load(Yii::$app->request->post())) {
+            $model->method_ids = implode(',', $post['method_ids']);
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
-
         return $this->render('update', [
             'model' => $model,
         ]);

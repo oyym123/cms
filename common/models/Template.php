@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "template".
@@ -24,7 +25,8 @@ class Template extends Base
     const TYPE_HOME = 1;            //首页
     const TYPE_LIST = 2;            //列表页
     const TYPE_DETAIL = 3;          //详情页
-    const TYPE_CUSTOMIZE = 4;       //自定义页面
+    const TYPE_TAGS = 4;          //详情页
+    const TYPE_CUSTOMIZE = 5;       //自定义页面
 
     /** 获取所有的类型 */
     public static function getType($key = 'all')
@@ -33,6 +35,7 @@ class Template extends Base
             self::TYPE_HOME => '首页',
             self::TYPE_LIST => '列表页',
             self::TYPE_DETAIL => '详情页',
+            self::TYPE_TAGS => '标签页',
             self::TYPE_CUSTOMIZE => '自定义页面',
         ];
         return $key === 'all' ? $data : $data[$key];
@@ -77,5 +80,21 @@ class Template extends Base
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 根据类型获取模板 */
+    public static function getTemplate($type)
+    {
+        $dbs = self::find()->where([
+            'status' => self::STATUS_BASE_NORMAL,
+            'type' => $type,
+        ])->asArray()->all();
+        return ArrayHelper::map($dbs, 'id', 'name');
+    }
+
+    /** 按照域名生成模板 */
+    public function setTmp()
+    {
+        
     }
 }

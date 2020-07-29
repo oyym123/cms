@@ -241,4 +241,6 @@ class BlackArticle extends \yii\db\ActiveRecord
         }
         return [$titleTag, $tagsName];
     }
+
+
 }

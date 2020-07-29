@@ -30,10 +30,11 @@ class Fan extends \yii\db\ActiveRecord
     /** 进行一切初始化操作 */
     public function init()
     {
+        //规则配置
         self::getRules();
 
         //模板静态生成
-
+        
 
     }
 

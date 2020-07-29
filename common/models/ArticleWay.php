@@ -62,4 +62,10 @@ class ArticleWay extends \yii\db\ActiveRecord
         $dbs = self::find()->asArray()->all();
         return ArrayHelper::map($dbs, 'id', 'name');
     }
+
+    public function deal()
+    {
+        
+
+    }
 }

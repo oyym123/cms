@@ -20,7 +20,7 @@ use Yii;
  * @property int|null $status 10=状态有效 20=无效
  * @property string|null $content 内容
  * @property string|null $intro 文章简介
- * @property string|null $title 标题 
+ * @property string|null $title 标题
  * @property string|null $push_time 发布时间
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -72,5 +72,21 @@ class PushArticle extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
+    }
+
+    /** 发布文章 */
+    public static function createOne($data)
+    {
+        $model = new PushArticle();
+        foreach ($data as $key => $item) {
+            $model->$key = $item;
+        }
+
+        $model->created_at = date('Y-m-d H:i:s');
+        if (!$model->save(false)) {
+            return [-1, $model->getErrors()];
+        } else {
+            return [1, $model];
+        }
     }
 }

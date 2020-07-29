@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use common\models\BlackArticle;
 use common\models\DomainColumn;
 use common\models\LoginForm;
+use common\models\PushArticle;
 use common\models\Tools;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
@@ -90,7 +91,7 @@ class SiteController extends Controller
         }
 
         $this->layout = "fan1/home";
-        $query = BlackArticle::find()->limit(10);
+        $query = PushArticle::find()->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 

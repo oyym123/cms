@@ -65,9 +65,12 @@ class DomainTplController extends Controller
     public function actionCreate()
     {
         $model = new DomainTpl();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $post = Yii::$app->request->post()['DomainTpl'];
+        if ($model->load(Yii::$app->request->post())) {
+            $model->t_customize = implode(',', $post['t_customize']);
+            if ($model->save(false)) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [

@@ -25,7 +25,7 @@ use Yii;
  * @property string|null $created_at
  * @property string|null $updated_at
  */
-class ArticleRules extends \yii\db\ActiveRecord
+class ArticleRules extends Base
 {
     /**
      * {@inheritdoc}
@@ -43,7 +43,7 @@ class ArticleRules extends \yii\db\ActiveRecord
         return [
             [['category_id', 'domain_id', 'column_id', 'one_page_num_min', 'one_page_num_max', 'one_page_word_min', 'one_page_word_max', 'one_day_push_num', 'user_id', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'method_ids', 'push_time_sm', 'push_time_bd'], 'string', 'max' => 255],
+            [['name', 'push_time_sm', 'push_time_bd'], 'string', 'max' => 255],
         ];
     }
 
@@ -71,5 +71,72 @@ class ArticleRules extends \yii\db\ActiveRecord
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+
+    /** 处理文章 */
+    public static function dealData()
+    {
+        //查询规则
+        $rules = self::find()->where([
+            'status' => self::STATUS_BASE_NORMAL,
+        ])->all();
+        $error = [];
+
+
+        //循环处理规则
+        foreach ($rules as $rule) {
+            //类型筛选
+            list($code, $msg) = Category::cateArticle($rule->category_id);
+
+            if ($code < 0) {
+                $error[] = $msg;
+            } else {
+                $data = $msg;
+
+                //TODO::手法处理
+
+
+                //TODO::拼接检验
+
+                foreach ($data as $item) {
+                    //保存数据
+                    $saveData = [
+                        'b_id' => $item['id'],
+                        'column_id' => $rule->column_id,
+                        'column_name' => ($x = $rule->column) ? $x->name : '',
+                        'rules_id' => $rule->id,
+                        'domain_id' => $rule->domain_id,
+                        'domain' => ($x = $rule->domain) ? $x->name : '',
+                        'from_path' => $item['from_path'],
+                        'keywords' => $item['keywords'],
+                        'title_img' => $item['title_img'],
+                        'status' => self::STATUS_BASE_NORMAL,
+                        'content' => $item['content'],
+                        'intro' => $item['intro'],
+                        'title' => $item['title'],
+                        'push_time' => Tools::randomDate('20200501', ''),
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ];
+
+                    list($saveCode, $saveMsg) = PushArticle::createOne($saveData);
+                    if ($saveData < 0) {
+                        $error[] = $saveMsg;
+                    }
+                }
+            }
+        }
+    }
+
+    /** 获取域名 */
+    public function getDomain()
+    {
+        return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
+    }
+
+    /** 获取类目 */
+    public function getColumn()
+    {
+        return $this->hasOne(DomainColumn::className(), ['id' => 'column_id']);
     }
 }

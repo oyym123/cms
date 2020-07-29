@@ -12,9 +12,7 @@ $this->title = '域名';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="domain-index">
-
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('新增', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -47,7 +45,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     return '<a href="" target="_blank">点击初始化</a>';
                 }
             ],
-
 //            'user_id',
 //            'created_at',
             'updated_at',

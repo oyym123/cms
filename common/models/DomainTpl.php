@@ -33,6 +33,7 @@ class DomainTpl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['id', 'domain_id', 'column_id', 't_home', 't_detail', 't_tags', 't_list',], 'required'],
             [['domain_id', 'template_id', 'column_id', 'type', 'status', 'user_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
@@ -48,6 +49,11 @@ class DomainTpl extends \yii\db\ActiveRecord
             'domain_id' => '域名',
             'column_id' => '分类',
             'template_id' => '模板',
+            't_home' => '首页',
+            't_detail' => '详情页',
+            't_tags' => '标签页',
+            't_customize' => '自定义页面',
+            't_list' => '列表页',
             'type' => '类型',
             'status' => '状态',
             'user_id' => '创建者',

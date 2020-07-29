@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Base;
 use Yii;
 use common\models\Template;
 use common\models\search\TemplateSearch;
@@ -123,5 +124,34 @@ class TemplateController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /** 获取模板 */
+    public function actionGetTemplate()
+    {
+        $q = Yii::$app->request->get('q', '');
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!$q) {
+            return $out;
+        }
+
+        $data = Template::find()
+            ->where([
+                'status' => Base::STATUS_BASE_NORMAL,
+                'type' => Template::TYPE_CUSTOMIZE
+            ])
+            ->select('id, en_name as text,name')
+            ->andFilterWhere(['like', 'en_name', $q])
+            ->limit(30)
+            ->asArray()
+            ->all();
+
+        foreach ($data as &$item) {
+            $item['text'] = '<strong>' . $item['text'] . '</strong>';
+        }
+        $out['results'] = array_values($data);
+        return $out;
     }
 }

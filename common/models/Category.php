@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "category".
@@ -18,7 +19,7 @@ use Yii;
  * @property string|null $created_at
  * @property string|null $updated_at
  */
-class Category extends \yii\db\ActiveRecord
+class Category extends Base
 {
     /**
      * {@inheritdoc}
@@ -59,5 +60,34 @@ class Category extends \yii\db\ActiveRecord
             'updated_at' => '修改时间',
             'created_at' => '创建时间',
         ];
+    }
+
+    /** 根据类型获取模板 */
+    public static function getCate()
+    {
+        $dbs = self::find()->where([
+            'status' => self::STATUS_BASE_NORMAL,
+        ])->asArray()->all();
+        return ArrayHelper::map($dbs, 'id', 'name');
+    }
+
+    //分类筛选
+    public static function cateArticle($id)
+    {
+        //查询出类型
+//        $cate = self::findOne($id);
+//
+//        if (empty($keywords)) {
+//            return [-1, '没有该类型'];
+//        }
+
+        //通过类型 查询标签类
+        $tags = '爸爸';
+
+        $data = BlackArticle::find()
+            ->where(['like', 'keywords', $tags])
+            ->asArray()
+            ->all();
+        return [1, $data];
     }
 }

@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\BlackArticle;
 use common\models\DomainColumn;
+use common\models\PushArticle;
 use common\models\Tools;
 use yii\data\Pagination;
 use yii\helpers\FileHelper;
@@ -17,7 +18,7 @@ class FanController extends Controller
         $this->layout = "fan1/home";
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) {
-            $model = BlackArticle::find()->where(['id' => $arr[0]])->asArray()->one();
+            $model = PushArticle::find()->where(['id' => $arr[0]])->asArray()->one();
             $render = Tools::jumpDomain('fan1/m_static/detail.html', 'fan1/static/detail.html', $_SERVER['HTTP_HOST']);
             return $this->renderPartial($render, ['model' => $model]);
         }
@@ -32,7 +33,7 @@ class FanController extends Controller
         }
 
         $this->layout = "fan1/home";
-        $query = BlackArticle::find()->limit(10);
+        $query = PushArticle::find()->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
         $models = $query->offset($pages->offset)

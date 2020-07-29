@@ -65,4 +65,8 @@ class Domain extends \yii\db\ActiveRecord
     {
         return self::find()->where(['name' => $name])->one();
     }
+
+
+
+
 }

@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\ArticleRules;
 use common\models\BaiduKeywords;
 use common\models\BaiDuSdk;
 use common\models\BlackArticle;
@@ -192,5 +193,10 @@ class CmsController extends Controller
     {
         $url = 'http://www.zuowen.com/e/20200526/5ecd1d79af916.shtml';
         (new ZuoWenWang())->saveData([$url]);
+    }
+
+    public function actionPushArticle()
+    {
+        ArticleRules::dealData();
     }
 }
