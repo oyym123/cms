@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use common\models\DomainColumn;
+use common\models\Fan;
 use Yii;
 use common\models\Domain;
 use common\models\search\DomainSearch;
@@ -65,11 +67,38 @@ class DomainController extends Controller
     public function actionCreate()
     {
         $model = new Domain();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            //自动创建一个home 类目
+            $data = [
+                'name' => 'home',
+                'tags' => '首页',
+                'domain_id' => $model->id,
+            ];
+
+            list($code, $msg) = DomainColumn::createOne($data);
+
+            //自动创建一个泛目录
+            $data = [
+                'name' => $model->start_tags,
+                'tags' => '标签',
+                'domain_id' => $model->id,
+            ];
+            list($codeFan, $msgFan) = DomainColumn::createOne($data);
+
+            if ($codeFan < 0) {
+                Yii::$app->getSession()->setFlash('error', $msgFan);
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
+            //规则配置
+            Fan::getRules($model->id);
+            if ($code < 0) {
+                Yii::$app->getSession()->setFlash('error', $msg);
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);

@@ -29,10 +29,10 @@ class Qiniu
     }
 
     /** 七牛云上传 */
-    public function fileUpload($name, $bucket = 'aks-img01', $from = 0, $clean = 0)
+    public function fileUpload($name, $bucket = 'aks-img01', $from = 0, $clean = 0, $imgName = 'title_img')
     {
         if ($clean == 1) {
-            $fileInfo = (new UploadForm())->cleanInfo($_FILES[$name], 'title_img');
+            $fileInfo = (new UploadForm())->cleanInfo($_FILES[$name], $imgName);
         } else {
             $fileInfo = $_FILES[$name];
         }

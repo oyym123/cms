@@ -14,13 +14,21 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
 
-    <?= $form->field($model, 'column_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
+    <?= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
 
-    <?= $form->field($model, 't_home')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_HOME), ['label' => '1', 'prompt' => '--请选择首页--'])->label('首页') ?>
+    <?= $form->field($model, 'tpl_id')->dropDownList(\common\models\TemplateTpl::getTpl(), ['prompt' => '--请选择套装--']) ?>
+
+    <?= $form->field($model, 'cate')->radioList(\common\models\Template::getCate(), []) ?>
+
+    <?= $form->field($model, 't_home')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_HOME), ['prompt' => '--请选择首页--'])->label('首页') ?>
 
     <?= $form->field($model, 't_list')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_LIST), ['prompt' => '--请选择列表页--']) ?>
 
     <?= $form->field($model, 't_detail')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_DETAIL), ['prompt' => '--请选择详情页--']) ?>
+
+    <?= $form->field($model, 't_inside')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_INSIDE), ['prompt' => '--请选择泛内页--']) ?>
+
+    <?= $form->field($model, 't_common')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_COMMON), ['prompt' => '--请选择详情页--']) ?>
 
     <?= $form->field($model, 't_tags')->dropDownList(\common\models\Template::getTemplate(\common\models\Template::TYPE_TAGS), ['prompt' => '--请选择标签页--']) ?>
 
@@ -51,7 +59,7 @@ use yii\widgets\ActiveForm;
                  return res.text; }'),
         ],
     ])->hint('输入c 检索自定义页面 可添加多个');
-    
+
     ?>
 
     <!--    --><? //= $form->field($model, 'type')->textInput() ?>

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "domain_column".
@@ -33,9 +34,10 @@ class DomainColumn extends Base
     public function rules()
     {
         return [
-            [['domain_id', 'user_id', 'status'], 'integer'],
+            [['domain_id', 'tags', 'name'], 'required'],
+            [['domain_id', 'user_id', 'status', 'mobile_show', 'pc_show'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'tags', 'domain_name'], 'string', 'max' => 255],
+            [['name', 'tags', 'domain_name', 'zh_name'], 'string', 'max' => 255],
         ];
     }
 
@@ -48,6 +50,9 @@ class DomainColumn extends Base
             'id' => 'ID',
             'name' => '名称',
             'tags' => 'Tags',
+            'zh_name' => '中文名称',
+            'pc_show' => 'PC端是否显示',
+            'mobile_show' => '移动端是否显示',
             'domain_id' => '域名id',
             'domain_name' => '域名',
             'user_id' => '创建者',
@@ -58,21 +63,81 @@ class DomainColumn extends Base
     }
 
     //根据当前域名获取 分类
-    public static function getColumn()
+    public static function getColumn($id = 0, $name = '', $from = '')
     {
-        $url = $_SERVER['HTTP_HOST'];
+        $name = $name ?: $_SERVER['HTTP_HOST'];
 
-        if (strpos($url, 'm.') !== false || strpos($url, 'www.') !== false) {
-            $res = explode('.', $url);
-            $url = $res[1] . '.' . $res[2];
+        if ($id) {
+            //查询这个域名下的所有类目
+            $domain = Domain::find()->where(['id' => $id])->one();
+        } else {
+            //查询这个域名下的所有类目
+            $domain = Domain::find()->where(['name' => Tools::getDoMain($name)])->one();
         }
 
-        //查询这个域名下的所有类目
-        $domain = Domain::find()->where(['name' => $url])->one();
-        $column = DomainColumn::find()->select('zh_name,name')->where([
-            'domain_id' => $domain->id,
-            'status' => self::STATUS_BASE_NORMAL
-        ])->asArray()->all();
-        return $column;
+        if ($domain) {
+            $andWhere = [];
+            //表示真人浏览 则判断是否显示
+            if ($from === 'person') {
+                if (Tools::isFromMobile() || strpos($_SERVER['HTTP_HOST'], 'm.') !== false) {
+                    $andWhere = ['mobile_show' => self::S_ON];
+                } else {
+                    $andWhere = ['pc_show' => self::S_ON];
+                }
+            }
+            $column = DomainColumn::find()->select('id,zh_name,name')->where([
+                'domain_id' => $domain->id,
+                'status' => self::STATUS_BASE_NORMAL
+            ])->andWhere($andWhere)->asArray()->all();
+            $arr = [];
+
+            //将home 放第一位
+            foreach ($column as $key => $item) {
+                if ($item['name'] == 'home') {
+                    $arr[0] = $item;
+                } else {
+                    $arr[$key + 1] = $item;
+                }
+            }
+            ksort($arr);
+            return $arr;
+        }
+        return [];
+    }
+
+
+    /** 获取域名 */
+    public function getDomain()
+    {
+        return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
+    }
+
+    public static function createOne($data)
+    {
+        $old = DomainColumn::find()->where([
+            'domain_id' => $data['domain_id'],
+            'name' => $data['name']
+        ])->one();
+
+        if (!empty($old)) {
+            return [-1, '类目名称不可相同'];
+        }
+
+        $model = new DomainColumn();
+        $model->name = $data['name'];
+        $model->tags = $data['tags'] ?? '';
+        $model->domain_id = $data['domain_id'];
+        $model->domain_name = '';
+        $model->created_at = date('Y-m-d H:i:s');
+        if (!$model->save(false)) {
+            return [-1, $model->getErrors()];
+        }
+        return [1, $model];
+    }
+
+    public static function getColumnData($domainId)
+    {
+        $res = DomainColumn::find()->where(['domain_id' => $domainId])->asArray()->all();
+        return ArrayHelper::map($res, 'id', 'name');
     }
 }

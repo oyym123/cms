@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'name',
+            'name:url',
             'ip',
             [
                 'label' => '状态',
@@ -38,13 +38,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return \common\models\Base::getBaseStatus($model->status);
                 }
             ],
-            [
-                'label' => '一键初始化',
-                'attribute' => 'status',
-                'content' => function ($model, $key, $index, $column) {
-                    return '<a href="" target="_blank">点击初始化</a>';
-                }
-            ],
+
 //            'user_id',
 //            'created_at',
             'updated_at',

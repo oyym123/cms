@@ -1,0 +1,61 @@
+*{margin: 0;padding: 0;}
+
+body{background: #e3e3e3;}
+td {font: 12px/1.5 Verdana, Arial, Helvetica, sans-serif;color: #333;}
+input { font: 10pt Verdana, Arial, Helvetica, sans-serif; border: none;}
+img {border: none;}
+p,ul,ol,li,form {margin: 0;padding: 0;list-style: none;}
+a {text-decoration: none;color: #333;}
+em{font-style: normal;}
+i{font-style: normal;}
+textarea{border: none;}
+h1,h2{font-size: 16px;font-weight: normal;}
+/* 自定义公共样式 */
+.text-center{text-align: center;}
+.fs14{font-size: 14px;}
+.fs16{font-size: 16px;}
+.color-fff{color: #fff;}
+.color-999{color: #999;}
+/* -------------------- header 头部模块  start*/
+.header-wrap{width: 100%;height: 100px;/* background-color: skyblue; */}
+/* logo 放置模块  */.fixed-nav{position: fixed;top: 0;width: 100%;height: 50px;padding: 0 10px;display: flex;justify-content: space-between;align-items: center;box-sizing: border-box;background: rgb(255, 42, 66);}
+.fixed-nav img{width: 120px;height: 50px;}
+/* 顶部tab导航栏模块 */.label-wrap{position: fixed;top: 50px;width: 100%;height: 50px;background: #Fff;border-bottom: 2px solid #e3e3e3;}
+.label-wrap>ul{display: flex;justify-content: center;align-items: center;}
+.label-wrap>ul>li{width: 60px;height: 50px;line-height: 50px;margin-right: 10px;}
+.label-wrap>ul>li.active{position: relative;}
+.label-wrap>ul>li.active>a{color: rgb(255, 42, 66);}
+.label-wrap>ul>li.active::after{content: '';position: absolute;bottom: 0;width: 100%;height: 2px;background: rgb(255, 42, 66);left: 0;}
+/*  header 头部模块  end --------------------*/
+/* -------------------- 主要内容模块  start*/
+.main>article{width: 100%;padding: 30px 13px;margin-bottom: 10px;background: #fff;}
+/* 用户模块 */.user-msg>a{display: flex;align-items: center;}
+.user-msg img{width: 30px;height: 30px;border-radius: 50%;overflow: hidden;margin-right: 1rem;}
+.section-list{box-sizing: border-box;}
+.section-list h1{padding-top: 20px;margin-bottom: 10px;text-indent: 30px;}
+.section-list section img{width: 100%;}
+/* 主要内容模块  end --------------------*/
+/* ---------------分类主要内容模块 start */.fenlei-main{padding: 15px 7 15px;display: flex;align-items: center;flex-wrap: wrap;}
+.fenlei-main>div{width: 33.3%;height: 35px;padding: 0 5px;box-sizing: border-box;margin-bottom: 10px;}
+.fenlei-main>div>a{display: block;width: 100%;height: 100%;line-height: 35px;background: #f6f6f6;text-align: center;}
+.footer-wrap{padding-bottom: 20px;}
+.footer-page{width: 100%; display: flex;justify-content: center;}
+.footer-page>a{padding: 5px 10px;margin: 0 5px; background: #fff;}
+.footer-page>a.dis-none{ display: none;}
+/* 分类主要内容模块 end--------------- */
+/* ------------------ 文章详情翻页样式 start */
+.page-box{width: 100%;padding: 12px 12.5px;background: #fff;box-sizing: border-box;display: flex;align-items: center;justify-content: space-between;margin-bottom: 10px;}
+.page-box a.pageUp{width: 80px;padding: 5px 0;color: rgb(255, 42, 66);border: 1px solid rgb(255, 42, 66);text-align: center;}
+.page-box a.pageDowm{padding: 12px 40px;color: #fff;background: rgb(255, 42, 66);text-align: center;}
+.page-box>.coll{width: 80px;padding: 5px 0;color: rgb(255, 42, 66);border: 1px solid rgb(255, 42, 66);text-align: center;}
+/* 文章详情翻页样式 end--------------- */
+/* ------------------ 文章详情评论样式 start */
+.fixed-footer{background: #fff;padding-bottom: 70px;}
+.footer-title{padding: 10px 30px;color: rgb(255, 42, 66);border-bottom: 1px solid #f6f6f6;}
+.comment-null{text-align: center;padding: 10px 0;}
+.comment-null>img{width: 55px;height: 40px;margin: 15px 0 8px;}
+.fixed-input{width: 100%;height: 45px;position: fixed;left: 0;bottom: 0;border-top: 1px solid #ccc;background: #fff;display: flex;align-items: center;justify-content: space-around;}
+.fixed-input input{width: 65%;height: 30px;border: 1px solid #ccc;text-indent: 20px;outline: none;border-radius: 5px;}
+.fixed-input input:focus{border-color: rgb(255, 42, 66);}
+.fixed-input button{padding: 5px 20px;background: rgb(255, 42, 66);color: #fff;border-radius: 5px;border: none;}
+/* 文章详情评论样式 end--------------- */

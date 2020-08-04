@@ -89,4 +89,34 @@ class PushArticle extends \yii\db\ActiveRecord
             return [1, $model];
         }
     }
+
+    /** 热门文章 */
+    public static function hotArticle()
+    {
+        $article = PushArticle::find()
+            ->select('id,title_img,push_time,title')
+            ->limit(10)
+            ->orderBy('title_img desc')
+            ->asArray()
+            ->all();
+        foreach ($article as &$item) {
+            $item['url'] = '/wen/' . $item['id'] . '.html';
+        }
+        return $article;
+    }
+
+    /** 最新文章 */
+    public static function newArticle()
+    {
+        $article = PushArticle::find()
+            ->select('id,title_img,push_time,title')
+            ->limit(10)
+            ->orderBy('id desc')
+            ->asArray()
+            ->all();
+        foreach ($article as &$item) {
+            $item['url'] = '/wen/' . $item['id'] . '.html';
+        }
+        return $article;
+    }
 }

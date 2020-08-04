@@ -77,6 +77,9 @@ class ArticleRules extends Base
     /** 处理文章 */
     public static function dealData()
     {
+        DomainTpl::setTmp();
+        exit;
+
         //查询规则
         $rules = self::find()->where([
             'status' => self::STATUS_BASE_NORMAL,

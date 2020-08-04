@@ -67,8 +67,36 @@ class DomainTplController extends Controller
         $model = new DomainTpl();
         $post = Yii::$app->request->post()['DomainTpl'];
         if ($model->load(Yii::$app->request->post())) {
-            $model->t_customize = implode(',', $post['t_customize']);
+            if (!empty($post['t_customize'])) {
+                $model->t_customize = implode(',', $post['t_customize']);
+            }
+
+            //判断是否有 重复
+            $res = DomainTpl::find()->where([
+                'domain_id' => $post['domain_id'],
+                'column_id' => $post['column_id'],
+                'cate' => $post['cate'],
+            ])->one();
+
+            if (!empty($res)) {
+                Yii::$app->getSession()->setFlash('error', '该类目已经存在模组，请去找到那个模组修改！');
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
+            //模组套装更换
+            if ($post['tpl_id'] > 0) {
+                list($code, $msg) = (new DomainTpl())->changeTpl($model, $post['tpl_id']);
+                if ($code < 0) {
+                    Yii::$app->getSession()->setFlash('error', $msg);
+                    return $this->redirect(['create', 'model' => $model]);
+                } else {
+                    $model = $msg;
+                }
+            }
+
             if ($model->save(false)) {
+                //更新模板
+                DomainTpl::setTmp($model->domain_id);
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }
@@ -88,9 +116,37 @@ class DomainTplController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post()['DomainTpl'];
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            //判断是否有 重复
+            $res = DomainTpl::find()->where([
+                'domain_id' => $post['domain_id'],
+                'column_id' => $post['column_id'],
+                'cate' => $post['cate'],
+            ])->one();
+
+            if (!empty($res) && $res->id != $id) {
+                Yii::$app->getSession()->setFlash('error', '该类目已经存在模组，请去修改！');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
+            //模组套装更换
+            if ($post['tpl_id'] > 0) {
+                list($code, $msg) = (new DomainTpl())->changeTpl($model, $post['tpl_id']);
+                if ($code < 0) {
+                    Yii::$app->getSession()->setFlash('error', $msg);
+                    return $this->redirect(['update', 'id' => $model->id]);
+                } else {
+                    $model = $msg;
+                }
+            }
+
+            if ($model->save(false)) {
+                //更新模板
+                DomainTpl::setTmp($model->domain_id);
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [

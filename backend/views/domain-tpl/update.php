@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\DomainTpl */
 
-$this->title = '更新模组: ' . $model->id;
+$this->title = '修改合成: ' . $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Domain Tpls', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';

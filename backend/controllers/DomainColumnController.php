@@ -2,6 +2,8 @@
 
 namespace backend\controllers;
 
+use common\models\DomainTpl;
+use common\models\Fan;
 use Yii;
 use common\models\DomainColumn;
 use common\models\search\DomainColumnSearch;
@@ -65,9 +67,23 @@ class DomainColumnController extends Controller
     public function actionCreate()
     {
         $model = new DomainColumn();
+        $post = Yii::$app->request->post()['DomainColumn'];
+        if ($model->load(Yii::$app->request->post())) {
+            $old = DomainColumn::find()->where([
+                'domain_id' => $post['domain_id'],
+                'name' => $post['name']
+            ])->one();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if (!empty($old)) {
+                Yii::$app->getSession()->setFlash('error', '此域名已存在该栏目');
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
+            if ($model->save()) {
+                //规则配置
+                Fan::getRules($model->domain_id);
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('create', [
@@ -85,9 +101,24 @@ class DomainColumnController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post()['DomainColumn'];
+        if ($model->load(Yii::$app->request->post())) {
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $old = DomainColumn::find()->where([
+                'domain_id' => $post['domain_id'],
+                'name' => $post['name']
+            ])->one();
+
+            if (!empty($old) && $old->id != $id) {
+                Yii::$app->getSession()->setFlash('error', '此域名已存在该栏目');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
+            if ($model->save()) {
+                //规则配置
+                Fan::getRules($model->domain_id);
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [

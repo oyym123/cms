@@ -53,7 +53,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     const CATCH_STATUS_ENABLE = 10; //正常
     const CATCH_STATUS_START = 20;  //可抓取
     const CATCH_STATUS_OVER = 30;  //搜狗抓取挖完毕
-    
+
     /**
      * {@inheritdoc}
      */
@@ -281,4 +281,24 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             return [1, 'success'];
         }
     }
+
+    /** 标签 */
+    public static function hotKeywords()
+    {
+        $keywords = BaiduKeywords::find()
+            ->select('id,keywords')
+            ->limit(15)
+            ->asArray()
+            ->all();
+
+        $domain = Domain::getDomainInfo();
+
+        if ($domain) {
+            foreach ($keywords as &$item) {
+                $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            }
+        }
+        return $keywords;
+    }
+
 }

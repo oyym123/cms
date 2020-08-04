@@ -2,10 +2,13 @@
 
 namespace frontend\controllers;
 
+use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\DomainColumn;
+use common\models\Fan;
 use common\models\LoginForm;
 use common\models\PushArticle;
+use common\models\Template;
 use common\models\Tools;
 use frontend\models\ContactForm;
 use frontend\models\PasswordResetRequestForm;
@@ -81,17 +84,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        //url 规则制定
-        $res = \common\models\Fan::getRules();
-
         //url转换 分页
         $url = Yii::$app->request->url;
         if (strpos($url, 'index_') && preg_match('/\d+/', $url, $arr)) {
             $_GET['page'] = $arr[0];
         }
 
-        $this->layout = "fan1/home";
-        $query = PushArticle::find()->limit(10);
+        $query = PushArticle::find()->limit(10)->orderBy('RAND()');
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -99,13 +98,35 @@ class SiteController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
+        list($layout, $render) = Fan::renderView(Template::TYPE_HOME);
+        $this->layout = $layout;
+        foreach ($models as &$item) {
+            $item['url'] = '/wen/' . $item['id'] . '.html';
+        }
+        $res = [
+            'home_list' => $models,
+        ];
 
-        $render = Tools::jumpDomain('/fan/fan1/m_static/index', '/fan/fan1/static/index', $_SERVER['HTTP_HOST']);
         return $this->render($render, [
             'column' => DomainColumn::getColumn(),
-            'models' => $models,
+            'models' => $res,
             'pages' => $pages,
         ]);
+    }
+
+    public function actionCustomize()
+    {
+        $url = str_replace(['/', '.html'], '', Yii::$app->request->url);
+        //查询该模板是否属于当前域名，防止被贼人盗用
+        $template = Template::find()->where(['en_name' => $url])->one();
+        if ($template) {
+            $model = [];
+            list($layout, $render) = \common\models\Fan::renderView(\common\models\Template::TYPE_CUSTOMIZE);
+            $this->layout = $layout;
+            //获取数据库中php代码执行结果
+            eval($template->php_func);
+            return $this->render($render, ['model' => $model]);
+        }
     }
 
     /**

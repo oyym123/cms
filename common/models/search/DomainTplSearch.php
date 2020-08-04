@@ -17,7 +17,7 @@ class DomainTplSearch extends DomainTpl
     public function rules()
     {
         return [
-            [['id', 'domain_id', 'template_id', 'column_id', 'type', 'status', 'user_id'], 'integer'],
+            [['id', 'domain_id', 'template_id', 'column_id', 'type', 'status', 'user_id','cate','t_inside'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -62,6 +62,8 @@ class DomainTplSearch extends DomainTpl
             'domain_id' => $this->domain_id,
             'template_id' => $this->template_id,
             'column_id' => $this->column_id,
+            't_inside' => $this->t_inside,
+            'cate' => $this->cate,
             'type' => $this->type,
             'status' => $this->status,
             'user_id' => $this->user_id,
