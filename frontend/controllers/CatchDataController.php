@@ -61,35 +61,7 @@ class CatchDataController extends Controller
         Tools::curlGet($url);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/upload/article",
-     *     summary="内容上传接口 【爬虫】",
-     *     tags={"内容"},
-     *     description="展示模板参数 OYYM 2020/7/30 18:35",
-     *   @OA\Response(
-     *     response=200,
-     *     description="返回码",
-     *     @OA\JsonContent( type="json", example=
-     *     {
-     *       "title_img": "标题图片",
-     *       "title": "标题",
-     *       "intro": "简介",
-     *       "push_time": "发布时间",
-     *     }
-     *     )
-     *   ),
-     * )
-     */
-    public function actionUploadArticle()
-    {
-        list($code, $msg) = WhiteArticle::createOne(Yii::$app->request->post());
-        if ($code < 0) {
-            exit($msg);
-        } else {
-            exit('success ' . $msg->id);
-        }
-    }
+
 
     /** 作文网数据爬取 & 翻译 */
     public function actionZww()

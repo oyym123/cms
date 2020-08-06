@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\DomainColumn;
 use common\models\Fan;
+use common\models\PushArticle;
 use Yii;
 use common\models\Domain;
 use common\models\search\DomainSearch;
@@ -96,6 +97,10 @@ class DomainController extends Controller
                 Yii::$app->getSession()->setFlash('error', $msg);
                 return $this->redirect(['create', 'model' => $model]);
             }
+
+            //创建一个新push_article表
+            $_GET['from_id'] = $model->id;
+            PushArticle::createTable($model->id);
 
             return $this->redirect(['view', 'id' => $model->id]);
         }

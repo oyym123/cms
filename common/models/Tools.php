@@ -94,8 +94,22 @@ class Tools extends \yii\db\ActiveRecord
     public static function cleanKeywords($keywords)
     {
         //中文逗号替换成英文 逗号替换为空
-        $keywords = str_replace(['，', ' '], [',', ''], $keywords);
-        return explode(',', $keywords);
+        $keywords = str_replace(['，'], [','], $keywords);
+        if (strpos($keywords, ',') !== false) {
+            $words = explode(',', $keywords);
+        } else {
+            $words = explode(' ', $keywords);
+        }
+
+        $arr = [];
+
+        foreach ($words as $item) {
+            $length = mb_strlen($item);
+            if ($length >= 2 && $length < 15) { //只获取关键词长度 大于2 并且 小于15的词
+                $arr[] = $item;
+            }
+        }
+        return $arr;
     }
 
     /** 生成唯一名称 */

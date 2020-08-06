@@ -9,7 +9,9 @@ return [
     'QiNiuAccessKey' => '88o_D4CZVwHBAG8xHCDxd_a6gHuMLCgPjcvTBqT5',
     'QiNiuSecretKey' => 'Q-juNSlonLCnBfvGpF9NJwaYUn7FS9y0MTKECIAr',
     'QiNiuHost' => 'http://img.thszxxdyw.org.cn/',
+    'QiNiuHostStatic' => 'http://static.thszxxdyw.org.cn/',
     'QiNiuBucketImg' => 'aks-img01',
+    'QiNiuBucketStatic' => 'aks-static',
     'YouDaoAppKey' => '3c405b325744c3f6',
     'YouDaoSecKey' => 'yoZ2a3k94QRzlXiFq8mvLjGxJStgquOB',
     'rabbitmqConfig' => [

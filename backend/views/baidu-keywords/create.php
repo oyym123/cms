@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\BaiduKeywords */
 
-$this->title = '创建Tags 逗号隔开可创建多个';
+$this->title = '创建Tags 逗号或者空格 隔开可创建多个';
 $this->params['breadcrumbs'][] = ['label' => 'Baidu Keywords', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

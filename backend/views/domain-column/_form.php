@@ -14,6 +14,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择域名--']) ?>
 
+
+    <?= $form->field($model, 'type')->dropDownList(\common\models\DomainColumn::getType(), ['prompt' => '--请选择类型--']) ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'zh_name')->textInput() ?>

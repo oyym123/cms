@@ -20,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <?php Pjax::begin(); ?>
-    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -32,6 +32,24 @@ $this->params['breadcrumbs'][] = $this->title;
             'keywords',
             'm_pv',
             'from_keywords',
+            [
+                'label' => '域名',
+                'attribute' => 'domain_id',
+                'filter' => \common\models\Domain::getDomianName(),
+                'filterInputOptions' => ['prompt' => '所有域名', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->domain->name;
+                }
+            ],
+            [
+                'label' => '分类　　　   　　　   ',
+                'attribute' => 'column_id',
+                'filter' => \common\models\DomainColumn::getColumnData(1),
+                'filterInputOptions' => ['prompt' => '所有栏目', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->column->name . '　【' . $model->column->zh_name . '】';
+                }
+            ],
 //            'pc_show_rate',
 //            'pc_rank',
             //'pc_cpc',

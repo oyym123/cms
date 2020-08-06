@@ -68,9 +68,10 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pc_show_rate', 'pc_rank', 'competition', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
+            [['domain_id', 'column_id', 'keywords'], 'required'],
+            [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
-            [['word_package', 'json_info'], 'string'],
+            [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
             [['m_cpc'], 'string', 'max' => 11],
@@ -88,6 +89,9 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             'from_keywords' => '来源词',
             'pc_show_rate' => 'Pc Show Rate',
             'pc_rank' => 'Pc Rank',
+            'type' => '类型',
+            'column_id' => '栏目',
+            'domain_id' => '域名',
             'pc_cpc' => 'Pc Cpc',
             'charge' => 'Charge',
             'competition' => '竞争度 （百分比）',
@@ -201,7 +205,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 //保存所有的关键词
                 list($code, $msg) = self::createOne($saveData);
                 if ($code < 0) {
-//                    $error[] = $msg;
+                    $error[] = $msg;
                 }
             }
         }
@@ -213,10 +217,16 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     /**
      * 新增关键词 并且调用百度营销词接口获取相应的参数
      */
-    public static function setKeywords($keywords)
+    public static function setKeywords($postData)
     {
-        $keywords = Tools::cleanKeywords($keywords);
+        $keywords = Tools::cleanKeywords($postData['keywords']);
+
+        if (count($keywords) > 1000) {
+            return [-1, '最多一次只能导入1000个词'];
+        }
+
         $error = [];
+
         foreach ($keywords as $item) {
             //判重 不可有所有重复的关键词 减少接口请求次数
             $oldInfo = self::find()->where(['keywords' => $item])->one();
@@ -264,6 +274,8 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 'keywords' => $info['word'],
                 'from_keywords' => '',
                 'similar' => '',
+                'domain_id' => $postData['domain_id'],
+                'column_id' => $postData['column_id'],
                 'competition' => $info['competition'],
                 'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
             ];
@@ -299,6 +311,19 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             }
         }
         return $keywords;
+    }
+
+
+    /** 获取域名 */
+    public function getDomain()
+    {
+        return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
+    }
+
+    /** 获取类目 */
+    public function getColumn()
+    {
+        return $this->hasOne(DomainColumn::className(), ['id' => 'column_id']);
     }
 
 }

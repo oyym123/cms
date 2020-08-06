@@ -20,6 +20,33 @@ use yii\helpers\ArrayHelper;
  */
 class DomainColumn extends Base
 {
+
+    public static function getType($key = 'all')
+    {
+        $data = [
+            'SPO' => '体育运动',
+            'MIL' => '国防军事',
+            'HOU' => '房产装修',
+            'CUL' => '文学艺术',
+            'ITC' => '网络技术',
+            'CAR' => '公司管理',
+            'HEA' => '医疗健康',
+            'ENT' => '影视娱乐',
+            'LEA' => '教育培训',
+            'AUT' => '汽车汽配',
+            'BUS' => '金融财经',
+            'MAC' => '仪器机械',
+            'AGR' => '农业林园',
+            'IND' => '化工轻工',
+            'FOO' => '厨房美食',
+            'GAM' => '游戏应用',
+            'SER' => '生活服务',
+            'SHO' => '购物败家',
+            'UNC' => '其他',
+        ];
+        return $key === 'all' ? $data : $data[$key];
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -37,7 +64,7 @@ class DomainColumn extends Base
             [['domain_id', 'tags', 'name'], 'required'],
             [['domain_id', 'user_id', 'status', 'mobile_show', 'pc_show'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'tags', 'domain_name', 'zh_name'], 'string', 'max' => 255],
+            [['name', 'tags', 'domain_name', 'zh_name', 'type'], 'string', 'max' => 255],
         ];
     }
 
@@ -50,6 +77,7 @@ class DomainColumn extends Base
             'id' => 'ID',
             'name' => '名称',
             'tags' => 'Tags',
+            'type' => '类型',
             'zh_name' => '中文名称',
             'pc_show' => 'PC端是否显示',
             'mobile_show' => '移动端是否显示',
