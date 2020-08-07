@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\ArticleRules */
 
-$this->title = 'Create Article Rules';
+$this->title = '创建文章规则';
 $this->params['breadcrumbs'][] = ['label' => 'Article Rules', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

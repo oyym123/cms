@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\ArticleRules;
 use common\models\BaiduKeywords;
 use common\models\BaiDuSdk;
 use common\models\BlackArticle;
@@ -15,6 +16,7 @@ use common\models\NewsClass;
 use common\models\NewsClassTags;
 use common\models\NewsData;
 use common\models\NewsTags;
+use common\models\PushArticle;
 use common\models\Tools;
 use common\models\ZuoWenWang;
 use frontend\models\ResendVerificationEmailForm;
@@ -50,7 +52,7 @@ class CmsController extends Controller
         list($code, $msg) = $tag->result();
 //        list($code, $msg) = $tag->result2();
 
-        $model = new  CmsAction();
+        $model = new CmsAction();
         list($code, $msg) = $model->result();
 //        list($code, $msg) = $model->result2();
     }
@@ -193,4 +195,17 @@ class CmsController extends Controller
         $url = 'http://www.zuowen.com/e/20200526/5ecd1d79af916.shtml';
         (new ZuoWenWang())->saveData([$url]);
     }
+
+    public function actionPushArticle()
+    {
+        ArticleRules::dealData();
+    }
+
+    public function actionCreateTable()
+    {
+        for ($i = 1; $i <= 8; $i++) {
+            (new PushArticle())->createTable($i);
+        }
+    }
+
 }

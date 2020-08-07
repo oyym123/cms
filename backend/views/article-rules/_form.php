@@ -14,40 +14,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'category_id')->textInput() ?>
+    <?= $form->field($model, 'category_id')->dropDownList(\common\models\Category::getCate(),['prompt' => '--请选择分类--']) ?>
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
 
     <?= $form->field($model, 'column_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
 
-    <?=
-    $form->field($model, 'method_ids')->widget(\kartik\select2\Select2::classname(), [
-        'options' => ['placeholder' => '请输入标签 ...'],
-        'pluginOptions' => [
-            'id' => new \yii\web\JsExpression("function(rs) {
-                return rs.taskId;
-            }"),
-            'placeholder' => 'search ...',
-            'multiple' => true,
-            'allowClear' => true,
-            'language' => [
-                'errorLoading' => new \yii\web\JsExpression("function () { return 'Waiting...'; }"),
-            ],
-            'ajax' => [
-                'url' => \yii\helpers\Url::to(['baidu-keywords/get-tags']),
-                'dataType' => 'json',
-                'data' => new \yii\web\JsExpression('function(params) {
-                return {q:params.term}; }')
-            ],
-            'escapeMarkup' => new \yii\web\JsExpression('function (markup) {
-             return markup; }'),
-            'templateResult' => new \yii\web\JsExpression('function(res) {
-             return res.text; }'),
-            'templateSelection' => new \yii\web\JsExpression('function (res) {
-             return res.text; }'),
-        ],
-    ]);
-    ?>
+    <?= $form->field($model, 'method_ids')->checkboxList(\common\models\ArticleWay::getWayName(), ['class' => 'label-group']) ?>
 
     <?= $form->field($model, 'one_page_num_min')->textInput() ?>
 

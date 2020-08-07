@@ -8,6 +8,7 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
+
 <div class="baidu-keywords-search">
 
     <?php $form = ActiveForm::begin([
@@ -17,6 +18,12 @@ use yii\widgets\ActiveForm;
             'data-pjax' => 1
         ],
     ]); ?>
+
+
+    <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
+
+    <?= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
+
 
     <?php
     echo '<label class="control-label" for="longkeywordssearch-key_search_num">最小m_pv</label>';
@@ -29,6 +36,8 @@ use yii\widgets\ActiveForm;
     echo '<input type="text" id="longkeywordssearch-key_search_num" class="form-control" name="m_pv_max" value="">';
     echo '<br/>';
     ?>
+
+
 
 <!--    --><?//= $form->field($model, 'id') ?>
 <!---->
@@ -118,3 +127,22 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+    $("#baidukeywordssearch-domain_id").change(function () {
+        var html = '';
+        $.ajax({
+            url: '/index.php/article-rules/get-class',
+            type: 'GET',
+            dataType: 'json',
+            data: {domain_id: $("#baidukeywordssearch-domain_id").find("option:selected").val()},
+            success: function (msg) {
+                $.each(msg, function (key, val) {
+                    html += '<option value="' + key + '">' + val + '</option>';
+                });
+                $("#baidukeywordssearch-column_id").html(html);
+            }
+        })
+    });
+</script>

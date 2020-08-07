@@ -94,8 +94,22 @@ class Tools extends \yii\db\ActiveRecord
     public static function cleanKeywords($keywords)
     {
         //中文逗号替换成英文 逗号替换为空
-        $keywords = str_replace(['，', ' '], [',', ''], $keywords);
-        return explode(',', $keywords);
+        $keywords = str_replace(['，'], [','], $keywords);
+        if (strpos($keywords, ',') !== false) {
+            $words = explode(',', $keywords);
+        } else {
+            $words = explode(' ', $keywords);
+        }
+
+        $arr = [];
+
+        foreach ($words as $item) {
+            $length = mb_strlen($item);
+            if ($length >= 2 && $length < 15) { //只获取关键词长度 大于2 并且 小于15的词
+                $arr[] = $item;
+            }
+        }
+        return $arr;
     }
 
     /** 生成唯一名称 */
@@ -206,6 +220,10 @@ class Tools extends \yii\db\ActiveRecord
      */
     public static function getDoMain($url)
     {
+        if (filter_var($url, FILTER_VALIDATE_IP)) {
+            return $url;
+        }
+
         if (empty($url)) {
             return '';
         }
@@ -254,10 +272,10 @@ class Tools extends \yii\db\ActiveRecord
         return $host;
     }
 
-    /** 跳转到相对应的域名 视图
+    /**
+     * 跳转到相对应的域名 视图
      * 移动端跳转m.domain
      * PC端跳转 www.domain domain
-     *
      */
     public static function jumpDomain($mRender, $pRender, $url)
     {
@@ -277,5 +295,38 @@ class Tools extends \yii\db\ActiveRecord
             $render = $mRender;
         }
         return $render;
+    }
+
+    /** 设置公共视图 */
+    public static function setLayout($topDomain)
+    {
+        $column = explode('/', $_SERVER['REQUEST_URI'])[1];
+
+        if (empty($column) || strpos($column, '.html') !== false) {  //没有二级类目
+            $column = 'home';
+        }
+
+        //表示是手机端 或者是手机端的域名 请求 则展示移动端的视图
+        $path = $topDomain . '/' . $column . '/';
+
+        if (self::isFromMobile() || strpos($_SERVER['HTTP_HOST'], 'm.') !== false) {
+            $layout = $path . 'm_main.php';
+        } else {
+            $layout = $path . 'main.php';
+        }
+
+        return [$layout, $path];
+    }
+
+    public static function cleanNumber($str)
+    {
+        return str_replace(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], '', $str);
+    }
+
+    public static function DebugToolbarOff()
+    {
+        if (class_exists('\yii\debug\Module')) {
+            \Yii::$app->view->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
+        }
     }
 }

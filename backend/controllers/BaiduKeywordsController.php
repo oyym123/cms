@@ -68,7 +68,8 @@ class BaiduKeywordsController extends Controller
         $model = new BaiduKeywords();
         if ($model->load(Yii::$app->request->post())) {
             $data = Yii::$app->request->post();
-            list($code, $msg) = BaiduKeywords::setKeywords($data['BaiduKeywords']['keywords']);
+
+            list($code, $msg) = BaiduKeywords::setKeywords($data['BaiduKeywords']);
             if ($code < 0) {
                 Yii::$app->getSession()->setFlash('error', json_encode($msg, JSON_UNESCAPED_UNICODE));
                 return $this->redirect(['create']);

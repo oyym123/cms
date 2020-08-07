@@ -28,26 +28,42 @@ class Qiniu
         return $upToken;
     }
 
+    /** 获取路径 */
+    public function getPath($bucket, $column = 'wordImg/')
+    {
+        switch ($bucket) {
+            case Yii::$app->params['QiNiuBucketStatic']:
+                return ['', Yii::$app->params['QiNiuHostStatic']];
+                break;
+            case Yii::$app->params['QiNiuBucketImg']:
+                return [$column, Yii::$app->params['QiNiuHost'] . $column];
+                break;
+        }
+    }
+
     /** 七牛云上传 */
-    public function fileUpload($name, $bucket = 'aks-img01', $from = 0, $clean = 0)
+    public function fileUpload($name, $bucket = 'aks-img01', $from = 0, $clean = 0, $imgName = 'title_img')
     {
         if ($clean == 1) {
-            $fileInfo = (new UploadForm())->cleanInfo($_FILES[$name], 'title_img');
+            $fileInfo = (new UploadForm())->cleanInfo($_FILES[$name], $imgName);
         } else {
             $fileInfo = $_FILES[$name];
         }
 
         header('content-type:text/html;charset=utf-8');
 
-        $allowExt = ['jpeg', 'jpg', 'png', 'gif'];
+        $allowExt = ['jpeg', 'jpg', 'png', 'gif', 'js', 'css', 'ttf'];
         $path = (new UploadForm())->moveFile($fileInfo, './img_tmp', false, $allowExt);
         $newName = str_replace('./img_tmp/', '', $path);
 
         //初始化 UploadManager 对象并进行文件的上传。
         $uploadMgr = new UploadManager();
         $token = $this->upToken($bucket);
+
+        list($column, $qNPath) = $this->getPath($bucket);
+
         //调用 UploadManager 的 putFile 方法进行文件的上传。
-        list($ret, $err) = $uploadMgr->putFile($token, 'wordImg/' . $newName, $path);
+        list($ret, $err) = $uploadMgr->putFile($token, $column . $newName, $path);
 
         if ($err !== null) {
             echo $newName;
@@ -59,12 +75,12 @@ class Qiniu
             if ($from == 1) {
                 return [
                     'state' => 'SUCCESS',
-                    'url' => Yii::$app->params['QiNiuHost'] . 'wordImg/' . $newName
+                    'url' => $qNPath . $newName
                 ];
             } else {
                 echo json_encode([
                     'state' => 'SUCCESS',
-                    'url' => Yii::$app->params['QiNiuHost'] . 'wordImg/' . $newName
+                    'url' => $qNPath . $newName
                 ]);
                 exit;
             }

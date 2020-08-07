@@ -241,4 +241,32 @@ class BlackArticle extends \yii\db\ActiveRecord
         }
         return [$titleTag, $tagsName];
     }
+
+
+    /** 统一推送接口 */
+    public function commonPush()
+    {
+        $dataSave = [
+            'title' => $title,
+            'type' => BlackArticle::TYPE_ZUO_WEN_WANG,
+            'key_id' => 0,
+            'intro' => $infoTitle[1],
+            'keywords' => $title,
+            'cut_word' => '',
+            'image_urls' => $msgImgsArr ? json_encode($msgImgsArr) : '',
+            'from_path' => $url,
+            'word_count' => mb_strlen($contentStr),
+            'part_content' => $part,
+            'en_part_content' => $enPart,
+            'all_part_content' => $allPart,
+            'title_img' => $img,
+            'content' => $contentStr,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        list($codeArticle, $msgArticle) = BlackArticle::createOne($dataSave);
+        if ($codeArticle < 0) {
+            $error[] = $msgArticle;
+        }
+    }
 }

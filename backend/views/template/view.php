@@ -31,6 +31,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'name',
+            [
+                'label' => '截图',
+                'format' => 'raw',
+                'attribute' => 'img',
+                'value' => function ($model) {
+                    return '<img src="' . $model->img . '" >';
+                }
+            ],
             'content:ntext',
             'type',
             'en_name',

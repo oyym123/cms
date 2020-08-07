@@ -5,7 +5,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\DomainTpl */
 
-$this->title = '创建模组';
+$this->title = '合成';
 $this->params['breadcrumbs'][] = ['label' => 'Domain Tpls', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

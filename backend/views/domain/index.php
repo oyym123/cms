@@ -12,9 +12,7 @@ $this->title = '域名';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="domain-index">
-
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
         <?= Html::a('新增', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -29,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'name',
+            'name:url',
             'ip',
             [
                 'label' => '状态',
@@ -38,13 +36,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
                 'content' => function ($model, $key, $index, $column) {
                     return \common\models\Base::getBaseStatus($model->status);
-                }
-            ],
-            [
-                'label' => '一键初始化',
-                'attribute' => 'status',
-                'content' => function ($model, $key, $index, $column) {
-                    return '<a href="" target="_blank">点击初始化</a>';
                 }
             ],
 

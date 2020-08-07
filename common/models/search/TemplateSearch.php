@@ -17,7 +17,7 @@ class TemplateSearch extends Template
     public function rules()
     {
         return [
-            [['id', 'type', 'status', 'user_id'], 'integer'],
+            [['id', 'type', 'status', 'user_id', 'cate'], 'integer'],
             [['name', 'content', 'en_name', 'intro', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -61,6 +61,7 @@ class TemplateSearch extends Template
             'id' => $this->id,
             'type' => $this->type,
             'status' => $this->status,
+            'cate' => $this->cate,
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
