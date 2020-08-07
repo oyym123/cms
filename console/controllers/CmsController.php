@@ -5,6 +5,7 @@ namespace console\controllers;
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\DbName;
+use common\models\FanUser;
 use common\models\LongKeywords;
 use common\models\Tools;
 
@@ -102,4 +103,10 @@ class CmsController extends \yii\console\Controller
     {
         (new BlackArticle())->pushArticle();
     }
+
+    public function actionCreateUser()
+    {
+        (new FanUser())->createMany();
+    }
+
 }

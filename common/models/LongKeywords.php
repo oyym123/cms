@@ -102,6 +102,25 @@ class LongKeywords extends \yii\db\ActiveRecord
         ];
     }
 
+    /** 标签 */
+    public static function hotKeywords()
+    {
+        $keywords = BaiduKeywords::find()
+            ->select('id,keywords')
+            ->limit(15)
+            ->asArray()
+            ->all();
+
+        $domain = Domain::getDomainInfo();
+
+        if ($domain) {
+            foreach ($keywords as &$item) {
+                $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            }
+        }
+        return $keywords;
+    }
+
     /**
      * @param $data
      * @return array
@@ -137,6 +156,8 @@ class LongKeywords extends \yii\db\ActiveRecord
 
         if (!$model->save(false)) {
             return [-1, $model->getErrors()];
+        } else {
+            return [1, $model];
         }
     }
 
@@ -144,35 +165,43 @@ class LongKeywords extends \yii\db\ActiveRecord
     public static function getKeywords()
     {
         set_time_limit(0);
+        $redis = \Yii::$app->redis;
+        $lastKeywords = $redis->get('last_keywords_id');
 
-        //获取所有的短尾关键词
-//        $keywords = BaiduKeywords::find()->select('id,keywords,search_num')->where([
-//            'between', 'search_num', 10, 200
-//        ])->limit(5000)->asArray()->all();
+        if ($lastKeywords) {
+            //获取所有的短尾关键词
+            $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
+                ->where(['>', 'id', $lastKeywords])
+                ->limit(120)
+                ->asArray()
+                ->all();
+        } else {
+            //获取所有的短尾关键词
+            $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
+                ->where(['>', 'id', 1])
+                ->limit(1)
+                ->asArray()
+                ->all();
+        }
 
-        $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
-            ->where(['like', 'keywords', '英语'])
-            ->andWhere(['between', 'm_pv', 10, 10000])
-//            ->limit(2)
-            ->asArray()
-            ->all();
-
-//        echo '<pre>';
-//        print_r($keywords);exit;
         $error = $sameArr = [];
+
         foreach ($keywords as $keyword) {
+
             //不可重复获取百度关键词
-            $oldInfo = self::find()->select('keywords')->where(['keywords' => $keyword['keywords']])->one();
+            $oldInfo = self::find()->select('keywords')->where(['key_id' => $keyword['id']])->one();
             if (empty($oldInfo)) {
                 list($code, $msg) = self::getBaiduKey($keyword);
                 if ($code < 0) {
                     $error[] = $msg;
                 }
-                Tools::writeLog($keyword);
+
                 sleep(10);
                 if ($code == -10) {
                     sleep(20);
                 }
+
+                Tools::writeLog($keyword);
             } else {
                 Tools::writeLog([$keyword, 'res' => '重复']);
                 $sameArr[] = $keyword['keywords'] . '   重复！';
@@ -268,7 +297,7 @@ class LongKeywords extends \yii\db\ActiveRecord
         ];
 
         foreach ($allKeyWords as $key => $item) {
-            foreach ($item as $value) {
+            foreach ($item as $k => $value) {
                 $dataSave = [
                     'name' => $value,
                     'key_id' => $data['id'],
@@ -278,18 +307,49 @@ class LongKeywords extends \yii\db\ActiveRecord
                     'm_search_name' => $mSearchStr,
                     'm_down_name' => $mDownStr,
                     'm_other_name' => $mOtherStr,
-                    'key_search_num' => $data['search_num'],
+//                    'key_search_num' => $data['search_num'],
                 ];
+
                 list($code, $msg) = self::createOne($dataSave);
+
                 if ($code < 0) {
                     $error[] = $msg;
+                } else {
+                    if ($k == 0) { //表示只推送一次
+                        self::pushReptile($msg);
+                    }
                 }
             }
         }
-
         echo '<pre>';
         print_r($error);
     }
 
+    /** 将新增的关键词推入到远程爬虫 */
+    public static function pushReptile($data)
+    {
+        $url = '';
+        //查询域名 栏目
+        $info = BaiduKeywords::find()->select('domain_id,column_id')->where(['id' => $data->kid])->one();
+        if ($info) {
+            //查询类型
+            $column = DomainColumn::findOne($info->column_id);
+            if ($column) {
+                $dataPush = [
+                    'note' => $data->keywords,
+                    'fan_key_id' => $data->id,
+                    'type' => $column->type,
+                    'keywords' => $data->name,
+                    'm_related_name' => $data->m_related_name,
+                    'm_search_name' => $data->m_search_name,
+                    'm_down_name' => $data->m_down_name,
+                    'm_other_name' => $data->m_other_name,
+                    'domain_id' => $info->domain_id,
+                    'column_id' => $info->column_id,
+                ];
+                Tools::curlPost($url, $dataPush);
+            }
+        }
 
+    }
 }

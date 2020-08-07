@@ -10,8 +10,8 @@ use yii\widgets\LinkPager;
 foreach ($models['home_list'] as $item) {
     ?>
     <article class="section-list">
-        <div class="user-msg"><a href="#" rel="nofollow"><img src="./images/user-img.png"
-                                                              alt=""><span>空白123456</span></a></div>
+        <div class="user-msg"><a href="#" rel="nofollow"><img src="<?= $item['avatar'] ?>"
+                                                              alt=""><span><?= $item['nickname'] ?></span></a></div>
         <a href="<?= $item['url'] ?>" title="">
             <section>
                 <h1><?= $item['title'] ?></h1>

@@ -78,7 +78,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
         ];
     }
 
-    
+
     /**
      * {@inheritdoc}
      */
@@ -220,6 +220,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
      */
     public static function setKeywords($postData)
     {
+        set_time_limit(0);
         $keywords = Tools::cleanKeywords($postData['keywords']);
 
         if (count($keywords) > 1000) {

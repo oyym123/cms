@@ -6,6 +6,7 @@ use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\DomainColumn;
 use common\models\Fan;
+use common\models\FanUser;
 use common\models\LoginForm;
 use common\models\PushArticle;
 use common\models\Template;
@@ -100,9 +101,18 @@ class SiteController extends Controller
 
         list($layout, $render) = Fan::renderView(Template::TYPE_HOME);
         $this->layout = $layout;
+
         foreach ($models as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
+            if ($user = FanUser::findOne($item['user_id'])) {
+                $item['nickname'] = $user->username;
+                $item['avatar'] = $user->avatar;
+            } else {
+                $item['nickname'] = '佚名';
+                $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+            }
         }
+
         $res = [
             'home_list' => $models,
         ];
@@ -118,7 +128,9 @@ class SiteController extends Controller
     {
         $url = str_replace(['/', '.html'], '', Yii::$app->request->url);
         //查询该模板是否属于当前域名，防止被贼人盗用
-        $template = Template::find()->where(['en_name' => $url])->one();
+        $template = Template::find()->where([
+            'en_name' => $url,
+        ])->one();
         if ($template) {
             $model = [];
             list($layout, $render) = \common\models\Fan::renderView(\common\models\Template::TYPE_CUSTOMIZE);
@@ -203,6 +215,7 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
+        exit;
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');

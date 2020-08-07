@@ -34,6 +34,7 @@
                     ['label' => '权限控制', 'icon' => 'dashboard', 'url' => ['/admin'],
                         'items' => [
                             ['label' => '管理员', 'icon' => 'fa fa-circle-o', 'url' => ['/admin'],],
+                            ['label' => '用户', 'icon' => 'fa fa-circle-o', 'url' => ['/fan-user'],],
 //                            ['label' => '后台用户', 'icon' => 'fa fa-circle-o', 'url' => ['/user'],],
                             ['label' => '权限', 'icon' => 'fa fa-circle-o', 'url' => ['/admin/role'],
                                 'items' => [

@@ -6,10 +6,10 @@
             <li>
                 <div class="user-msg">
                     <a class="user-box" rel="nofollow">
-                        <img class="js_user_image" src="././imges/accout-qq.png"/><span class="user-name">用户昵称</span>
+                        <img class="js_user_image" src="<?= $item['avatar'] ?>"/><span class="user-name"><?= $item['nickname'] ?></span>
                     </a>
                 </div>
-                <a href="<?= $item['url']?>">
+                <a href="wen/<?= $item['id'] ?>.html">
                     <p class="title-p"><?= $item['title'] ?></p>
                     <p class="detail-p">
                         <?= $item['intro'] ?>
@@ -29,15 +29,15 @@
         <li>
 
         <li>
-            <div class="page-list">
-                <a href="#" title="">1</a>
-                <a href="#" title="">2</a>
-                <a href="#" title="">3</a>
-                <a href="#" title="">4</a>
-                <a href="#" title="">5</a>
-                <a href="#" title="">...</a>
-                <a href="#" title="">下一页</a>
-            </div>
+<!--            <div class="page-list">-->
+<!--                <a href="#" title="">1</a>-->
+<!--                <a href="#" title="">2</a>-->
+<!--                <a href="#" title="">3</a>-->
+<!--                <a href="#" title="">4</a>-->
+<!--                <a href="#" title="">5</a>-->
+<!--                <a href="#" title="">...</a>-->
+<!--                <a href="#" title="">下一页</a>-->
+<!--            </div>-->
 
             <?php
 

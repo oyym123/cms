@@ -133,8 +133,6 @@ class Tools extends \yii\db\ActiveRecord
      * @param $begintime  起始时间 格式为 Y-m-d H:i:s
      * @param $endtime    结束时间 格式为 Y-m-d H:i:s
      * @param $is         是否是时间戳 格式为 Boolean
-     * 飞鸟慕鱼博客
-     * http://www.feiniaomy.com
      */
     public static function randomDate($begintime, $endtime = "", $is = true)
     {

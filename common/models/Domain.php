@@ -32,7 +32,7 @@ class Domain extends Base
     public function rules()
     {
         return [
-            [['name', 'end_tags', 'start_tags', 'jump_url'], 'required'],
+            [['name', 'end_tags', 'start_tags', 'jump_url','zh_name','intro'], 'required'],
             [['status', 'user_id', 'is_jump'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'ip'], 'string', 'max' => 255],
@@ -48,6 +48,8 @@ class Domain extends Base
             'id' => 'ID',
             'name' => '域名地址',
             'ip' => 'Ip',
+            'zh_name' => '网站名称',
+            'intro' => '描述',
             'end_tags' => '泛目录结尾符',
             'start_tags' => '泛目录开始符',
             'is_jump' => '是否开启流量转化',

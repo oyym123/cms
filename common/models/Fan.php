@@ -30,7 +30,7 @@ class Fan extends BaseController
                 '" . $domain->start_tags . '<id:\d+>' . $domain->end_tags . "/' => '/fan/tags-detail',";
 
                 $dataStr .= "
-                'customize_<id:\d+>.html' => '/fan/customize',";
+                'customize_<id:\d+>.html' => '/site/customize',";
             } else {
                 $dataStr .= "
                 '" . $item['name'] . "' => '/fan',
