@@ -34,13 +34,15 @@
                     ['label' => '权限控制', 'icon' => 'dashboard', 'url' => ['/admin'],
                         'items' => [
                             ['label' => '管理员', 'icon' => 'fa fa-circle-o', 'url' => ['/admin'],],
+                            ['label' => '用户', 'icon' => 'fa fa-circle-o', 'url' => ['/fan-user'],],
 //                            ['label' => '后台用户', 'icon' => 'fa fa-circle-o', 'url' => ['/user'],],
-                            ['label' => '权限', 'icon' => 'fa fa-circle-o', 'url' => ['/admin/role'],
+                            ['label' => '权限管理', 'icon' => 'fa fa-circle-o', 'url' => ['/admin/role'],
                                 'items' => [
-//                                  ['label' => '菜单', 'icon' => 'file-code-o', 'url' => ['/admin/menu'],],
+                                  ['label' => '菜单', 'icon' => 'file-code-o', 'url' => ['/admin/menu'],],
                                     ['label' => '权限', 'icon' => 'file-code-o', 'url' => ['/admin/permission'],],
                                     ['label' => '角色', 'icon' => 'file-code-o', 'url' => ['/admin/role'],],
                                     ['label' => '分配', 'icon' => 'file-code-o', 'url' => ['/admin/assignment'],],
+                                    ['label' => '规则', 'icon' => 'file-code-o', 'url' => ['/admin/rule'],],
                                     ['label' => '路由', 'icon' => 'file-code-o', 'url' => ['/admin/route'],],
                                 ]
                             ],

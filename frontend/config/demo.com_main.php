@@ -61,13 +61,13 @@ return [
                 'label/index_<id:\d+>.html' => '/fan/tags-list',
                 
                 'jaks<id:\d+>mq/' => '/fan/tags-detail',
-                'customize_<id:\d+>.html' => '/fan/customize',
+                'customize_<id:\d+>.html' => '/site/customize',
                 'jaks' => '/fan',
                 'jaks/<id:\d+>.html' => '/fan/detail',            
                 'jaks/index_<id:\d+>.html' => '/fan',
                 
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删
+                //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
 

@@ -1,8 +1,28 @@
+<head>
+    <title><?= $models['data']['title'] ?></title>
+
+    <?php
+
+    if ( !empty($tdk)) {
+        ?>
+        <meta name="keywords" content="<?= $tdk['keywords'] ?>">
+        <meta name="description" content="<?= $tdk['description'] ?>">
+        <meta property="og:type" content="<?= $tdk['og_type'] ?>"/>
+        <meta property="og:title" content="<?= $tdk['og_title'] ?>"/>
+        <meta property="og:description" content="<?= $tdk['og_description'] ?>"/>
+        <meta property="og:image" content="<?= $tdk['og_image'] ?>"/>
+        <meta property="og:release_date" content="<?= $tdk['og_release_date'] ?>"/>
+        <?php
+    }
+    ?>
+</head>
+
 <ul class="content-left">
     <li style="background: #fff;">
         <div class="user-msg">
             <a class="user-box">
-                <img class="js_user_image" src="/imges/accout-qq.png"/><span class="user-name">用户昵称</span>
+                <img class="js_user_image" src="<?= $models['data']['avatar'] ?>"/><span
+                        class="user-name"><?= $models['data']['nickname'] ?></span>
             </a>
         </div>
         <p class="title-p"><?= $models['data']['title'] ?></p>
@@ -19,7 +39,7 @@
         <br clear="all"/>
         <div class="page-flip">
             <a class="pageup" href="<?= $models['pre'] ?>">上一条</a>
-            <a class="pagedowm" href="<?= $models['next']?>">下一条</a>
+            <a class="pagedowm" href="<?= $models['next'] ?>">下一条</a>
         </div>
 
         <div class="comment-box">

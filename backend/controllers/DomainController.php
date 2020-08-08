@@ -121,6 +121,8 @@ class DomainController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            //规则配置
+            Fan::getRules($id);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

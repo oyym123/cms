@@ -9,6 +9,7 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
+
         'redis' => [
             'class' => 'yii\redis\Connection',
             'hostname' => 'localhost',
@@ -27,4 +28,5 @@ return [
         ],
 
     ],
+
 ];

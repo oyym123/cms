@@ -7,6 +7,8 @@ use common\models\BlackArticle;
 use common\models\Domain;
 use common\models\DomainColumn;
 use common\models\Fan;
+use common\models\FanUser;
+use common\models\LongKeywords;
 use common\models\PushArticle;
 use common\models\Template;
 use common\models\Tools;
@@ -51,16 +53,38 @@ class FanController extends Controller
     {
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $model = PushArticle::find()->select('title_img,content,title,intro,push_time')->where(['id' => $arr[0]])->asArray()->one();
+            $model = PushArticle::find()->select('user_id,title_img,content,title,intro,push_time')->where(['id' => $arr[0]])->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_DETAIL);
             $this->layout = $layout;
             $column = explode('/', $url)[1];
+
+            if ($user = FanUser::findOne($model['user_id'])) {
+                $model['nickname'] = $user->username;
+                $model['avatar'] = $user->avatar;
+            } else {
+                $model['nickname'] = '佚名';
+                $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+            }
+
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
                 'next' => '/' . $column . '/' . ($arr[0] + 1) . '.html',
             ];
-            return $this->render($render, ['models' => $res]);
+
+            $desc = mb_substr($model['title'], 0, 28);
+            return $this->render($render, [
+                'models' => $res,
+                'tdk' => [
+                    'keywords' => '12321',
+                    'description' => $desc,
+                    'og_type' => 'news',
+                    'og_title' => $model['title'],
+                    'og_description' => $desc,
+                    'og_image' => '',
+                    'og_release_date' => $desc,
+                ]
+            ]);
         }
     }
 
@@ -78,6 +102,9 @@ class FanController extends Controller
      *       "title_img": "标题图片",
      *       "title": "标题",
      *       "intro": "简介",
+     *       "user_id": "用户id",
+     *       "nickname": "用户昵称",
+     *       "avatar": "用户头像",
      *       "push_time": "发布时间",
      *     }
      *     )
@@ -86,14 +113,13 @@ class FanController extends Controller
      */
     public function actionIndex()
     {
-
         //url转换 分页
         $url = Yii::$app->request->url;
         if (strpos($url, 'index_') && preg_match('/\d+/', $url, $arr)) {
             $_GET['page'] = $arr[0];
         }
 
-        $query = PushArticle::find()->select('id,title_img,title,intro,push_time')->limit(10)->orderBy('RAND()');
+        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->limit(10)->orderBy('RAND()');
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -106,6 +132,13 @@ class FanController extends Controller
 
         foreach ($models as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
+            if ($user = FanUser::findOne($item['user_id'])) {
+                $item['nickname'] = $user->username;
+                $item['avatar'] = $user->avatar;
+            } else {
+                $item['nickname'] = '佚名';
+                $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+            }
         }
 
 //        print_r( $this->layout );exit;
@@ -130,9 +163,8 @@ class FanController extends Controller
      *     description="返回码",
      *     @OA\JsonContent( type="json", example=
      *     {
-     *       "title_img": "标题图片",
-     *       "title": "标题",
-     *       "intro": "简介",
+     *       "id": "标签id",
+     *       "name": "标签名称",
      *       "push_time": "发布时间",
      *     }
      *     )
@@ -147,7 +179,7 @@ class FanController extends Controller
             $_GET['page'] = $arr[0];
         }
 
-        $query = BaiduKeywords::find()->select('id,keywords')->limit(10);
+        $query = LongKeywords::find()->select('id,name')->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
 
@@ -170,21 +202,35 @@ class FanController extends Controller
         list($layout, $render) = Fan::renderView(Template::TYPE_TAGS);
         $this->layout = $layout;
 
-        return $this->render($render, [
-            'column' => DomainColumn::getColumn(),
-            'models' => $res,
-            'pages' => $pages,
-        ]);
+        if (Yii::$app->request->isAjax) {
+            exit(json_encode($models));
+        } else {
+            return $this->render($render, [
+                'column' => DomainColumn::getColumn(),
+                'models' => $res,
+                'pages' => $pages,
+            ]);
+        }
+
     }
+
 
     public function actionTagsDetail()
     {
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $model = PushArticle::find()->select('id,title_img,content,title,intro,push_time')->where(['id' => 1])->asArray()->one();
+            $model = PushArticle::find()->select('user_id,id,title_img,content,title,intro,push_time')->where(['id' => rand(1, 39)])->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
             $model['url'] = '/wen/' . $model['id'] . '.html';
+
+            if ($user = FanUser::findOne($model['user_id'])) {
+                $model['nickname'] = $user->username;
+                $model['avatar'] = $user->avatar;
+            } else {
+                $model['nickname'] = '佚名';
+                $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+            }
             $res = [
                 'data' => $model
             ];

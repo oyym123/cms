@@ -133,8 +133,6 @@ class Tools extends \yii\db\ActiveRecord
      * @param $begintime  起始时间 格式为 Y-m-d H:i:s
      * @param $endtime    结束时间 格式为 Y-m-d H:i:s
      * @param $is         是否是时间戳 格式为 Boolean
-     * 飞鸟慕鱼博客
-     * http://www.feiniaomy.com
      */
     public static function randomDate($begintime, $endtime = "", $is = true)
     {
@@ -328,5 +326,40 @@ class Tools extends \yii\db\ActiveRecord
         if (class_exists('\yii\debug\Module')) {
             \Yii::$app->view->off(\yii\web\View::EVENT_END_BODY, [\yii\debug\Module::getInstance(), 'renderToolbar']);
         }
+    }
+
+    /** 判断是否有爬虫 */
+    public static function isSpider()
+    {
+        $flag = false;
+        $tmp = $_SERVER['HTTP_USER_AGENT'];
+        if (strpos($tmp, 'Googlebot') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'Baiduspider') > 0) {
+            $flag = true;
+        } else if (strpos($tmp, 'Yahoo! Slurp') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'msnbot') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'Sosospider') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'YodaoBot') !== false || strpos($tmp, 'OutfoxBot') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'Sogou web spider') !== false || strpos($tmp, 'Sogou Orion spider') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'fast-webcrawler') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'Gaisbot') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'ia_archiver') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'altavista') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'lycos_spider') !== false) {
+            $flag = true;
+        } else if (strpos($tmp, 'Inktomi slurp') !== false) {
+            $flag = true;
+        }
+        return $flag;
     }
 }

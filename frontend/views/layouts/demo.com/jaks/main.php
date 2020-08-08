@@ -13,6 +13,8 @@ use frontend\assets\AppAsset;
 use common\widgets\Alert;
 
 AppAsset::register($this);
+
+$domain = \common\models\Domain::getDomainInfo();
 ?>
 
 <?php $this->beginPage() ?>
@@ -21,11 +23,9 @@ AppAsset::register($this);
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>华中教育网</title>
-    <meta name="description" content="华中教育网为您提供中国教育考试相关信息资讯大全，高等教育学生信息网，全国教育大会，基础教育资源应用平台等教育相关信息。"/>
-    <meta name="keywords" content="帝国网站管理系统,EmpireCMS"/>
+    <meta name="description" content="<?= $domain->intro ?>"/>
+    <meta name="keywords" content="<?= $domain->zh_name ?>"/>
     <meta name="applicable-device" content="pc">
     <link type="image/x-icon" rel="shortcut icon" href="/favicon.ico">
     <link href="/css/index.css" rel="stylesheet" type="text/css"/>
@@ -42,10 +42,11 @@ AppAsset::register($this);
                 <li class="nav-frist-div"></li>
                 <?php
                 $column = explode('/', $_SERVER['REQUEST_URI'])[1];
-                foreach (DomainColumn::getColumn(0,'','person') as $key => $item) {
+                foreach (DomainColumn::getColumn(0, '', 'person') as $key => $item) {
                     $active = '';
                     if ($column == $item['name']) {
                         $active = 'curr active';
+                        echo "<title>" . $item['zh_name'] . "</title>";
                     }
 
                     if ($item['name'] != 'home') {
@@ -77,7 +78,7 @@ AppAsset::register($this);
             <div class="float-right-box">
                 <ul class="content-right">
                     <li class="right-top-pd">
-                        <div class="right-top"><span>热门文章</span><a href="#" title=""><em>更多>></em></a></div>
+                        <div class="right-top"><span>热门文章</span><a href="/wen" title=""><em>更多>></em></a></div>
                     </li>
 
                     <li class="img-txt-ul">
@@ -102,7 +103,7 @@ AppAsset::register($this);
 
                 <ul class="content-right-mt">
                     <li class="right-top-pd">
-                        <div class="right-top"><span>标签</span><a href="#" title=""><em>更多>></em></a></div>
+                        <div class="right-top"><span>标签</span><a href="/label" title=""><em>更多>></em></a></div>
                     </li>
                     <li class="label-box">
                         <div class="label-list">
@@ -120,7 +121,7 @@ AppAsset::register($this);
 
                 <ul class="content-right-mt">
                     <li class="right-top-pd">
-                        <div class="right-top"><span>最新文章</span><a href="#" title=""><em>更多>></em></a></div>
+                        <div class="right-top"><span>最新文章</span><a href="/wen" title=""><em>更多>></em></a></div>
                     </li>
                     <li>
                         <ul class="article-list">
@@ -151,4 +152,4 @@ AppAsset::register($this);
 </body>
 </html>
 <?php $this->endPage() ?>
- 
+

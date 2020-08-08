@@ -23,6 +23,8 @@ use yii\widgets\ActiveForm;
 
     echo $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'zh_name')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'intro')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'ip')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'start_tags')->textInput(['maxlength' => true])->hint('一旦创建请勿修改') ?>
     <?= $form->field($model, 'end_tags')->textInput(['maxlength' => true]) ?>

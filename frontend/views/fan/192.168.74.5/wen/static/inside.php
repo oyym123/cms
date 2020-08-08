@@ -4,8 +4,8 @@
     ?>
         <li>
             <div class="user-msg">
-                <a class="user-box" rel="nofollow">
-                    <img class="js_user_image" src="././imges/accout-qq.png"/><span class="user-name">用户昵称</span>
+                <a class="user-box">
+                    <img class="js_user_image" src="<?= $item['avatar'] ?>"/><span class="user-name"><?= $item['nickname'] ?></span>
                 </a>
             </div>
             <a href="<?=  $item['url']?>">

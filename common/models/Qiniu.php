@@ -88,15 +88,15 @@ class Qiniu
     }
 
     /** 直接抓取远程文件到七牛云 */
-    public function fetchFile($url, $bucket, $key)
+    public function fetchFile($url, $bucket, $key, $column = 'wordImg2/')
     {
         $uploadMgr = new BucketManager($this->auth);
         try {
-            list($ret, $error) = $uploadMgr->fetch($url, $bucket, 'wordImg/' . $key);
+            list($ret, $error) = $uploadMgr->fetch($url, $bucket, $column . $key);
             if ($error !== null) {
                 return [-1, $error];
             } else {
-                return [1, Yii::$app->params['QiNiuHost'] . 'wordImg/' . $key];
+                return [1, Yii::$app->params['QiNiuHost'] . $column . $key];
             }
         } catch (\Exception $e) {
             return [-1, $e->getMessage()];

@@ -24,8 +24,8 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         //PhpManager将权限关系保存在文件里,这里使用的是DbManager方式,将权限关系保存在数据库.
-        "authManager" => [
-            "class" => 'yii\rbac\DbManager', //这里记得用单引号而不是双引号
+        "authManager" => [ //权限
+            "class" => 'yii\rbac\DbManager', //将权限关系保存在数据库中
             "defaultRoles" => ["guest"],
         ],
         'user' => [
@@ -71,9 +71,8 @@ return [
         'as access' => [
             'class' => 'mdm\admin\components\AccessControl',
             'allowActions' => [
-                '*'
                 //这里是允许访问的action
-                //controller/action
+                'template'
             ]
         ],
         /*

@@ -61,7 +61,7 @@ class DomainColumn extends Base
     public function rules()
     {
         return [
-            [['domain_id', 'tags', 'name'], 'required'],
+            [['domain_id', 'tags', 'name', 'type'], 'required'],
             [['domain_id', 'user_id', 'status', 'mobile_show', 'pc_show'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'tags', 'domain_name', 'zh_name', 'type'], 'string', 'max' => 255],

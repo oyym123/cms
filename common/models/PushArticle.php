@@ -113,6 +113,12 @@ class PushArticle extends \yii\db\ActiveRecord
         return $article;
     }
 
+    /** 获取用户名称 */
+    public function getFanUser()
+    {
+        return $this->hasOne(FanUser::className(), ['id' => 'user_id']);
+    }
+
     /** 最新文章 */
     public static function newArticle()
     {

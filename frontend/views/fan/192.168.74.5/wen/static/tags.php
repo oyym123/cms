@@ -10,8 +10,8 @@ use yii\widgets\LinkPager;
             <?php
             foreach ($models['home_list'] as $item) {
                 ?>
-                <a href="<?= $item['url'] ?>" title="<?= $item['keywords'] ?>">
-                    <?= $item['keywords'] ?>
+                <a href="<?= $item['url'] ?>" title="<?= $item['name'] ?>">
+                    <?= $item['name'] ?>
                 </a>
 
                 <?php
@@ -21,15 +21,16 @@ use yii\widgets\LinkPager;
     </li>
     <li>
         <br clear="all"/>
-        <div class="page-list">
-            <a href="#" title="">1</a>
-            <a href="#" title="">2</a>
-            <a href="#" title="">3</a>
-            <a href="#" title="">4</a>
-            <a href="#" title="">5</a>
-            <a href="#" title="">...</a>
-            <a href="#" title="">下一页</a>
-        </div>
+<!--        <div class="page-list">-->
+<!--            <a href="#" title="">1</a>-->
+<!--            <a href="#" title="">2</a>-->
+<!--            <a href="#" title="">3</a>-->
+<!--            <a href="#" title="">4</a>-->
+<!--            <a href="#" title="">5</a>-->
+<!--            <a href="#" title="">...</a>-->
+<!--            <a href="#" title="">下一页</a>-->
+<!--        </div>-->
+        <br/>
         <?php
 
 
