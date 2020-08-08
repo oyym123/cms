@@ -42,34 +42,32 @@ return [
             'showScriptName' => false,
             'rules' => [
                 'home' => '/fan',
-                'home/<id:\d+>.html' => '/fan/detail',
+                'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
-                'home/index_<id:\d+>.html' => '/fan',
-
+                
                 'wen' => '/fan',
-                'wen/<id:\d+>.html' => '/fan/detail',
+                'wen/<id:\d+>.html' => '/fan/detail',            
                 'wen/index_<id:\d+>.html' => '/fan',
-
+                
                 'j' => '/fan',
-                'j/<id:\d+>.html' => '/fan/detail',
+                'j/<id:\d+>.html' => '/fan/detail',            
                 'j/index_<id:\d+>.html' => '/fan',
-
+                
                 'mao' => '/fan',
-                'mao/<id:\d+>.html' => '/fan/detail',
+                'mao/<id:\d+>.html' => '/fan/detail',            
                 'mao/index_<id:\d+>.html' => '/fan',
-
-                'label' => '/fan/tags-list',
+                
+                'label' => '/fan/tags-list',        
                 'label/index_<id:\d+>.html' => '/fan/tags-list',
-
+                
                 'jaks<id:\d+>mq/' => '/fan/tags-detail',
                 'customize_<id:\d+>.html' => '/site/customize',
                 'jaks' => '/fan',
-                'jaks/<id:\d+>.html' => '/fan/detail',
+                'jaks/<id:\d+>.html' => '/fan/detail',            
                 'jaks/index_<id:\d+>.html' => '/fan',
-
-                'user/<id:\d+>.html' => '/user/index',
+                
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删
+                //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
 

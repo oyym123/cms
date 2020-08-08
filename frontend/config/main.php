@@ -50,7 +50,7 @@ return [
                 'j/index_<id:\d+>.html' => '/fan',
                 
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删
+                //end 正则注释识别 勿删 &end_url
             ],
         ],
 

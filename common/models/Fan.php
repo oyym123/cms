@@ -17,6 +17,12 @@ class Fan extends BaseController
 
         $topDomain = $domain->name;
 
+        $domainInfo = json_encode([
+                'is_jump' => $domain->is_jump,
+                'jump_url' => $domain->jump_url
+            ]) . '  &end_url';
+
+
         $dataStr = "'rules' => [";
 
         foreach (DomainColumn::getColumn($domainId) as $item) {
@@ -42,8 +48,8 @@ class Fan extends BaseController
 
         $dataStr .= "
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删";
-        $res = preg_replace("@'rules'(.*)?//end 正则注释识别 勿删@s", $dataStr, $main);
+                //end 正则注释识别 勿删" . $domainInfo;
+        $res = preg_replace("@'rules'(.*)?//end 正则注释识别 勿删(.*)?&end_url@s", $dataStr, $main);
         file_put_contents(__DIR__ . '/../../frontend/config/' . $topDomain . '_main.php', $res);
     }
 
