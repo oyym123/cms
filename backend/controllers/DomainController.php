@@ -94,7 +94,6 @@ class DomainController extends Controller
             ];
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
-
             if ($codeFan < 0) {
                 Yii::$app->getSession()->setFlash('error', $msgFan);
                 return $this->redirect(['create', 'model' => $model]);
