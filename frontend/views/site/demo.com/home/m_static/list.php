@@ -9,7 +9,7 @@
                         <img class="js_user_image" src="<?= $item['avatar'] ?>"/><span class="user-name"><?= $item['nickname'] ?></span>
                     </a>
                 </div>
-                <a href="wen/<?= $item['id'] ?>.html">
+                <a href="/wen/<?= $item['id'] ?>.html">
                     <p class="title-p"><?= $item['title'] ?></p>
                     <p class="detail-p">
                         <?= $item['intro'] ?>
@@ -54,4 +54,5 @@
 
         </li>
     </ul>
+
 

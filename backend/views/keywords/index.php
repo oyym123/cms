@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php Pjax::end(); ?>
 </div>
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script>
     $("#catch_aizhan").click(function () {
         if ($("#catch_value").val() == '') {
