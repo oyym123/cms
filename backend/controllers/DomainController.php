@@ -86,6 +86,15 @@ class DomainController extends Controller
             ];
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
+            //自动创建一个label
+            $data = [
+                'name' => 'label',
+                'tags' => '标签',
+                'domain_id' => $model->id,
+            ];
+            list($codeFan, $msgFan) = DomainColumn::createOne($data);
+
+
             if ($codeFan < 0) {
                 Yii::$app->getSession()->setFlash('error', $msgFan);
                 return $this->redirect(['create', 'model' => $model]);
