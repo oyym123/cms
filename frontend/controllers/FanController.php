@@ -66,10 +66,26 @@ class FanController extends Controller
                 $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
 
+//            $preTitle = PushArticle::findOne($arr[0] - 1);
+//            $nextTitle = PushArticle::findOne($arr[0] + 1);
+//
+//            if ($preTitle) {
+//                $preTitle = $preTitle->title;
+//            }else{
+//                $preTitle =  '没有更多内容啦！';
+//            }
+//
+//            if ($nextTitle) {
+//                $nextTitle = $nextTitle->title;
+//            }else{
+//                $nextTitle =  '没有更多内容啦！';
+//            }
+
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
                 'next' => '/' . $column . '/' . ($arr[0] + 1) . '.html',
+
             ];
 
             $desc = mb_substr($model['title'], 0, 28);
@@ -154,7 +170,7 @@ class FanController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/fan/tags",
+     *     path="/fan/tags-list",
      *     summary="标签页 【前端】",
      *     tags={"网页"},
      *     description="展示模板参数 OYYM 2020/7/30 18:35",

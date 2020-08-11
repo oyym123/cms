@@ -96,7 +96,7 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 </div>
 
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script type="text/javascript">
     $("#blackarticle-db_id").change(function () {
         var html = '';
