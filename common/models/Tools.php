@@ -362,4 +362,19 @@ class Tools extends \yii\db\ActiveRecord
         }
         return $flag;
     }
+
+    /**
+     * 内容校验
+     *  防止有人模板 填写exec命令盗取代码
+     */
+    public static function contentCheck($content)
+    {
+        $execArr = ['exec', 'system', 'file_get_content', 'passthru'];
+        foreach ($execArr as $item) {
+            if (strpos($content, $item) !== false) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -68,8 +68,11 @@ $domain = \common\models\Domain::getDomainInfo();
         </nav>
     </div>
     <div class="header-null-box"></div>
-
-
+    <div class="container">
+        <?= Breadcrumbs::widget([
+            'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
+        ]) ?>
+        <?= Alert::widget() ?>
         <main class="content-list">
             <?= $content ?>
             <div class="float-right-box">
@@ -148,4 +151,5 @@ $domain = \common\models\Domain::getDomainInfo();
 <?php $this->endBody() ?>
 </body>
 </html>
+<?php $this->endPage() ?>
 
