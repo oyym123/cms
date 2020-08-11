@@ -369,7 +369,7 @@ class Tools extends \yii\db\ActiveRecord
      */
     public static function contentCheck($content)
     {
-        $execArr = ['exec', 'system', 'file_get_content', 'passthru'];
+        $execArr = ['exec', 'system', 'file_get_content', 'passthru', 'popen'];
         foreach ($execArr as $item) {
             if (strpos($content, $item) !== false) {
                 return false;
