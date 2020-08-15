@@ -208,4 +208,9 @@ class CmsController extends Controller
         }
     }
 
+    public function actionSetRules()
+    {
+        LongKeywords::setRules();
+    }
+
 }

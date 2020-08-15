@@ -90,8 +90,12 @@ class SiteController extends Controller
         if (strpos($url, 'index_') && preg_match('/\d+/', $url, $arr)) {
             $_GET['page'] = $arr[0];
         }
+        
+        $maxRand = rand(200, 500);
+        $minRand = rand(1, 199);
 
-        $query = PushArticle::find()->limit(10)->orderBy('RAND()');
+        $query = PushArticle::find()->andWhere(['between', 'id', $minRand, $maxRand])->limit(10);
+
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -215,7 +219,7 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
-     
+
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
             Yii::$app->session->setFlash('success', 'Thank you for registration. Please check your inbox for verification email.');

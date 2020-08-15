@@ -59,7 +59,7 @@ return [
                 
                 'label' => '/fan/tags-list',        
                 'label/index_<id:\d+>.html' => '/fan/tags-list',
-
+                
                 'jaks<id:\d+>mq/' => '/fan/tags-detail',
                 'customize_<id:\d+>.html' => '/site/customize',
                 'jaks' => '/fan',

@@ -81,6 +81,8 @@ class FanController extends Controller
 //                $nextTitle =  '没有更多内容啦！';
 //            }
 
+            $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
+
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',

@@ -41,7 +41,8 @@ class ArticleRules extends Base
     public function rules()
     {
         return [
-            [['category_id', 'domain_id', 'column_id', 'one_page_num_min', 'one_page_num_max', 'one_page_word_min', 'one_page_word_max', 'one_day_push_num', 'user_id', 'status'], 'integer'],
+            [['method_ids','domain_id', 'column_id'], 'required'],
+            [['category_id', 'one_page_num_min', 'one_page_num_max', 'one_page_word_min', 'one_page_word_max', 'one_day_push_num', 'user_id', 'status'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'push_time_sm', 'push_time_bd'], 'string', 'max' => 255],
         ];

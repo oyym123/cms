@@ -81,8 +81,7 @@ class Images extends \yii\db\ActiveRecord
             return [-1, $model->getErrors()];
         }
     }
-
-
+    
     /**
      * 根据关键词抓取
      * https://pixabay.com/

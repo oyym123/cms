@@ -27,7 +27,7 @@ use Yii;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class LongKeywords extends \yii\db\ActiveRecord
+class LongKeywords extends Base
 {
     /**
      * {@inheritdoc}
@@ -105,9 +105,10 @@ class LongKeywords extends \yii\db\ActiveRecord
     /** 标签 */
     public static function hotKeywords()
     {
-        $keywords = BaiduKeywords::find()
-            ->select('id,keywords')
+        $keywords = LongKeywords::find()
+            ->select('id,name as keywords')
             ->limit(15)
+            ->orderBy('id desc')
             ->asArray()
             ->all();
 
@@ -187,9 +188,8 @@ class LongKeywords extends \yii\db\ActiveRecord
         $error = $sameArr = [];
 
         foreach ($keywords as $keyword) {
-
             //不可重复获取百度关键词
-            $oldInfo = self::find()->select('keywords')->where(['key_id' => $keyword['id']])->one();
+            $oldInfo = self::find()->select('keywords')->where(['keywords' => $keyword['keywords']])->one();
             if (empty($oldInfo)) {
                 list($code, $msg) = self::getBaiduKey($keyword);
                 if ($code < 0) {
@@ -321,6 +321,7 @@ class LongKeywords extends \yii\db\ActiveRecord
                 }
             }
         }
+
         echo '<pre>';
         print_r($error);
     }
@@ -328,9 +329,10 @@ class LongKeywords extends \yii\db\ActiveRecord
     /** 将新增的关键词推入到远程爬虫 */
     public static function pushReptile($data)
     {
-        $url = '';
+        $url = 'http://127.0.0.1:88/keyword/save-keyword';
+
         //查询域名 栏目
-        $info = BaiduKeywords::find()->select('domain_id,column_id')->where(['id' => $data->kid])->one();
+        $info = BaiduKeywords::find()->select('id,domain_id,column_id')->where(['id' => $data->key_id])->one();
         if ($info) {
             //查询类型
             $column = DomainColumn::findOne($info->column_id);
@@ -347,9 +349,91 @@ class LongKeywords extends \yii\db\ActiveRecord
                     'domain_id' => $info->domain_id,
                     'column_id' => $info->column_id,
                 ];
+                var_export($dataPush);
+                exit;
                 Tools::curlPost($url, $dataPush);
             }
         }
+    }
 
+    /**
+     * 设定规则 定时拉取文章
+     */
+    public static function setRules()
+    {
+        set_time_limit(0);
+
+        //查询所有栏目
+        $domainColumn = DomainColumn::find()->select('id,type,domain_id')->where([
+            'status' => self::STATUS_BASE_NORMAL,
+        ])->asArray()->all();
+        $url = 'http://127.0.0.1:88/cms/article';
+
+        foreach ($domainColumn as $column) {
+            //查询分类规则
+            $rules = ArticleRules::find()->where([
+                'column_id' => $column['id']
+            ])->asArray()->one();
+
+            //只拉取有规则的
+            if (!empty($rules)) {
+                //根据栏目获取短尾关键词
+                $baiduKeywords = BaiduKeywords::find()->select('id,keywords,type')->where([
+                    'column_id' => $column['id']
+                ])->asArray()->all();
+
+                foreach ($baiduKeywords as $keyword) {
+                    //根据短尾关键词 获取长尾关键词
+                    $longKeywords = LongKeywords::find()->select('id,name')->where([
+                        'key_id' => $keyword['id']
+                    ])->asArray()->all();
+
+                    foreach ($longKeywords as $longKeyword) {
+                        //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
+                        $data = [
+                            'key_id' => $longKeyword['id'],
+                            'type' => strtoupper($column['type']),
+                            'one_page_num_min' => $rules['one_page_num_min'],
+                            'one_page_num_max' => $rules['one_page_num_max'],
+                            'one_page_word_min' => $rules['one_page_word_min'],
+                            'one_page_word_max' => $rules['one_page_word_max'],
+                        ];
+
+                        //发送请求至爬虫库
+                        $res = Tools::curlPost($url, $data);
+                        $res = json_decode($res, true);
+
+                        foreach ($res as $re) {
+                            //存储入库
+                            $saveData[] = [
+                                'column_id' => $column['id'],
+                                'from_path' => $re['from_path'],
+                                'domain_id' => $column['domain_id'],
+                                'key_id' => $keyword['id'],
+                                'keywords' => $keyword['name'],
+                                'fan_key_id' => $keyword['fan_key_id'],
+                                'rules_id' => $rules['id'],
+                                'content' => $re['content'],
+                                'intro' => $re['intro'],
+                                'title' => $re['title'],
+                                'user_id' => rand(1, 3822),
+                                'push_time' => Tools::randomDate('20200501', ''),
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s'),
+                            ];
+                        }
+
+                        if (!empty($saveData)) {
+                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+                        } else {
+                            print_r('没有数据');
+                            exit;
+                        }
+
+                        sleep(5);
+                    }
+                }
+            }
+        }
     }
 }

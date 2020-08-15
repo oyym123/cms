@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use library\pepper\Modelx;
 use Yii;
 use yii\db\Migration;
 
@@ -26,8 +27,14 @@ use yii\db\Migration;
  * @property string|null $created_at
  * @property string|null $updated_at
  */
-class PushArticle extends \yii\db\ActiveRecord
+class PushArticle extends Modelx
 {
+
+    //原始表名，表结构母版
+    protected static $originalName = 'push_article';
+    //redis表名set key
+    protected static $tableSetKey = 'project:tableset';
+
     /**
      * {@inheritdoc}
      */
@@ -38,7 +45,7 @@ class PushArticle extends \yii\db\ActiveRecord
         if ($domain) {
             return 'push_article_' . $domain->id;
         }
-        return 'push_article';
+        return static::$originalName . '_' . (static::$targetKey);
     }
 
     /**
@@ -99,10 +106,11 @@ class PushArticle extends \yii\db\ActiveRecord
     /** 热门文章 */
     public static function hotArticle()
     {
+
         $article = PushArticle::find()
             ->select('id,title_img,push_time,title')
             ->limit(10)
-            ->orderBy('title_img desc')
+            ->orderBy('user_id desc')
             ->asArray()
             ->all();
 
@@ -147,6 +155,7 @@ class PushArticle extends \yii\db\ActiveRecord
             'domain' => $migrate->string(25)->defaultValue('')->comment('域名'),
             'domain_id' => $migrate->integer(11)->defaultValue(0)->comment('域名id'),
             'from_path' => $migrate->string(255)->defaultValue('')->comment('来路地址'),
+            'fan_key_id' => $migrate->integer(11)->defaultValue(0)->comment('泛目录关键词id'),
             'key_id' => $migrate->integer(11)->defaultValue(0)->comment('关键词id'),
             'keywords' => $migrate->string(30)->defaultValue('')->comment('关键词'),
             'rules_id' => $migrate->integer(11)->defaultValue(0)->comment('规则id'),

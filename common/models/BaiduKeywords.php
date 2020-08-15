@@ -231,7 +231,11 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 
         foreach ($keywords as $item) {
             //判重 不可有所有重复的关键词 减少接口请求次数
-            $oldInfo = self::find()->where(['keywords' => $item])->one();
+            $oldInfo = self::find()->where([
+                'keywords' => $item,
+                'column_id' => $postData['column_id']
+            ])->one();
+
             if (!empty($oldInfo)) {
                 $error[] = $item . '  已经重复了！';
                 continue;
