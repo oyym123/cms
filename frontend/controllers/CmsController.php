@@ -121,10 +121,10 @@ class CmsController extends Controller
      */
     public function actionCatchBaidu()
     {
+        LongKeywords::pushReptile();
         LongKeywords::getKeywords();
     }
-
-    /**
+        /**
      * 抓取文章目录
      */
     public function actionDirCatch()

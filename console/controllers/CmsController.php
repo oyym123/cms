@@ -79,6 +79,7 @@ class CmsController extends \yii\console\Controller
      */
     public function actionCatchBaidu()
     {
+        LongKeywords::pushReptile();
         LongKeywords::getKeywords();
     }
 
@@ -108,5 +109,4 @@ class CmsController extends \yii\console\Controller
     {
         (new FanUser())->createMany();
     }
-
 }

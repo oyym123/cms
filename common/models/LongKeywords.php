@@ -180,7 +180,7 @@ class LongKeywords extends Base
             //获取所有的短尾关键词
             $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
                 ->where(['>', 'id', 1])
-                ->limit(1)
+                ->limit(1000)
                 ->asArray()
                 ->all();
         }
@@ -327,10 +327,25 @@ class LongKeywords extends Base
     }
 
     /** 将新增的关键词推入到远程爬虫 */
-    public static function pushReptile($data)
+    public static function pushReptile($data=[])
     {
         $url = 'http://127.0.0.1:88/keyword/save-keyword';
 
+        $dataPush = array(
+            'note' => '科学教育',
+            'fan_key_id' => 17292,
+            'type' => 'LEA',
+            'keywords' => '科学教育专业',
+            'm_related_name' => '[]',
+            'm_search_name' => '["科学教育专业就业前景","科学教育专业是冷门吗","科学教育的内容是什么","科学教育的含义是什么","科学教育期刊","科学教育品牌"]',
+            'm_down_name' => '["科学教育专业","科学教育专业学什么","科学教育是什么","科学教育(师范)是什么专业","科学教育专业就业前景","科学教育是什么专业","科学教育专业考研方向","科学教育专业当什么老师","科学教育师范专业当什么老师","科学教育师范类就业方向"]',
+            'm_other_name' => '["科学教育是什么","科学教育专业学什么","科学教育专升本","科学教育是什么专业","科学教育专业就业前景","科学教育考研","科学教育师范专业","孩子的教育方式和方法","怎样教育孩子","教育科研期刊"]',
+            'domain_id' => 3,
+            'column_id' => 4,
+        );
+        $res = Tools::curlPost($url, $dataPush);
+        print_r($res);
+        exit;
         //查询域名 栏目
         $info = BaiduKeywords::find()->select('id,domain_id,column_id')->where(['id' => $data->key_id])->one();
         if ($info) {
@@ -351,7 +366,7 @@ class LongKeywords extends Base
                 ];
                 var_export($dataPush);
                 exit;
-                Tools::curlPost($url, $dataPush);
+                $res = Tools::curlPost($url, $dataPush);
             }
         }
     }
