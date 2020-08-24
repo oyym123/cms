@@ -45,13 +45,13 @@ return [
                 'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
                 
-                'j' => '/fan',
-                'j/<id:\d+>.html' => '/fan/detail',            
-                'j/index_<id:\d+>.html' => '/fan',
-                
                 'wen' => '/fan',
                 'wen/<id:\d+>.html' => '/fan/detail',            
                 'wen/index_<id:\d+>.html' => '/fan',
+                
+                'j' => '/fan',
+                'j/<id:\d+>.html' => '/fan/detail',            
+                'j/index_<id:\d+>.html' => '/fan',
                 
                 'mao' => '/fan',
                 'mao/<id:\d+>.html' => '/fan/detail',            

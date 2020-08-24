@@ -85,28 +85,51 @@ class SiteController extends Controller
     public function actionSiteXml()
     {
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.xml';
 
-        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
-            $data = file_get_contents($filePath);
-        } else {
-            $articles = PushArticle::find()->select('id,column_name,push_time')->orderBy('id desc')->all();
-            $data = '';
+        if (Yii::$app->request->get('m', 0) == 1) {
+            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(6)->orderBy('id desc')->all();
+            $data = '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">';
             foreach ($articles as $article) {
-                $url = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+
                 $data .= '
                     <url>
-                    <loc>' . $url . '</loc>
+                    <loc>' . $urlM . '</loc>
+                    <mobile:mobile type="mobile"/>
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
                     </url>
                     <br/>';
             }
-            //存入缓存文件
-            file_put_contents($filePath, $data);
+
+            $data .= '
+                    </urlset>';
+            exit($data);
+
+        } else {
+            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(6)->orderBy('id desc')->all();
+            $data = '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">';
+            foreach ($articles as $article) {
+                $urlPc = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data .= '
+                    <url>
+                    <loc>' . $urlPc . '</loc>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    <br/>';
+
+            }
+            $data .= '
+                    </urlset>';
+            exit($data);
+
         }
-        exit($data);
+
     }
 
     /**
