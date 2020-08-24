@@ -90,7 +90,7 @@ class SiteController extends Controller
         if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
             $data = file_get_contents($filePath);
         } else {
-            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(100)->orderBy('id desc')->all();
+            $articles = PushArticle::find()->select('id,column_name,push_time')->orderBy('id desc')->all();
             $data = '';
             foreach ($articles as $article) {
                 $url = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
@@ -120,7 +120,7 @@ class SiteController extends Controller
             $data = file_get_contents($filePath);
             exit($data);
         } else {
-            $articles = PushArticle::find()->select('id,column_name')->limit(10)->orderBy('id desc')->all();
+            $articles = PushArticle::find()->select('id,column_name')->orderBy('id desc')->all();
             $data = [];
             foreach ($articles as $article) {
                 $data[] = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
