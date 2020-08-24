@@ -80,6 +80,59 @@ class SiteController extends Controller
     }
 
     /**
+     *
+     */
+    public function actionSiteXml()
+    {
+        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.xml';
+
+        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
+            $data = file_get_contents($filePath);
+        } else {
+            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(100)->orderBy('id desc')->all();
+            $data = '';
+            foreach ($articles as $article) {
+                $url = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data .= '
+                    <url>
+                    <loc>' . $url . '</loc>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    <br/>';
+            }
+            //存入缓存文件
+            file_put_contents($filePath, $data);
+        }
+        exit($data);
+    }
+
+    /**
+     *
+     */
+    public function actionSiteTxt()
+    {
+        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
+        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
+            $data = file_get_contents($filePath);
+            exit($data);
+        } else {
+            $articles = PushArticle::find()->select('id,column_name')->limit(10)->orderBy('id desc')->all();
+            $data = [];
+            foreach ($articles as $article) {
+                $data[] = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            }
+            $data = implode('<br/>', $data);
+            //存入缓存文件
+            file_put_contents($filePath, $data);
+            exit($data);
+        }
+    }
+
+    /**
      * Displays homepage.
      *
      * @return mixed
