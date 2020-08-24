@@ -318,11 +318,11 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     }
 
     /** 标签 */
-    public static function hotKeywords()
+    public static function hotKeywords($num = 15)
     {
         $keywords = BaiduKeywords::find()
             ->select('id,keywords')
-            ->limit(15)
+            ->limit($num)
             ->asArray()
             ->all();
 

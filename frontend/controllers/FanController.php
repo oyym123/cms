@@ -92,9 +92,10 @@ class FanController extends Controller
                 'tags' => mb_substr($model['title'], 0, 5),
             ];
             $desc = mb_substr($model['title'], 0, 28);
-            
+
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
+                'title' => $model['title'],
                 'keywords' => $model['title'],
                 'description' => $desc,
                 'og_type' => 'news',
@@ -162,7 +163,8 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['list_tdk'] = [
                 'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
-                'keywords' => $column->zh_name,
+                'keywords' => $column->keywords?:$column->zh_name,
+                'intro' => $column->intro?:$column->zh_name,
             ];
 
             return $this->render($render, [
@@ -213,7 +215,8 @@ class FanController extends Controller
 
         $view->params['list_tdk'] = [
             'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
-            'keywords' => $column->zh_name,
+            'keywords' => $column->keywords?:$column->zh_name,
+            'intro' => $column->intro?:$column->zh_name,
         ];
 
         return $this->render($render, [
@@ -304,6 +307,7 @@ class FanController extends Controller
             $view->params['tags_list_tdk'] = [
                 'title' => '最新标签_' . $domain->zh_name,
                 'keywords' => $domain->zh_name,
+                'intro' => $domain->intro,
             ];
 
             return $this->render($render, [
@@ -337,6 +341,8 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
                 'title' => $model->title,
+                'keywords' => $model->title,
+                'intro' => $model->title,
             ];
             return $this->render($render, ['models' => $res]);
         }
