@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\Base;
 use common\models\DomainTpl;
 use common\models\Qiniu;
+use common\models\Tools;
 use common\models\WhiteArticle;
 use Yii;
 use common\models\Template;
@@ -78,6 +79,11 @@ class TemplateController extends Controller
                 }
             }
 
+            if (!Tools::contentCheck($model->content)) {
+                Yii::$app->getSession()->setFlash('error', '有敏感词！请重新提交');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
             if (!empty($_FILES['Template']['name']['img'])) {
                 //标题图片处理
                 $imgInfo = (new Qiniu())->fileUpload('Template', 'aks-img01', 1, 1, 'img');
@@ -124,7 +130,12 @@ class TemplateController extends Controller
                     return $this->redirect(['update', 'id' => $model->id]);
                 }
             }
-            
+
+            if (!Tools::contentCheck($model->content)) {
+                Yii::$app->getSession()->setFlash('error', '有敏感词！请重新提交');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
             if (!empty($_FILES['Template']['name']['img'])) {
                 //标题图片处理
                 $imgInfo = (new Qiniu())->fileUpload('Template', 'aks-img01', 1, 1, 'img');

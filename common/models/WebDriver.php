@@ -185,7 +185,6 @@ class WebDriver extends RemoteWebDriver
             'created_at' => date('Y-m-d H:i:s'),
         ];
 
-
         list($codeArticle, $msgArticle) = WhiteArticle::createOne($dataSave);
 
         if ($codeArticle < 0) {
