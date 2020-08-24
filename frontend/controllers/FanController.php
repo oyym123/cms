@@ -95,7 +95,7 @@ class FanController extends Controller
 
 
             $view = Yii::$app->view;
-            $view->params['tdk'] = [
+            $view->params['detail_tdk'] = [
                 'keywords' => '12321',
                 'description' => $desc,
                 'og_type' => 'news',
@@ -179,7 +179,6 @@ class FanController extends Controller
             $minRand = rand($lastId - 280, $lastId - 201);
             $andWhere = ['between', 'id', $minRand, $maxRand];
         }
-
 
         $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->andWhere($andWhere)->limit(10);
 
