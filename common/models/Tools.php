@@ -28,7 +28,7 @@ class Tools extends \yii\db\ActiveRecord
         //设置抓取的url
         curl_setopt($curl, CURLOPT_URL, $url);
         //设置头文件的信息作为数据流输出
-        curl_setopt($curl, CURLOPT_HEADER, 1);
+        curl_setopt($curl, CURLOPT_HEADER, 0);
         //设置获取的信息以文件流的形式返回，而不是直接输出。
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         //设置post方式提交
@@ -377,4 +377,62 @@ class Tools extends \yii\db\ActiveRecord
         }
         return true;
     }
+
+    /** 获取爬虫地址 */
+    public static function reptileUrl()
+    {
+        return PHP_OS == 'WINNT' ? \Yii::$app->params['local_reptile_url'] : \Yii::$app->params['online_reptile_url'];
+    }
+
+    /** 格式化时间 */
+    public static function formatTime($time)
+    {
+        if (is_int($time)) {
+            $time = intval($time);
+        } else {
+            return '';
+        }
+
+        $ctime = time();
+        $t = $ctime - $time; //时间差 （秒）
+
+        if ($t < 0) {
+            return date('Y-m-d', $time);
+        }
+
+        $y = intval(date('Y', $ctime) - date('Y', $time));//是否跨年
+
+        if ($t == 0) {
+            $text = '刚刚';
+        } elseif ($t < 60) {//一分钟内
+            $text = $t . '秒前';
+        } elseif ($t < 3600) {//一小时内
+            $text = floor($t / 60) . '分钟前';
+        } elseif ($t < 86400) {//一天内
+            $text = floor($t / 3600) . '小时前'; // 一天内
+        } elseif ($t < 2592000) {//30天内
+            if ($time > strtotime(date('Ymd', strtotime("-1 day")))) {
+                $text = '昨天';
+            } elseif ($time > strtotime(date('Ymd', strtotime("-2 days")))) {
+                $text = '前天';
+            } else {
+                $text = floor($t / 86400) . '天前';
+            }
+        } elseif ($t < 31536000 && $y == 0) {//一年内 不跨年
+            $m = date('m', $ctime) - date('m', $time) - 1;
+
+            if ($m == 0) {
+                $text = floor($t / 86400) . '天前';
+            } else {
+                $text = $m . '个月前';
+            }
+        } elseif ($t < 31536000 && $y > 0) {//一年内 跨年
+            $text = (12 - date('m', $time) + date('m', $ctime)) . '个月前';
+        } else {
+            $text = (date('Y', $ctime) - date('Y', $time)) . '年前';
+        }
+
+        return $text;
+    }
+
 }

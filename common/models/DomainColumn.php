@@ -62,9 +62,9 @@ class DomainColumn extends Base
     {
         return [
             [['domain_id', 'tags', 'name', 'type'], 'required'],
-            [['domain_id', 'user_id', 'status', 'mobile_show', 'pc_show'], 'integer'],
+            [['domain_id', 'user_id', 'status', 'mobile_show', 'pc_show', 'sort', 'is_change'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'tags', 'domain_name', 'zh_name', 'type'], 'string', 'max' => 255],
+            [['name', 'tags', 'domain_name', 'zh_name', 'type', 'title', 'keywords', 'intro'], 'string', 'max' => 255],
         ];
     }
 
@@ -75,12 +75,17 @@ class DomainColumn extends Base
     {
         return [
             'id' => 'ID',
-            'name' => '名称',
+            'name' => '英文名称',
             'tags' => 'Tags',
             'type' => '类型',
             'zh_name' => '中文名称',
             'pc_show' => 'PC端是否显示',
             'mobile_show' => '移动端是否显示',
+            'title' => '标题',
+            'is_change' => '是否随机列表内容',
+            'keywords' => '关键字',
+            'intro' => '简介',
+            'sort' => '排序',
             'domain_id' => '域名id',
             'domain_name' => '域名',
             'user_id' => '创建者',
@@ -116,7 +121,7 @@ class DomainColumn extends Base
             $column = DomainColumn::find()->select('id,zh_name,name')->where([
                 'domain_id' => $domain->id,
                 'status' => self::STATUS_BASE_NORMAL
-            ])->andWhere($andWhere)->asArray()->all();
+            ])->orderBy('sort desc')->andWhere($andWhere)->asArray()->all();
             $arr = [];
 
             //将home 放第一位

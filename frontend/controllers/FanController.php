@@ -66,40 +66,47 @@ class FanController extends Controller
                 $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
 
-//            $preTitle = PushArticle::findOne($arr[0] - 1);
-//            $nextTitle = PushArticle::findOne($arr[0] + 1);
-//
-//            if ($preTitle) {
-//                $preTitle = $preTitle->title;
-//            }else{
-//                $preTitle =  '没有更多内容啦！';
-//            }
-//
-//            if ($nextTitle) {
-//                $nextTitle = $nextTitle->title;
-//            }else{
-//                $nextTitle =  '没有更多内容啦！';
-//            }
+            $preTitle = PushArticle::findOne($arr[0] - 1);
+            $nextTitle = PushArticle::findOne($arr[0] + 1);
+
+            if ($preTitle) {
+                $preTitle = $preTitle->title;
+            } else {
+                $preTitle = '没有更多内容啦！';
+            }
+
+            if ($nextTitle) {
+                $nextTitle = $nextTitle->title;
+            } else {
+                $nextTitle = '没有更多内容啦！';
+            }
+
+            $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
 
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
                 'next' => '/' . $column . '/' . ($arr[0] + 1) . '.html',
+                'pre_title' => $preTitle,
+                'next_title' => $nextTitle,
+                'tags' => mb_substr($model['title'], 0, 5),
+            ];
+            $desc = mb_substr($model['title'], 0, 28);
 
+
+            $view = Yii::$app->view;
+            $view->params['tdk'] = [
+                'keywords' => '12321',
+                'description' => $desc,
+                'og_type' => 'news',
+                'og_title' => $model['title'],
+                'og_description' => $desc,
+                'og_image' => '',
+                'og_release_date' => $desc,
             ];
 
-            $desc = mb_substr($model['title'], 0, 28);
             return $this->render($render, [
                 'models' => $res,
-                'tdk' => [
-                    'keywords' => '12321',
-                    'description' => $desc,
-                    'og_type' => 'news',
-                    'og_title' => $model['title'],
-                    'og_description' => $desc,
-                    'og_image' => '',
-                    'og_release_date' => $desc,
-                ]
             ]);
         }
     }
@@ -135,7 +142,47 @@ class FanController extends Controller
             $_GET['page'] = $arr[0];
         }
 
-        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->limit(10)->orderBy('RAND()');
+        $lastId = PushArticle::find()->select('id')->orderBy('id desc')->one()->id;
+
+        //获取当前栏目
+        $columnName = explode('/', $url)[1];
+        $domain = Domain::getDomainInfo();
+
+        $column = DomainColumn::find()->where(['name' => $columnName, 'domain_id' => $domain->id])->one();
+
+        list($layout, $render) = Fan::renderView(Template::TYPE_LIST);
+        $this->layout = $layout;
+
+        //表示是用户列表
+        if (strpos($url, '/user') !== false) {
+            list($models, $pages) = $this->user(57);
+            $res = [
+                'home_list' => $models,
+            ];
+
+            $view = Yii::$app->view;
+            $view->params['list_tdk'] = [
+                'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
+                'keywords' => $column->zh_name,
+            ];
+
+            return $this->render($render, [
+                'models' => $res,
+                'pages' => $pages,
+            ]);
+        }
+
+        $andWhere = [];
+
+        if ($column->is_change) {
+            $maxRand = rand($lastId - 200, $lastId);
+            $minRand = rand($lastId - 280, $lastId - 201);
+            $andWhere = ['between', 'id', $minRand, $maxRand];
+        }
+
+
+        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->andWhere($andWhere)->limit(10);
+
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -143,14 +190,16 @@ class FanController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
-        list($layout, $render) = Fan::renderView(Template::TYPE_LIST);
-        $this->layout = $layout;
 
         foreach ($models as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
+                $item['is_hot'] = 1;
+                $item['is_top'] = 1;
+                $item['is_recommend'] = 1;
+                $item['tags'] = mb_substr($item['title'], 0, 5);
             } else {
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
@@ -162,10 +211,42 @@ class FanController extends Controller
             'home_list' => $models,
         ];
 
+        $view = Yii::$app->view;
+
+        $view->params['list_tdk'] = [
+            'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
+            'keywords' => $column->zh_name,
+        ];
+
         return $this->render($render, [
             'models' => $res,
             'pages' => $pages,
         ]);
+    }
+
+    // 用户中心
+    public function user($userId)
+    {
+        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
+        $countQuery = clone $query;
+        $pages = new Pagination(['totalCount' => $countQuery->count()]);
+
+        $models = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->asArray()->all();
+
+        foreach ($models as &$item) {
+            if ($user = FanUser::findOne($item['user_id'])) {
+                $item['push_time'] = Tools::formatTime(strtotime($item['push_time']));
+                $item['nickname'] = $user->username;
+                $item['avatar'] = $user->avatar;
+                $item['is_hot'] = 1;
+                $item['is_top'] = 1;
+                $item['is_recommend'] = 1;
+                $item['tags'] = mb_substr($item['title'], 0, 5);
+            }
+        }
+        return [$models, $pages];
     }
 
     /**
@@ -221,6 +302,12 @@ class FanController extends Controller
         if (Yii::$app->request->isAjax) {
             exit(json_encode($models));
         } else {
+            $view = Yii::$app->view;
+            $view->params['tags_list_tdk'] = [
+                'title' => '最新标签_' . $domain->zh_name,
+                'keywords' => $domain->zh_name,
+            ];
+
             return $this->render($render, [
                 'column' => DomainColumn::getColumn(),
                 'models' => $res,
@@ -229,7 +316,6 @@ class FanController extends Controller
         }
 
     }
-
 
     public function actionTagsDetail()
     {
@@ -249,6 +335,10 @@ class FanController extends Controller
             }
             $res = [
                 'data' => $model
+            ];
+            $view = Yii::$app->view;
+            $view->params['tags_tdk'] = [
+                'title' => $model->title,
             ];
             return $this->render($render, ['models' => $res]);
         }

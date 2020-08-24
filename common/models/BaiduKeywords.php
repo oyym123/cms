@@ -152,36 +152,32 @@ class BaiduKeywords extends \yii\db\ActiveRecord
         $model->created_at = date('Y-m-d H:i:s');
         if (!$model->save(false)) {
             return [-1, $model->getErrors()];
+        } else {
+            return [1, $model];
         }
     }
 
     /**
      * 获取百度SDK关键词的数据
      */
-    public function getSdkWords()
+    public static function getSdkWords($id = 0)
     {
+
         set_time_limit(0);
+        $andWhere = [];
+        if ($id) {
+            $andWhere = ['id' => $id];
+        }
+
         //所有的种词
-        $initWords1 = ['外教一对一', '英语一对一', '英语培训', '少儿英语', '小学英语', '初中英语', '高中英语', '大学英语', '成人英语', '英语听力', '英语语法', '英语作文', '英语单词', '雅思英语', '托福英语'];
         $error = [];
 
-        //获取所有来源词
-        $oneInfo = self::find()->select('from_keywords')->asArray()->distinct('from_keywords')->all();
-        $fromKeyArr = array_column($oneInfo, 'from_keywords');
-
-        $initWords = self::find()->select('keywords')->where(['not in', 'keywords', $fromKeyArr])->asArray()->all();
-        $initWords = array_column($initWords, 'keywords');
+        $initWords = self::find()->where(['pid' => 0])->andWhere($andWhere)->all();
 
         //用种词调用相关词查询接口 最多只能查询到300个
         foreach ($initWords as $key => $initWord) {
-            if (in_array($initWord, $fromKeyArr)) {
-                $error[] = $initWord . '   来源词重复了！';
-                continue;
-            }
-
             sleep(1);
-
-            $data = (new BaiDuSdk())->getKeyWords($initWord);
+            $data = (new BaiDuSdk())->getKeyWords($initWord->keywords);
             if ($data === false) {
                 $error[] = $initWord . '  没有请求请成功！';
                 continue;
@@ -189,6 +185,8 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 
             foreach ($data as $item) {
                 $saveData = [
+                    'type' => $initWord->type,
+                    'pid' => $initWord->id,
                     'pc_pv' => $item['pcPV'],
                     'show_reasons' => json_encode($item['showReasons'], JSON_UNESCAPED_UNICODE),
                     'm_pv' => $item['mobilePV'],
@@ -197,7 +195,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                     'businessPoints' => json_encode($item['businessPoints'], JSON_UNESCAPED_UNICODE),
                     'all_pv' => $item['pv'],
                     'keywords' => $item['word'],
-                    'from_keywords' => $initWord,
+                    'from_keywords' => $initWord->keywords,
                     'similar' => $item['similar'],
                     'competition' => $item['competition'],
                     'json_info' => json_encode($item, JSON_UNESCAPED_UNICODE),
@@ -205,6 +203,20 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 
                 //保存所有的关键词
                 list($code, $msg) = self::createOne($saveData);
+                if ($code > 0) {
+                    $dataSave = [
+                        'name' => $item['word'],
+                        'key_id' => $msg->id,
+                        'type_name' => $msg->type,
+                        'keywords' => $initWord->keywords,
+                    ];
+
+                    list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
+
+                    if ($codeKey > 0) {
+                        LongKeywords::bdPushReptile($msgKey);
+                    }
+                }
                 if ($code < 0) {
                     $error[] = $msg;
                 }
@@ -231,7 +243,11 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 
         foreach ($keywords as $item) {
             //判重 不可有所有重复的关键词 减少接口请求次数
-            $oldInfo = self::find()->where(['keywords' => $item])->one();
+            $oldInfo = self::find()->where([
+                'keywords' => $item,
+                'column_id' => $postData['column_id']
+            ])->one();
+
             if (!empty($oldInfo)) {
                 $error[] = $item . '  已经重复了！';
                 continue;
@@ -249,6 +265,8 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 'show_reasons' => '后台添加',
                 'm_pv' => $info['mobile']['pv'],
                 'm_show' => $info['mobile']['show'],
+                'type' => $postData['type'],
+                'pid' => 0,
                 'm_ctr' => $info['mobile']['ctr'],
                 'm_click' => $info['mobile']['click'],
                 'm_rec_bid' => $info['mobile']['recBid'],
@@ -276,16 +294,19 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 'keywords' => $info['word'],
                 'from_keywords' => '',
                 'similar' => '',
-                'domain_id' => $postData['domain_id'],
-                'column_id' => $postData['column_id'],
+                'domain_id' => $postData['domain_id'] ?? 0,
+                'column_id' => $postData['column_id'] ?? 0,
                 'competition' => $info['competition'],
                 'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
             ];
 
             //保存所有的关键词
             list($code, $msg) = self::createOne($saveData);
+
             if ($code < 0) {
                 $error[] = $msg;
+            } else {
+                self::getSdkWords($msg->id);
             }
         }
 

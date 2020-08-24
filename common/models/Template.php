@@ -47,6 +47,22 @@ class Template extends Base
         return $key === 'all' ? $data : $data[$key];
     }
 
+    /** 获取所有的类型 */
+    public static function getEnType($key = 'all')
+    {
+        $data = [
+            self::TYPE_HOME => 'home',
+            self::TYPE_LIST => 'list',
+            self::TYPE_DETAIL => 'detail',
+            self::TYPE_TAGS => 'tags',
+            self::TYPE_CUSTOMIZE => 'customize',
+            self::TYPE_COMMON => 'common',
+            self::TYPE_INSIDE => 'inside',
+        ];
+        return $key === 'all' ? $data : $data[$key];
+    }
+
+
     /** 获取所有的类别 */
     public static function getCate($key = 'all')
     {

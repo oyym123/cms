@@ -10,19 +10,25 @@ use yii\widgets\ActiveForm;
 
 <div class="template-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin();
+    if (strpos(Yii::$app->request->url, 'create') !== false) {
+        $model->cate = \common\models\Template::CATE_PC;
+    }
+    ?>
+
+    <?= $form->field($model, 'type')->dropDownList(\common\models\Template::getType(), []) ?>
+
+    <?= $form->field($model, 'cate')->radioList(\common\models\Template::getCate(), []) ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+
+    <?= $form->field($model, 'en_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'content')->textarea(['rows' => 8]) ?>
 
     <?= $form->field($model, 'php_func')->textarea(['rows' => 5])->hint('需要自定义页面时,找后端填写此栏目') ?>
 
-    <?= $form->field($model, 'cate')->radioList(\common\models\Template::getCate(), []) ?>
 
-    <?= $form->field($model, 'type')->dropDownList(\common\models\Template::getType(), []) ?>
-
-    <?= $form->field($model, 'en_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'intro')->textarea(['rows' => 3]) ?>
 
@@ -42,7 +48,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->dropDownList(\common\models\Base::getBaseStatus(), []) ?>
 
-
     <!---->
     <!--    --><? //= $form->field($model, 'created_at')->textInput() ?>
     <!---->
@@ -55,3 +60,52 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript">
+
+    <?php $form = ActiveForm::begin();
+    if (strpos(Yii::$app->request->url, 'create') !== false) {
+    ?>
+    $.ajax({
+        url: '/index.php/template/get-name',
+        type: 'GET',
+        dataType: 'json',
+        data: {type: $("#template-type").find("option:selected").val(), cate: $('input:radio:checked').val()},
+        success: function (msg) {
+            $("#template-name").val(msg.name);
+            $("#template-en_name").val(msg.en_name);
+        }
+    })
+
+    $("#template-type").change(function () {
+        var html = '';
+        $.ajax({
+            url: '/index.php/template/get-name',
+            type: 'GET',
+            dataType: 'json',
+            data: {type: $("#template-type").find("option:selected").val(), cate: $('input:radio:checked').val()},
+            success: function (msg) {
+                $("#template-name").val(msg.name);
+                $("#template-en_name").val(msg.en_name);
+            }
+        })
+    });
+
+    $("#template-cate").change(function () {
+        var html = '';
+        $.ajax({
+            url: '/index.php/template/get-name',
+            type: 'GET',
+            dataType: 'json',
+            data: {type: $("#template-type").find("option:selected").val(), cate: $('input:radio:checked').val()},
+            success: function (msg) {
+                $("#template-name").val(msg.name);
+                $("#template-en_name").val(msg.en_name);
+            }
+        })
+    });
+    <?php
+    }
+    ?>
+</script>
+

@@ -27,7 +27,7 @@ use Yii;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class LongKeywords extends \yii\db\ActiveRecord
+class LongKeywords extends Base
 {
     /**
      * {@inheritdoc}
@@ -45,7 +45,7 @@ class LongKeywords extends \yii\db\ActiveRecord
         return [
             [['key_id', 'key_search_num', 'status', 'from', 'type'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['m_down_name', 'm_search_name', '', 'm_related_name', 'name', 'pc_down_name', 'm_other_name', 'pc_search_name', 'pc_related_name', 'keywords', 'remark', 'url'], 'string', 'max' => 255],
+            [['m_down_name', 'm_search_name', 'm_related_name', 'name', 'pc_down_name', 'm_other_name', 'pc_search_name', 'pc_related_name', 'keywords', 'remark', 'url'], 'string', 'max' => 255],
         ];
     }
 
@@ -105,9 +105,10 @@ class LongKeywords extends \yii\db\ActiveRecord
     /** 标签 */
     public static function hotKeywords()
     {
-        $keywords = BaiduKeywords::find()
-            ->select('id,keywords')
+        $keywords = LongKeywords::find()
+            ->select('id,name as keywords')
             ->limit(15)
+            ->orderBy('id desc')
             ->asArray()
             ->all();
 
@@ -139,6 +140,7 @@ class LongKeywords extends \yii\db\ActiveRecord
 
         $model->name = $data['name'];
         $model->type = $data['type'];
+        $model->type_name = $data['type_name'];
         $model->m_down_name = $data['m_down_name'] ?? '';
         $model->m_search_name = $data['m_search_name'] ?? '';
         $model->m_related_name = $data['m_related_name'] ?? '';
@@ -179,7 +181,7 @@ class LongKeywords extends \yii\db\ActiveRecord
             //获取所有的短尾关键词
             $keywords = BaiduKeywords::find()->select('id,keywords,m_pv')
                 ->where(['>', 'id', 1])
-                ->limit(1)
+                ->limit(120)
                 ->asArray()
                 ->all();
         }
@@ -187,9 +189,8 @@ class LongKeywords extends \yii\db\ActiveRecord
         $error = $sameArr = [];
 
         foreach ($keywords as $keyword) {
-
             //不可重复获取百度关键词
-            $oldInfo = self::find()->select('keywords')->where(['key_id' => $keyword['id']])->one();
+            $oldInfo = self::find()->select('keywords')->where(['keywords' => $keyword['keywords']])->one();
             if (empty($oldInfo)) {
                 list($code, $msg) = self::getBaiduKey($keyword);
                 if ($code < 0) {
@@ -207,6 +208,7 @@ class LongKeywords extends \yii\db\ActiveRecord
                 $sameArr[] = $keyword['keywords'] . '   重复！';
             }
         }
+
 
         echo '<pre>';
         print_r($sameArr);
@@ -279,21 +281,13 @@ class LongKeywords extends \yii\db\ActiveRecord
             }
         }
 
-        $mDownStr = json_encode($resDown, JSON_UNESCAPED_UNICODE);
-
-        $mOtherStr = json_encode($resOther, JSON_UNESCAPED_UNICODE);
-
-        $mRelatedStr = json_encode($resRelated, JSON_UNESCAPED_UNICODE);
-
-        $mSearchStr = json_encode($resSearch, JSON_UNESCAPED_UNICODE);
-
         $error = [];
 
         $allKeyWords = [
             10 => $resDown,
             20 => $resSearch,
-            40 => $resOther,
             30 => $resRelated,
+            40 => $resOther,
         ];
 
         foreach ($allKeyWords as $key => $item) {
@@ -303,41 +297,80 @@ class LongKeywords extends \yii\db\ActiveRecord
                     'key_id' => $data['id'],
                     'type' => $key,
                     'keywords' => $data['keywords'],
-                    'm_related_name' => $mRelatedStr,
-                    'm_search_name' => $mSearchStr,
-                    'm_down_name' => $mDownStr,
-                    'm_other_name' => $mOtherStr,
-//                    'key_search_num' => $data['search_num'],
                 ];
 
                 list($code, $msg) = self::createOne($dataSave);
 
                 if ($code < 0) {
                     $error[] = $msg;
-                } else {
-                    if ($k == 0) { //表示只推送一次
-                        self::pushReptile($msg);
-                    }
                 }
             }
         }
+
+        $keywords = self::find()->where(['key_id' => $data['id']])->all();
+        $resOther = $resRelated = $resSearch = $resDown = [];
+        foreach ($keywords as $keyword) {
+            if ($keyword->type == self::TYPE_M_DOWN) {
+                $resDown[] = [
+                    'id' => $keyword->id,
+                    'name' => $keyword->name
+                ];
+            } elseif ($keyword->type == self::TYPE_M_SEARCH) {
+                $resSearch[] = [
+                    'id' => $keyword->id,
+                    'name' => $keyword->name
+                ];
+            } elseif ($keyword->type == self::TYPE_M_RELATED) {
+                $resRelated[] = [
+                    'id' => $keyword->id,
+                    'name' => $keyword->name
+                ];
+            } elseif ($keyword->type == self::TYPE_M_OTHER) {
+                $resOther[] = [
+                    'id' => $keyword->id,
+                    'name' => $keyword->name
+                ];
+            }
+        }
+
+        $mDownStr = json_encode($resDown, JSON_UNESCAPED_UNICODE);
+
+        $mOtherStr = json_encode($resOther, JSON_UNESCAPED_UNICODE);
+
+        $mRelatedStr = json_encode($resRelated, JSON_UNESCAPED_UNICODE);
+
+        $mSearchStr = json_encode($resSearch, JSON_UNESCAPED_UNICODE);
+
+        $dataSave = [
+            'm_related_name' => $mRelatedStr,
+            'm_search_name' => $mSearchStr,
+            'm_down_name' => $mDownStr,
+            'm_other_name' => $mOtherStr,
+        ];
+
+        self::updateAll($dataSave, ['key_id' => $data['id']]);
+        $msg = self::find()->where(['key_id' => $data['id']])->one();
+
+        self::pushReptile($msg);
+
         echo '<pre>';
         print_r($error);
     }
 
     /** 将新增的关键词推入到远程爬虫 */
-    public static function pushReptile($data)
+    public static function pushReptile($data = [])
     {
-        $url = '';
+        $url = Tools::reptileUrl() . '/keyword/save-keyword';
         //查询域名 栏目
-        $info = BaiduKeywords::find()->select('domain_id,column_id')->where(['id' => $data->kid])->one();
+        $info = BaiduKeywords::find()->select('id,domain_id,column_id')->where(['id' => $data->key_id])->one();
         if ($info) {
             //查询类型
             $column = DomainColumn::findOne($info->column_id);
             if ($column) {
                 $dataPush = [
                     'note' => $data->keywords,
-                    'fan_key_id' => $data->id,
+                    'fan_key_id' => $info->id,
+                    'key_id' => $data->id,
                     'type' => $column->type,
                     'keywords' => $data->name,
                     'm_related_name' => $data->m_related_name,
@@ -347,9 +380,162 @@ class LongKeywords extends \yii\db\ActiveRecord
                     'domain_id' => $info->domain_id,
                     'column_id' => $info->column_id,
                 ];
-                Tools::curlPost($url, $dataPush);
+
+                $res = Tools::curlPost($url, $dataPush);
+                if (strpos($res, 'success') === false) {
+                    print_r($res);
+                    exit;
+                    Tools::writeLog($res, 'reptile_keywords_error.log');
+                } else {
+                    Tools::writeLog([$data->name => '保存成功'], 'reptile_keywords.log');
+                }
             }
         }
+    }
 
+    /** 将新增的关键词推入到远程爬虫 */
+    public static function bdPushReptile($data = [])
+    {
+        $url = Tools::reptileUrl() . '/keyword/save-keyword';
+
+        $resOther[] = [
+            'id' => $data->id,
+            'name' => $data->name
+        ];
+
+        $mOtherStr = json_encode($resOther, JSON_UNESCAPED_UNICODE);
+
+        $dataPush = [
+            'note' => $data->keywords,
+            'fan_key_id' => $data->key_id,
+            'key_id' => $data->id,
+            'type' => $data->type_name,
+            'keywords' => $data->name,
+            'm_related_name' => '[]',
+            'm_search_name' => '[]',
+            'm_down_name' => '[]',
+            'm_other_name' => $mOtherStr,
+            'domain_id' => 0,
+            'column_id' => 0,
+        ];
+
+        $res = Tools::curlPost($url, $dataPush);
+
+        if (strpos($res, 'success') === false) {
+            print_r($res);
+            exit;
+            Tools::writeLog($res, 'reptile_keywords_error.log');
+        } else {
+            Tools::writeLog([$data->name => '保存成功'], 'reptile_keywords.log');
+        }
+    }
+
+    /**
+     * 设定规则 定时拉取文章
+     */
+    public static function setRules()
+    {
+        set_time_limit(0);
+
+        //查询所有栏目
+        $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
+            'status' => self::STATUS_BASE_NORMAL,
+        ])->asArray()->all();
+
+        $url = Tools::reptileUrl() . '/cms/article';
+
+        foreach ($domainColumn as $column) {
+            //查询分类规则
+            $rules = ArticleRules::find()->where([
+                'column_id' => $column['id']
+            ])->asArray()->one();
+
+            //只拉取有规则的
+            if (!empty($rules)) {
+                //根据栏目获取短尾关键词
+                $baiduKeywords = BaiduKeywords::find()->select('id,keywords,type')->where([
+                    'column_id' => $column['id']
+                ])->asArray()->all();
+
+                foreach ($baiduKeywords as $keyword) {
+
+                    //检验是否拉取过数据
+                    $oldArticle = PushArticle::findx($column['domain_id'])->where(['fan_key_id' => $keyword['id']])->one();
+
+                    if (!empty($oldArticle)) {
+                        Tools::writeLog($column['zh_name'] . ' ---  ' . $keyword['keywords'] . '  已经拉取过了', 'set_rules.log');
+                        continue;
+                    }
+
+                    //根据短尾关键词 获取长尾关键词
+                    $longKeywords = LongKeywords::find()->select('id,name')->where([
+                        'key_id' => $keyword['id']
+                    ])->asArray()->all();
+
+                    foreach ($longKeywords as $longKeyword) {
+                        //检验是否拉取过数据
+                        $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
+
+                        if (!empty($oldArticleKey)) {
+                            Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
+                            continue;
+                        }
+
+                        //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
+                        $data = [
+                            'fan_key_id' => $keyword['id'],
+                            'key_id' => $longKeyword['id'],
+                            'type' => strtoupper($column['type']),
+                            'one_page_num_min' => $rules['one_page_num_min'],
+                            'one_page_num_max' => $rules['one_page_num_max'],
+                            'one_page_word_min' => $rules['one_page_word_min'],
+                            'one_page_word_max' => $rules['one_page_word_max'],
+                        ];
+
+                        //发送请求至爬虫库
+                        $res = Tools::curlPost($url, $data);
+
+                        $res = json_decode($res, true);
+
+
+                        if (isset($res[0]['from_path'])) {
+                            foreach ($res as $re) {
+                                //存储入库
+                                $saveData[] = [
+                                    'column_id' => $column['id'],
+                                    'from_path' => $re['from_path'],
+                                    'domain_id' => $column['domain_id'],
+                                    'key_id' => $longKeyword['id'],
+                                    'keywords' => $keyword['name'],
+                                    'column_name' => $column['name'],
+                                    'fan_key_id' => $keyword['id'],
+                                    'rules_id' => $rules['id'],
+                                    'content' => $re['content'],
+                                    'intro' => $re['intro'],
+                                    'title' => $re['title'],
+                                    'user_id' => rand(1, 3822),
+                                    'push_time' => Tools::randomDate('20200501', ''),
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s'),
+                                ];
+                            }
+                        }
+
+                        if (!empty($saveData)) {
+//                            echo '<pre>';
+//                            var_export($data);
+//                            exit;
+                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+                        } else {
+//                            echo '<pre>';
+//                            var_export($data);
+//                            exit;
+                        }
+
+//                        sleep(5);
+                    }
+                }
+            }
+        }
     }
 }

@@ -121,10 +121,10 @@ class CmsController extends Controller
      */
     public function actionCatchBaidu()
     {
+        LongKeywords::pushReptile();
         LongKeywords::getKeywords();
     }
-
-    /**
+        /**
      * 抓取文章目录
      */
     public function actionDirCatch()
@@ -206,6 +206,11 @@ class CmsController extends Controller
         for ($i = 1; $i <= 8; $i++) {
             (new PushArticle())->createTable($i);
         }
+    }
+
+    public function actionSetRules()
+    {
+        LongKeywords::setRules();
     }
 
 }

@@ -88,6 +88,13 @@ textarea{border: none}
 .float-right-box .content-right-mt{margin-top: 12px;}
 .article-list a{display: block; width: 260px;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;}
 
+ h2 {
+    padding-bottom: 12px;
+    font-size: 20px;
+    font-size: .2rem;
+    border-bottom: 1px solid #efefef;
+}
+
 .pagination > li > a, .pagination > li > span {
     position: relative;
     float: left;
