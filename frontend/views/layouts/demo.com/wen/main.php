@@ -39,7 +39,7 @@
         } elseif (isset($this->params['detail_tdk'])) { //详情页TDK
             $tdk = $this->params['detail_tdk'];
             ?>
-
+            <title><?= $tdk['title'] ?></title>
             <meta name="keywords" content="<?= $tdk['keywords'] ?>">
             <meta name="description" content="<?= $tdk['description'] ?>">
             <meta property="og:type" content="<?= $tdk['og_type'] ?>"/>
