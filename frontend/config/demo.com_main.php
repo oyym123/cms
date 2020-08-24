@@ -79,6 +79,8 @@ return [
                 'user/index_<id:\d+>.html' => '/fan',
                 
                 'index_<id:\d+>.html' => '/site/index',
+                'site.xml' => '/site/site-xml',
+                'site.txt' => '/site/site-txt',
                 //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
