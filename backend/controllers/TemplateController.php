@@ -224,4 +224,51 @@ class TemplateController extends Controller
         $out['results'] = array_values($data);
         return $out;
     }
+
+    /**
+     * 获取最新名称
+     */
+    public function actionGetName()
+    {
+        $type = Yii::$app->request->get('type');
+        $cate = Yii::$app->request->get('cate');
+
+        $lastName = Template::find()
+            ->where([
+                'cate' => $cate,
+                'type' => $type
+            ])->orderBy('id desc')->one();
+
+
+        if (!empty($lastName)) {
+            $arr = explode('_', $lastName->name);
+            $num = end($arr);
+
+            $name = Template::getType($type);
+            $enName = Template::getEnType($type);
+            if ($cate == Template::CATE_PC) {
+                $name = $name . '_' . ($num + 1);
+                $enName = $enName . '_' . ($num + 1);
+            } else {
+                $name = 'm_' . $name . '_' . ($num + 1);
+                $enName = 'm_' . $enName . '_' . ($num + 1);
+            }
+        } else {
+            $name = Template::getType($type);
+            $enName = Template::getEnType($type);
+            if ($cate == Template::CATE_PC) {
+                $name = $name . '_1';
+                $enName = $enName . '_1';
+            } else {
+                $name = 'm_' . $name . '_1';
+                $enName = 'm_' . $enName . '_1';
+            }
+        }
+
+        $name = [
+            'en_name' => $name,
+            'name' => $enName,
+        ];
+        exit(json_encode($name));
+    }
 }

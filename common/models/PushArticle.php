@@ -104,12 +104,12 @@ class PushArticle extends Modelx
     }
 
     /** 热门文章 */
-    public static function hotArticle()
+    public static function hotArticle($num = 10)
     {
 
         $article = PushArticle::find()
             ->select('id,title_img,push_time,title')
-            ->limit(10)
+            ->limit($num)
             ->orderBy('user_id desc')
             ->asArray()
             ->all();
@@ -128,11 +128,11 @@ class PushArticle extends Modelx
     }
 
     /** 最新文章 */
-    public static function newArticle()
+    public static function newArticle($num = 10)
     {
         $article = PushArticle::find()
             ->select('id,title_img,push_time,title')
-            ->limit(10)
+            ->limit($num)
             ->orderBy('id desc')
             ->asArray()
             ->all();

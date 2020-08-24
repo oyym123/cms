@@ -11,9 +11,7 @@ use yii\widgets\ActiveForm;
 <div class="baidu-keywords-form">
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
-
-    <?= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
+    <?= $form->field($model, 'type')->dropDownList([\common\models\DomainColumn::getType()], ['prompt' => '--请选择类型--']) ?>
 
     <?= $form->field($model, 'keywords')->textInput(['maxlength' => true]) ?>
 

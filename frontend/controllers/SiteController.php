@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
+use common\models\Domain;
 use common\models\DomainColumn;
 use common\models\Fan;
 use common\models\FanUser;
@@ -90,11 +91,23 @@ class SiteController extends Controller
         if (strpos($url, 'index_') && preg_match('/\d+/', $url, $arr)) {
             $_GET['page'] = $arr[0];
         }
-        
-        $maxRand = rand(200, 500);
-        $minRand = rand(1, 199);
 
-        $query = PushArticle::find()->andWhere(['between', 'id', $minRand, $maxRand])->limit(10);
+        $lastId = PushArticle::find()->select('id')->orderBy('id desc')->one()->id;
+
+        //获取当前栏目
+        $columnName = 'home';
+
+        $domain = Domain::getDomainInfo();
+
+        $column = DomainColumn::find()->where(['name' => $columnName, 'domain_id' => $domain->id])->one();
+
+        if ($column->is_change) {
+            $maxRand = rand($lastId - 200, $lastId);
+            $minRand = rand($lastId - 280, $lastId - 201);
+            $andWhere = ['between', 'id', $minRand, $maxRand];
+        }
+
+        $query = PushArticle::find()->andWhere($andWhere)->limit(10);
 
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
@@ -111,6 +124,10 @@ class SiteController extends Controller
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
+                $item['is_hot'] = 1;
+                $item['is_top'] = 1;
+                $item['is_recommend'] = 1;
+                $item['tags'] = mb_substr($item['title'], 0, 5);
             } else {
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';

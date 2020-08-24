@@ -27,6 +27,16 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'mobile_show')->radioList(\common\models\Base::getBaseS()) ?>
 
+    <?= $form->field($model, 'is_change')->radioList(\common\models\Base::getBaseS()) ?>
+
+    <?= $form->field($model, 'sort')->textInput() ?>
+
+    <?= $form->field($model, 'title')->textInput() ?>
+
+    <?= $form->field($model, 'keywords')->textInput() ?>
+
+    <?= $form->field($model, 'intro')->textarea() ?>
+
     <!---->
     <!---->
 

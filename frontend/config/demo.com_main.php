@@ -45,13 +45,13 @@ return [
                 'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
                 
-                'wen' => '/fan',
-                'wen/<id:\d+>.html' => '/fan/detail',            
-                'wen/index_<id:\d+>.html' => '/fan',
-                
                 'j' => '/fan',
                 'j/<id:\d+>.html' => '/fan/detail',            
                 'j/index_<id:\d+>.html' => '/fan',
+                
+                'wen' => '/fan',
+                'wen/<id:\d+>.html' => '/fan/detail',            
+                'wen/index_<id:\d+>.html' => '/fan',
                 
                 'mao' => '/fan',
                 'mao/<id:\d+>.html' => '/fan/detail',            
@@ -65,6 +65,18 @@ return [
                 'jaks' => '/fan',
                 'jaks/<id:\d+>.html' => '/fan/detail',            
                 'jaks/index_<id:\d+>.html' => '/fan',
+                
+                'jidian' => '/fan',
+                'jidian/<id:\d+>.html' => '/fan/detail',            
+                'jidian/index_<id:\d+>.html' => '/fan',
+                
+                'dianshang' => '/fan',
+                'dianshang/<id:\d+>.html' => '/fan/detail',            
+                'dianshang/index_<id:\d+>.html' => '/fan',
+                
+                'user' => '/fan',
+                'user/<id:\d+>.html' => '/fan/detail',            
+                'user/index_<id:\d+>.html' => '/fan',
                 
                 'index_<id:\d+>.html' => '/site/index',
                 //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
