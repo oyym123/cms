@@ -92,11 +92,10 @@ class FanController extends Controller
                 'tags' => mb_substr($model['title'], 0, 5),
             ];
             $desc = mb_substr($model['title'], 0, 28);
-
-
+            
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
-                'keywords' => '12321',
+                'keywords' => $model['title'],
                 'description' => $desc,
                 'og_type' => 'news',
                 'og_title' => $model['title'],
