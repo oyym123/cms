@@ -31,16 +31,16 @@ $domain = \common\models\Domain::getDomainInfo();
         $tdk = $this->params['list_tdk'];
         ?>
 
-        <title><?= $tdk['title'] ?></title>
+        <title><?= $tdk['title'] ?>1</title>
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
-
+        <meta name="description" content="<?= $tdk['intro'] ?>">
         <?php
     } elseif (isset($this->params['detail_tdk'])) { //详情页TDK
         $tdk = $this->params['detail_tdk'];
         ?>
         <title><?= $tdk['title'] ?></title>
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
-        <meta name="description" content="<?= $tdk['description'] ?>">
+        <meta name="description" content="<?= $tdk['intro'] ?>">
         <meta property="og:type" content="<?= $tdk['og_type'] ?>"/>
         <meta property="og:title" content="<?= $tdk['og_title'] ?>"/>
         <meta property="og:description" content="<?= $tdk['og_description'] ?>"/>
@@ -60,7 +60,7 @@ $domain = \common\models\Domain::getDomainInfo();
         $tdk = $this->params['home_tdk'];
         ?>
 
-        <title><?= $tdk['title'] ?></title>
+        <title><?= $tdk['title'] ?>1</title>
         <meta name="description" content="<?= $tdk['intro'] ?>">
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
 

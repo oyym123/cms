@@ -209,7 +209,6 @@ class LongKeywords extends Base
             }
         }
 
-
         echo '<pre>';
         print_r($sameArr);
         echo '<hr/>';
@@ -394,9 +393,10 @@ class LongKeywords extends Base
     }
 
     /** 将新增的关键词推入到远程爬虫 */
-    public static function bdPushReptile($data = [])
+    public static function bdPushReptile($data = [],$id)
     {
         $url = Tools::reptileUrl() . '/keyword/save-keyword';
+      //  $url = \Yii::$app->params['online_reptile_url'] . '/keyword/save-keyword';
 
         $resOther[] = [
             'id' => $data->id,
@@ -407,7 +407,7 @@ class LongKeywords extends Base
 
         $dataPush = [
             'note' => $data->keywords,
-            'fan_key_id' => $data->key_id,
+            'fan_key_id' => $id,
             'key_id' => $data->id,
             'type' => $data->type_name,
             'keywords' => $data->name,
@@ -420,7 +420,6 @@ class LongKeywords extends Base
         ];
 
         $res = Tools::curlPost($url, $dataPush);
-
         if (strpos($res, 'success') === false) {
             print_r($res);
             exit;

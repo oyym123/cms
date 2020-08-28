@@ -162,7 +162,6 @@ class BaiduKeywords extends \yii\db\ActiveRecord
      */
     public static function getSdkWords($id = 0)
     {
-
         set_time_limit(0);
         $andWhere = [];
         if ($id) {
@@ -172,18 +171,35 @@ class BaiduKeywords extends \yii\db\ActiveRecord
         //所有的种词
         $error = [];
 
-        $initWords = self::find()->where(['pid' => 0])->andWhere($andWhere)->all();
+        $initWords = self::find()->where(['pid' => 0])->andWhere(['>', 'id', '232703'])->all();
+
 
         //用种词调用相关词查询接口 最多只能查询到300个
         foreach ($initWords as $key => $initWord) {
             sleep(1);
+            //保存种词本身
+            $dataSave = [
+                'name' => $initWord->keywords,
+                'key_id' => $id,
+                'type_name' => $initWord->type,
+                'keywords' => $initWord->keywords,
+            ];
+
+            list($codeLong, $msgLong) = self::setLongKeywords($dataSave, 0);
+
+            if ($codeLong < 0) {
+                Tools::writeLog($initWord->keywords . '重复了', 'create_long.txt');
+                continue;
+            }
+
             $data = (new BaiDuSdk())->getKeyWords($initWord->keywords);
+            Tools::writeLog('获取到   ' . $initWord->keywords . '    所有的拓展词', 'create_long.txt');
             if ($data === false) {
                 $error[] = $initWord . '  没有请求请成功！';
                 continue;
             }
 
-            foreach ($data as $item) {
+            foreach ($data as $k => $item) {
                 $saveData = [
                     'type' => $initWord->type,
                     'pid' => $initWord->id,
@@ -202,7 +218,8 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 ];
 
                 //保存所有的关键词
-                list($code, $msg) = self::createOne($saveData);
+                list($code, $msg) = AllBaiduKeywords::createOne($saveData);
+
                 if ($code > 0) {
                     $dataSave = [
                         'name' => $item['word'],
@@ -210,13 +227,9 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                         'type_name' => $msg->type,
                         'keywords' => $initWord->keywords,
                     ];
-
-                    list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
-
-                    if ($codeKey > 0) {
-                        LongKeywords::bdPushReptile($msgKey);
-                    }
+                    self::setLongKeywords($dataSave, $k);
                 }
+
                 if ($code < 0) {
                     $error[] = $msg;
                 }
@@ -226,6 +239,39 @@ class BaiduKeywords extends \yii\db\ActiveRecord
         echo '<pre>';
         print_r($error);
     }
+
+
+    /** 设置长尾关键词 */
+    public static function setLongKeywords($dataSave, $k)
+    {
+        list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
+        if ($codeKey > 0) {
+            //只抓取前30个至长尾词库
+            if ($k < 30) {
+//                LongKeywords::bdPushReptile($msgKey);
+            }
+            return [1, 'success'];
+        } else {
+            return [-1, $msgKey];
+        }
+    }
+
+    /** 推送关键词 */
+    public static function pushKeywords()
+    {
+        //233061
+        //231954
+        for ($i = 231954; $i <= 233061; $i++) {
+            echo $i . PHP_EOL;
+            //搜索 下拉词栏目
+            $bd = BaiduKeywords::find()->select('id,keywords')->where(['id' => $i])->asArray()->one();
+            $long = LongKeywords::find()->where(['keywords' => $bd['keywords']])->orderBy('RAND()')->limit(20)->all();
+            foreach ($long as $l) {
+                LongKeywords::bdPushReptile($l, $bd['id']);
+            }
+        }
+    }
+
 
     /**
      * 新增关键词 并且调用百度营销词接口获取相应的参数
@@ -303,10 +349,28 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             //保存所有的关键词
             list($code, $msg) = self::createOne($saveData);
 
+            //只保存主词
             if ($code < 0) {
                 $error[] = $msg;
             } else {
-                self::getSdkWords($msg->id);
+
+                //保存主词
+//                $dataSave = [
+//                    'name' => $info['word'],
+//                    'key_id' => $msg->id,
+//                    'type_name' => $msg->type,
+//                    'keywords' => $info['word'],
+//                ];
+//
+//                list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
+//
+//                if ($codeKey > 0) {
+//                    LongKeywords::bdPushReptile($msgKey);
+//                }
+
+
+                //保存扩展词
+//                self::getSdkWords($msg->id);
             }
         }
 

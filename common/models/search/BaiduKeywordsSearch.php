@@ -18,7 +18,7 @@ class BaiduKeywordsSearch extends BaiduKeywords
     {
         return [
             [['id', 'pc_show_rate', 'pc_rank','domain_id','column_id', 'competition', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
-            [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_cpc', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'word_package', 'json_info', 'similar', 'created_at', 'updated_at'], 'safe'],
+            [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_cpc', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'word_package', 'json_info', 'similar', 'created_at', 'updated_at','type'], 'safe'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
         ];
     }
@@ -70,6 +70,7 @@ class BaiduKeywordsSearch extends BaiduKeywords
             'domain_id' => $this->domain_id,
             'competition' => $this->competition,
             'match_type' => $this->match_type,
+            'type' => $this->type,
             'bid' => $this->bid,
             'pc_click' => $this->pc_click,
             'pc_pv' => $this->pc_pv,

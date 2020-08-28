@@ -266,8 +266,8 @@ class TemplateController extends Controller
         }
 
         $name = [
-            'en_name' => $name,
-            'name' => $enName,
+            'en_name' => $enName,
+            'name' => $name,
         ];
         exit(json_encode($name));
     }

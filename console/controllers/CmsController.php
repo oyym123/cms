@@ -109,4 +109,10 @@ class CmsController extends \yii\console\Controller
     {
         (new FanUser())->createMany();
     }
+
+    public function actionPushK()
+    {
+        return BaiduKeywords::pushKeywords();
+    }
+
 }
