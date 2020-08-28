@@ -163,8 +163,8 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['list_tdk'] = [
                 'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
-                'keywords' => $column->keywords?:$column->zh_name,
-                'intro' => $column->intro?:$column->zh_name,
+                'keywords' => $column->keywords ?: $column->zh_name,
+                'intro' => $column->intro ?: $column->zh_name,
             ];
 
             return $this->render($render, [
@@ -215,8 +215,8 @@ class FanController extends Controller
 
         $view->params['list_tdk'] = [
             'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
-            'keywords' => $column->keywords?:$column->zh_name,
-            'intro' => $column->intro?:$column->zh_name,
+            'keywords' => $column->keywords ?: $column->zh_name,
+            'intro' => $column->intro ?: $column->zh_name,
         ];
 
         return $this->render($render, [
@@ -277,6 +277,13 @@ class FanController extends Controller
             $_GET['page'] = $arr[0];
         }
 
+        //获取当前栏目
+        $columnName = explode('/', $url)[1];
+        $domain = Domain::getDomainInfo();
+
+        $column = DomainColumn::find()->where(['name' => $columnName, 'domain_id' => $domain->id])->one();
+
+
         $query = LongKeywords::find()->select('id,name')->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
@@ -305,9 +312,9 @@ class FanController extends Controller
         } else {
             $view = Yii::$app->view;
             $view->params['tags_list_tdk'] = [
-                'title' => '最新标签_' . $domain->zh_name,
-                'keywords' => $domain->zh_name,
-                'intro' => $domain->intro,
+                'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
+                'keywords' => $column->keywords ?: $column->zh_name,
+                'intro' => $column->intro ?: $column->zh_name,
             ];
 
             return $this->render($render, [
@@ -340,9 +347,9 @@ class FanController extends Controller
             ];
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
-                'title' => $model->title,
-                'keywords' => $model->title,
-                'intro' => $model->title,
+                'title' => $model['title'],
+                'keywords' => $model['title'],
+                'intro' => $model['title'],
             ];
             return $this->render($render, ['models' => $res]);
         }
