@@ -108,6 +108,7 @@ class BaiDuSdk extends sms_service_KRService
      */
     public function getKeyWords($keywords)
     {
+
         $datas = $this->getKRByQueryTest($keywords);
         if ($datas === false) {
             return false;

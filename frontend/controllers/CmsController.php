@@ -96,6 +96,7 @@ class CmsController extends Controller
      */
     public function actionCatchYin()
     {
+        set_time_limit(0);
         (new BaiduKeywords())->getSdkWords();
     }
 
@@ -211,6 +212,11 @@ class CmsController extends Controller
     public function actionSetRules()
     {
         LongKeywords::setRules();
+    }
+
+    public function actionPushK()
+    {
+        return BaiduKeywords::pushKeywords();
     }
 
 }

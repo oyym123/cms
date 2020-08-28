@@ -20,10 +20,10 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
 
-    <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
-
-    <?= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
-
+    <?= $form->field($model, 'type')->dropDownList(\common\models\DomainColumn::getType(), ['prompt' => '--请选择类型--']) ?>
+<!---->
+<!--    --><?//= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
+<!---->
 
     <?php
     echo '<label class="control-label" for="longkeywordssearch-key_search_num">最小m_pv</label>';
