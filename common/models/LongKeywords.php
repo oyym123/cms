@@ -393,10 +393,10 @@ class LongKeywords extends Base
     }
 
     /** 将新增的关键词推入到远程爬虫 */
-    public static function bdPushReptile($data = [],$id)
+    public static function bdPushReptile($data = [], $id)
     {
         $url = Tools::reptileUrl() . '/keyword/save-keyword';
-      //  $url = \Yii::$app->params['online_reptile_url'] . '/keyword/save-keyword';
+        //  $url = \Yii::$app->params['online_reptile_url'] . '/keyword/save-keyword';
 
         $resOther[] = [
             'id' => $data->id,
@@ -458,9 +458,8 @@ class LongKeywords extends Base
 
                 foreach ($baiduKeywords as $keyword) {
 
-                    //检验是否拉取过数据
+//                    //检验是否拉取过数据
                     $oldArticle = PushArticle::findx($column['domain_id'])->where(['fan_key_id' => $keyword['id']])->one();
-
                     if (!empty($oldArticle)) {
                         Tools::writeLog($column['zh_name'] . ' ---  ' . $keyword['keywords'] . '  已经拉取过了', 'set_rules.log');
                         continue;
@@ -468,10 +467,12 @@ class LongKeywords extends Base
 
                     //根据短尾关键词 获取长尾关键词
                     $longKeywords = LongKeywords::find()->select('id,name')->where([
-                        'key_id' => $keyword['id']
+                        'keywords' => $keyword['keywords'],
+                        'from' => 10,
                     ])->asArray()->all();
 
-                    foreach ($longKeywords as $longKeyword) {
+
+                    foreach ($longKeywords as $key => $longKeyword) {
                         //检验是否拉取过数据
                         $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
 
@@ -480,10 +481,13 @@ class LongKeywords extends Base
                             continue;
                         }
 
+                        echo $longKeyword['name'] . "<br/>";
+
                         //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
                         $data = [
                             'fan_key_id' => $keyword['id'],
                             'key_id' => $longKeyword['id'],
+                            'keywords' => $longKeyword['name'],
                             'type' => strtoupper($column['type']),
                             'one_page_num_min' => $rules['one_page_num_min'],
                             'one_page_num_max' => $rules['one_page_num_max'],
@@ -495,8 +499,7 @@ class LongKeywords extends Base
                         $res = Tools::curlPost($url, $data);
 
                         $res = json_decode($res, true);
-
-
+                        $saveData = [];
                         if (isset($res[0]['from_path'])) {
                             foreach ($res as $re) {
                                 //存储入库
@@ -505,7 +508,8 @@ class LongKeywords extends Base
                                     'from_path' => $re['from_path'],
                                     'domain_id' => $column['domain_id'],
                                     'key_id' => $longKeyword['id'],
-                                    'keywords' => $keyword['name'],
+                                    'title_img' => $re['title_img'],
+                                    'keywords' => $longKeyword['name'],
                                     'column_name' => $column['name'],
                                     'fan_key_id' => $keyword['id'],
                                     'rules_id' => $rules['id'],
@@ -519,13 +523,14 @@ class LongKeywords extends Base
                                 ];
                             }
                         }
-
+//
                         if (!empty($saveData)) {
-//                            echo '<pre>';
-//                            var_export($data);
-//                            exit;
+                            Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+
                             PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+//                            sleep(1);
                         } else {
+                            Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
 //                            echo '<pre>';
 //                            var_export($data);
 //                            exit;
@@ -536,5 +541,6 @@ class LongKeywords extends Base
                 }
             }
         }
+        exit;
     }
 }

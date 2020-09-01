@@ -106,16 +106,16 @@ class PushArticle extends Modelx
     /** 热门文章 */
     public static function hotArticle($num = 10)
     {
-
         $article = PushArticle::find()
-            ->select('id,title_img,push_time,title')
-            ->limit($num)
+            ->select('key_id,id,title_img,push_time,title,column_name')
             ->orderBy('user_id desc')
+            ->where(['like', 'title_img', 'http'])
             ->asArray()
+            ->limit($num)
             ->all();
 
-        foreach ($article as &$item) {
-            $item['url'] = '/wen/' . $item['id'] . '.html';
+        foreach ($article as $key => &$item) {
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
         return $article;
@@ -136,9 +136,11 @@ class PushArticle extends Modelx
             ->orderBy('id desc')
             ->asArray()
             ->all();
+
         foreach ($article as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
         }
+
         return $article;
     }
 
