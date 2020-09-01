@@ -156,7 +156,9 @@ class FanController extends Controller
 
         //表示是用户列表
         if (strpos($url, '/user') !== false) {
-            list($models, $pages) = $this->user(57);
+
+            preg_match('/\d+/', $url, $userId);
+            list($models, $pages) = $this->user($userId);
             $res = [
                 'home_list' => $models,
             ];
