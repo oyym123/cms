@@ -91,6 +91,7 @@ class FanController extends Controller
                 'next_title' => $nextTitle,
                 'tags' => mb_substr($model['title'], 0, 5),
             ];
+
             $desc = mb_substr($model['title'], 0, 28);
 
             $view = Yii::$app->view;
@@ -281,10 +282,15 @@ class FanController extends Controller
         $columnName = explode('/', $url)[1];
         $domain = Domain::getDomainInfo();
 
-        $column = DomainColumn::find()->where(['name' => $columnName, 'domain_id' => $domain->id])->one();
+        $column = DomainColumn::find()
+            ->where(['name' => $columnName, 'domain_id' => $domain->id])
+            ->one();
 
 
-        $query = LongKeywords::find()->select('id,name')->limit(10);
+        $query = LongKeywords::find()
+            ->where(['domain_id' => $domain->id])
+            ->andWhere(['from' => 10])
+            ->select('id,name')->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
 
@@ -330,7 +336,11 @@ class FanController extends Controller
     {
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $model = PushArticle::find()->select('user_id,id,title_img,content,title,intro,push_time')->where(['id' => rand(1, 39)])->asArray()->one();
+            $model = PushArticle::find()
+                ->select('user_id,id,title_img,content,title,intro,push_time')
+                ->where(['key_id' => $arr])
+                ->andWhere(['like', 'title_img', 'http'])
+                ->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
             $model['url'] = '/wen/' . $model['id'] . '.html';

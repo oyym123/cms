@@ -266,7 +266,11 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             //搜索 下拉词栏目
             $bd = BaiduKeywords::find()->select('id,keywords')->where(['id' => $i])->asArray()->one();
             $long = LongKeywords::find()->where(['keywords' => $bd['keywords']])->orderBy('RAND()')->limit(20)->all();
+
+            //标记长尾词
             foreach ($long as $l) {
+                $l->from = 10;
+                $l->save(false);
                 LongKeywords::bdPushReptile($l, $bd['id']);
             }
         }
@@ -384,13 +388,15 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     /** 标签 */
     public static function hotKeywords($num = 15)
     {
-        $keywords = BaiduKeywords::find()
-            ->select('id,keywords')
+        $domain = Domain::getDomainInfo();
+
+        $keywords = LongKeywords::find()
+            ->select('id,name as keywords')
+            ->where(['domain_id' => $domain->id])
+            ->andWhere(['from' => 10])
             ->limit($num)
             ->asArray()
             ->all();
-
-        $domain = Domain::getDomainInfo();
 
         if ($domain) {
             foreach ($keywords as &$item) {

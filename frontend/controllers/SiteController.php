@@ -215,12 +215,12 @@ class SiteController extends Controller
         ];
 
         $view = Yii::$app->view;
+
         $view->params['list_tdk'] = [
             'title' => $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
         ];
-
 
         return $this->render($render, [
             'column' => DomainColumn::getColumn(),
