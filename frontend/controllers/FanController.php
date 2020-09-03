@@ -402,7 +402,7 @@ class FanController extends Controller
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
             $model = PushArticle::find()
-                ->select('user_id,id,title_img,content,title,intro,push_time')
+                ->select('user_id,keywords,id,title_img,content,title,intro,push_time')
                 ->where(['key_id' => $arr])
                 ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
@@ -422,7 +422,7 @@ class FanController extends Controller
             ];
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
-                'title' => $model['title'],
+                'title' => $model['keywords'],
                 'keywords' => $model['title'],
                 'intro' => $model['title'],
             ];
