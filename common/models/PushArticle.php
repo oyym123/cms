@@ -115,6 +115,8 @@ class PushArticle extends Modelx
             ->all();
 
         foreach ($article as $key => &$item) {
+
+
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
@@ -160,6 +162,7 @@ class PushArticle extends Modelx
             'fan_key_id' => $migrate->integer(11)->defaultValue(0)->comment('泛目录关键词id'),
             'key_id' => $migrate->integer(11)->defaultValue(0)->comment('关键词id'),
             'keywords' => $migrate->string(30)->defaultValue('')->comment('关键词'),
+            'user_id' => $migrate->string(30)->defaultValue('')->comment('用户id'),
             'rules_id' => $migrate->integer(11)->defaultValue(0)->comment('规则id'),
             'content' => $migrate->text()->comment('内容'),
             'title_img' => $migrate->integer(11)->defaultValue(0)->comment('关键词'),
@@ -170,7 +173,15 @@ class PushArticle extends Modelx
             'created_at' => $migrate->dateTime()->comment('创建时间'),
             'updated_at' => $migrate->dateTime()->comment('修改时间'),
         ], $tableOptions);
+
         //关键字id索引
         $migrate->createIndex('key_id-index', 'push_article_' . $id, ['key_id'], false);
+        $initSql = file_get_contents(__DIR__ . '/../../frontend/web/init.sql');
+
+        $initSql = str_replace('push_article_5','push_article_'.$id,$initSql);
+
+        //插入初始数据
+        $db=Yii::$app->db;
+        $db->createCommand($initSql)->execute();
     }
 }

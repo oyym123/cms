@@ -197,13 +197,13 @@ class SiteController extends Controller
 
         foreach ($models as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
                 $item['is_hot'] = 1;
                 $item['is_top'] = 1;
                 $item['is_recommend'] = 1;
-                $item['tags'] = mb_substr($item['title'], 0, 5);
             } else {
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
@@ -213,6 +213,7 @@ class SiteController extends Controller
         $res = [
             'home_list' => $models,
         ];
+
 
         $view = Yii::$app->view;
 
