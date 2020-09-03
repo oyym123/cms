@@ -403,6 +403,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
             }
         }
+
         return $keywords;
     }
 

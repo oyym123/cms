@@ -39,11 +39,17 @@ class FanController extends Controller
      *     description="返回码",
      *     @OA\JsonContent( type="json", example=
      *     {
-     *       "title_img": "标题图片",
-     *       "content": "内容",
-     *       "title": "标题",
-     *       "intro": "简介",
-     *       "push_time": "发布时间",
+     *       "$models['data']['content']": "内容",
+     *       "$models['data']['title']": "标题",
+     *       "$models['push_time']": "发布时间",
+     *       "$models['data']['avatar']": "头像",
+     *       "$models['data']['nickname']": "昵称",
+     *       "$models['pre']": "上一条 URL",
+     *       "$models['next']": "下一条 URL",
+     *       "$models['pre_title']": "上一条标题",
+     *       "$models['next_title']": "下一条标题",
+     *       "$models['reading']": "阅读量",
+     *       "$models['keywords']": "关键词",
      *     }
      *     )
      *   )
@@ -53,7 +59,7 @@ class FanController extends Controller
     {
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $model = PushArticle::find()->select('user_id,title_img,content,title,intro,push_time')->where(['id' => $arr[0]])->asArray()->one();
+            $model = PushArticle::find()->select('user_id,title_img,keywords,key_id,content,title,intro,push_time')->where(['id' => $arr[0]])->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_DETAIL);
             $this->layout = $layout;
             $column = explode('/', $url)[1];
@@ -80,16 +86,17 @@ class FanController extends Controller
             } else {
                 $nextTitle = '没有更多内容啦！';
             }
-
+            $domain = Domain::getDomainInfo();
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
-
+            $model['keywords_url'] = '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags;
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
                 'next' => '/' . $column . '/' . ($arr[0] + 1) . '.html',
                 'pre_title' => $preTitle,
                 'next_title' => $nextTitle,
-                'tags' => mb_substr($model['title'], 0, 5),
+                'keywords' => $model['keywords'],
+                'reading' => substr(time(), 3) + rand(99, 1000)
             ];
 
             $desc = mb_substr($model['title'], 0, 28);
@@ -97,12 +104,12 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'title' => $model['title'],
-                'keywords' => $model['title'],
+                'keywords' => $model['keywords'],
                 'description' => $desc,
                 'og_type' => 'news',
                 'og_title' => $model['title'],
                 'og_description' => $desc,
-                'og_image' => '',
+                'og_image' => $model['title_img'],
                 'og_release_date' => $desc,
             ];
 
@@ -115,7 +122,7 @@ class FanController extends Controller
     /**
      * @OA\Get(
      *     path="/fan/index",
-     *     summary="列表页 【前端】",
+     *     summary="列表页 【前端】 循环参数 $models",
      *     tags={"网页"},
      *     description="展示模板参数 OYYM 2020/7/30 18:35",
      *   @OA\Response(
@@ -123,13 +130,15 @@ class FanController extends Controller
      *     description="返回码",
      *     @OA\JsonContent( type="json", example=
      *     {
-     *       "title_img": "标题图片",
-     *       "title": "标题",
-     *       "intro": "简介",
-     *       "user_id": "用户id",
-     *       "nickname": "用户昵称",
-     *       "avatar": "用户头像",
-     *       "push_time": "发布时间",
+     *       "$item['title']": "标题",
+     *       "$item['intro']": "简介",
+     *       "$item['user_id']": "用户id",
+     *       "$item['nickname']": "用户昵称",
+     *       "$item['avatar']": "用户头像",
+     *       "$item['push_time']": "发布时间",
+     *       "$item['is_hot']": "是否热门 0=不热门 1=热门",
+     *       "$item['is_top']": "是否置顶 0=不置顶 1=置顶",
+     *       "$item['is_recommend']": "是否推荐 0=不推荐 1=推荐",
      *     }
      *     )
      *   ),
@@ -158,7 +167,7 @@ class FanController extends Controller
         if (strpos($url, '/user') !== false) {
 
             preg_match('/\d+/', $url, $userId);
-            list($models, $pages) = $this->user($userId);
+            list($models, $pages) = $this->user($userId, $domain);
             $res = [
                 'home_list' => $models,
             ];
@@ -184,7 +193,7 @@ class FanController extends Controller
             $andWhere = ['between', 'id', $minRand, $maxRand];
         }
 
-        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->andWhere($andWhere)->limit(10);
+        $query = PushArticle::find()->select('id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')->andWhere($andWhere)->limit(10);
 
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
@@ -193,16 +202,15 @@ class FanController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
-
         foreach ($models as &$item) {
-            $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
                 $item['is_hot'] = 1;
                 $item['is_top'] = 1;
                 $item['is_recommend'] = 1;
-                $item['tags'] = mb_substr($item['title'], 0, 5);
             } else {
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
@@ -212,6 +220,10 @@ class FanController extends Controller
 //        print_r( $this->layout );exit;
         $res = [
             'home_list' => $models,
+            'column_info' => [
+                'name' => $columnName,
+                'url' => $_SERVER['HTTP_HOST'] . '/' . $columnName
+            ],
         ];
 
         $view = Yii::$app->view;
@@ -228,10 +240,10 @@ class FanController extends Controller
         ]);
     }
 
-    // 用户中心
-    public function user($userId)
+
+    public function user($userId, $domain)
     {
-        $query = PushArticle::find()->select('id,user_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
+        $query = PushArticle::find()->select('id,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -240,6 +252,8 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
+            $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['push_time'] = Tools::formatTime(strtotime($item['push_time']));
                 $item['nickname'] = $user->username;
@@ -247,7 +261,6 @@ class FanController extends Controller
                 $item['is_hot'] = 1;
                 $item['is_top'] = 1;
                 $item['is_recommend'] = 1;
-                $item['tags'] = mb_substr($item['title'], 0, 5);
             }
         }
         return [$models, $pages];
@@ -255,8 +268,8 @@ class FanController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/fan/tags-list",
-     *     summary="标签页 【前端】",
+     *     path="/fan/common",
+     *     summary="公共页 【前端】",
      *     tags={"网页"},
      *     description="展示模板参数 OYYM 2020/7/30 18:35",
      *   @OA\Response(
@@ -264,9 +277,34 @@ class FanController extends Controller
      *     description="返回码",
      *     @OA\JsonContent( type="json", example=
      *     {
-     *       "id": "标签id",
-     *       "name": "标签名称",
-     *       "push_time": "发布时间",
+     *       "BaiduKeywords::hotKeywords()": "【热门标签】   用于循环  $item['url']         $item['keywords']",
+     *       "PushArticle::newArticle()": "   【最新文章】   用于循环  $item['url']         $item['title']",
+     *       "PushArticle::hotArticle()": "   【热门文章】   用于循环  $item['title_img']   $item['url']        $item['title']   $item['push_time']",
+     *       "DomainColumn::getColumn(0, '', 'person')": " 【导航栏】   用于循环  $item['name'] = url   $item['zh_name']",
+     *     }
+     *     )
+     *   ),
+     * )
+     */
+    public function actionCommon()
+    {
+
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/fan/tags-list",
+     *     summary="标签页 【前端】 循环参数  $models",
+     *     tags={"网页"},
+     *     description="展示模板参数 OYYM 2020/7/30 18:35",
+     *   @OA\Response(
+     *     response=200,
+     *     description="返回码",
+     *     @OA\JsonContent( type="json", example=
+     *     {
+     *       "$item['id']": "标签id",
+     *       "$item['name']": "标签名称",
+     *       "$item['url']": "标签 URL",
      *     }
      *     )
      *   ),
@@ -288,7 +326,6 @@ class FanController extends Controller
             ->where(['name' => $columnName, 'domain_id' => $domain->id])
             ->one();
 
-
         $query = LongKeywords::find()
             ->where(['domain_id' => $domain->id])
             ->andWhere(['from' => 10])
@@ -309,7 +346,11 @@ class FanController extends Controller
         }
 
         $res = [
-            'home_list' => $models
+            'home_list' => $models,
+            'column_info' => [
+                'name' => '',
+                'url' => ''
+            ],
         ];
 
         list($layout, $render) = Fan::renderView(Template::TYPE_TAGS);
@@ -331,9 +372,31 @@ class FanController extends Controller
                 'pages' => $pages,
             ]);
         }
-
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/fan/tags-detail",
+     *     summary="泛内页 【前端】",
+     *     tags={"网页"},
+     *     description="展示模板参数 OYYM 2020/7/30 18:35",
+     *   @OA\Response(
+     *     response=200,
+     *     description="返回码",
+     *     @OA\JsonContent( type="json", example=
+     *     {
+     *       "$models['title']": "标题",
+     *       "$models['intro']": "简介",
+     *       "$models['user_id']": "用户id",
+     *       "$models['nickname']": "用户昵称",
+     *       "$models['avatar']": "用户头像",
+     *       "$models['push_time']": "发布时间",
+     *     }
+     *     )
+     *   ),
+     * )
+     */
     public function actionTagsDetail()
     {
         $url = Yii::$app->request->url;
@@ -363,6 +426,7 @@ class FanController extends Controller
                 'keywords' => $model['title'],
                 'intro' => $model['title'],
             ];
+
             return $this->render($render, ['models' => $res]);
         }
     }

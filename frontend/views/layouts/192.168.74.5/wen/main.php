@@ -31,7 +31,7 @@ $domain = \common\models\Domain::getDomainInfo();
         $tdk = $this->params['list_tdk'];
         ?>
 
-        <title><?= $tdk['title'] ?>1</title>
+        <title><?= $tdk['title'] ?></title>
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
         <meta name="description" content="<?= $tdk['intro'] ?>">
         <?php
@@ -60,7 +60,7 @@ $domain = \common\models\Domain::getDomainInfo();
         $tdk = $this->params['home_tdk'];
         ?>
 
-        <title><?= $tdk['title'] ?>1</title>
+        <title><?= $tdk['title'] ?></title>
         <meta name="description" content="<?= $tdk['intro'] ?>">
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
 

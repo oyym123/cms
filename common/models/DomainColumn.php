@@ -133,8 +133,10 @@ class DomainColumn extends Base
                 }
             }
             ksort($arr);
+            
             return $arr;
         }
+
         return [];
     }
 
