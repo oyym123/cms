@@ -222,7 +222,7 @@ class SiteController extends Controller
             'title' => $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
-            'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
+            'canonical' => 'http://' . $_SERVER['HTTP_HOST'],
         ];
 
         return $this->render($render, [
