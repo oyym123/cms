@@ -435,4 +435,12 @@ class Tools extends \yii\db\ActiveRecord
         return $text;
     }
 
+    /** 修改 */
+    public static function getLocalUrl()
+    {
+        $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ?
+            "https://" : "http://";
+        $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        return $url;//输出完整的url
+    }
 }
