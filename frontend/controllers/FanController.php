@@ -99,7 +99,8 @@ class FanController extends Controller
                 'next_title' => $nextTitle,
                 'keywords' => $model['keywords'],
                 'keywords_url' => '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags,
-                'reading' => substr(time(), 3) + rand(99, 1000)
+                'reading' => substr(time(), 3) + rand(99, 1000),
+
             ];
 
             $desc = mb_substr($model['title'], 0, 28);
@@ -307,7 +308,6 @@ class FanController extends Controller
         }
 
 
-
         return [$models, $pages];
     }
 
@@ -456,7 +456,7 @@ class FanController extends Controller
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
             $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $model['column_name'] . '/' . $model['id'] . '.html';
-            $model['user_url'] ='/user/index_' . $model['user_id'] . '.html';
+            $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
             if ($user = FanUser::findOne($model['user_id'])) {
                 $model['nickname'] = $user->username;
@@ -473,7 +473,7 @@ class FanController extends Controller
                 'title' => $model['keywords'],
                 'keywords' => $model['keywords'],
                 'intro' => $model['keywords'],
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'].$url,
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
             return $this->render($render, ['models' => $res]);
