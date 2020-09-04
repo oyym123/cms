@@ -48,6 +48,7 @@ class FanController extends Controller
      *       "$models['next']": "下一条 URL",
      *       "$models['pre_title']": "上一条标题",
      *       "$models['next_title']": "下一条标题",
+     *       "$models['user_url']": "跳转到用户URL链接",
      *       "$models['reading']": "阅读量",
      *       "$models['keywords']": "关键词",
      *     }
@@ -89,6 +90,8 @@ class FanController extends Controller
             $domain = Domain::getDomainInfo();
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
             $model['keywords_url'] = '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags;
+            $item['user_url'] = '/user/index_' . $model['user_id'] . '.html';
+
             $res = [
                 'data' => $model,
                 'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
@@ -141,6 +144,7 @@ class FanController extends Controller
      *       "$item['is_top']": "是否置顶 0=不置顶 1=置顶",
      *       "$item['is_recommend']": "是否推荐 0=不推荐 1=推荐",
      *       "$item['keywords_url']": "关键词URL",
+     *       "$item['user_url']": "跳转到用户URL链接",
      *       "$item['column_info']['name']": "当前栏目名称",
      *       "$item['column_info']['url']": "当前栏目URL",
      *     }
@@ -177,11 +181,11 @@ class FanController extends Controller
             ];
 
             $view = Yii::$app->view;
-            $view->params['list_tdk'] = [
+            $view->params['user_tdk'] = [
                 'title' => $models[0]['nickname'] . '_' . $domain->zh_name,
                 'keywords' => $models[0]['nickname'] . '_' . $domain->zh_name,
                 'intro' => $column->intro . '_' . $domain->zh_name,
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
             return $this->render($render, [
@@ -270,6 +274,7 @@ class FanController extends Controller
      *       "$item['is_recommend']": "是否推荐 0=不推荐 1=推荐",
      *       "$item['keywords']": "关键词",
      *       "$item['keywords_url']": "关键词URL",
+     *       "$item['user_url']": "跳转到用户URL链接",
      *       "$item['column_info']['name']": "当前栏目名称",
      *       "$item['column_info']['url']": "当前栏目URL",
      *     }
@@ -288,6 +293,7 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
+            $item['user_url'] = '/user/index_' . $item['id'] . '.html';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
@@ -299,6 +305,9 @@ class FanController extends Controller
                 $item['is_recommend'] = 1;
             }
         }
+
+
+
         return [$models, $pages];
     }
 
@@ -426,6 +435,7 @@ class FanController extends Controller
      *       "$models['title']": "标题",
      *       "$models['intro']": "简介",
      *       "$models['user_id']": "用户id",
+     *       "$models['user_url']": "跳转到用户URL链接",
      *       "$models['nickname']": "用户昵称",
      *       "$models['avatar']": "用户头像",
      *       "$models['push_time']": "发布时间",
