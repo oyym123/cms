@@ -244,6 +244,35 @@ class FanController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *     path="/fan/user",
+     *     summary="用户页 【前端】 循环参数 $models",
+     *     tags={"网页"},
+     *     description="展示模板参数 OYYM 2020/7/30 18:35",
+     *   @OA\Response(
+     *     response=200,
+     *     description="返回码",
+     *     @OA\JsonContent( type="json", example=
+     *     {
+     *       "$item['title']": "标题",
+     *       "$item['intro']": "简介",
+     *       "$item['user_id']": "用户id",
+     *       "$item['nickname']": "用户昵称",
+     *       "$item['avatar']": "用户头像",
+     *       "$item['push_time']": "发布时间",
+     *       "$item['is_hot']": "是否热门 0=不热门 1=热门",
+     *       "$item['is_top']": "是否置顶 0=不置顶 1=置顶",
+     *       "$item['is_recommend']": "是否推荐 0=不推荐 1=推荐",
+     *       "$item['keywords']": "关键词",
+     *       "$item['keywords_url']": "关键词URL",
+     *       "$item['column_info']['name']": "当前栏目名称",
+     *       "$item['column_info']['url']": "当前栏目URL",
+     *     }
+     *     )
+     *   ),
+     * )
+     */
     public function user($userId, $domain)
     {
         $query = PushArticle::find()->select('id,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
