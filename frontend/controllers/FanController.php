@@ -103,6 +103,7 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
                 'title' => $model['title'],
                 'keywords' => $model['keywords'],
                 'description' => $desc,
@@ -177,9 +178,10 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['list_tdk'] = [
-                'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
-                'keywords' => $column->keywords ?: $column->zh_name,
-                'intro' => $column->intro ?: $column->zh_name,
+                'title' => $models[0]['nickname'] . '_' . $domain->zh_name,
+                'keywords' => $models[0]['nickname'] . '_' . $domain->zh_name,
+                'intro' => $column->intro . '_' . $domain->zh_name,
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
             ];
 
             return $this->render($render, [
@@ -207,6 +209,7 @@ class FanController extends Controller
 
         foreach ($models as &$item) {
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
@@ -235,6 +238,7 @@ class FanController extends Controller
             'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
+            'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
         ];
 
         return $this->render($render, [
@@ -275,7 +279,7 @@ class FanController extends Controller
      */
     public function user($userId, $domain)
     {
-        $query = PushArticle::find()->select('id,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
+        $query = PushArticle::find()->select('id,column_name,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
@@ -284,7 +288,7 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
-            $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['push_time'] = Tools::formatTime(strtotime($item['push_time']));
@@ -396,6 +400,7 @@ class FanController extends Controller
                 'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
                 'keywords' => $column->keywords ?: $column->zh_name,
                 'intro' => $column->intro ?: $column->zh_name,
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
             ];
 
             return $this->render($render, [
@@ -434,13 +439,14 @@ class FanController extends Controller
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
             $model = PushArticle::find()
-                ->select('user_id,keywords,id,title_img,content,title,intro,push_time')
+                ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time')
                 ->where(['key_id' => $arr])
                 ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
-            $model['url'] = '/wen/' . $model['id'] . '.html';
+            $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $model['column_name'] . '/' . $model['id'] . '.html';
+            $model['user_url'] ='/user/index_' . $model['user_id'] . '.html';
 
             if ($user = FanUser::findOne($model['user_id'])) {
                 $model['nickname'] = $user->username;
@@ -455,8 +461,9 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
                 'title' => $model['keywords'],
-                'keywords' => $model['title'],
-                'intro' => $model['title'],
+                'keywords' => $model['keywords'],
+                'intro' => $model['keywords'],
+                'canonical' => 'http://' . $_SERVER['HTTP_HOST'].$url,
             ];
 
             return $this->render($render, ['models' => $res]);
