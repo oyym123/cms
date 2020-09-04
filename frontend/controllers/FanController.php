@@ -89,8 +89,7 @@ class FanController extends Controller
             }
             $domain = Domain::getDomainInfo();
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
-            $model['keywords_url'] = '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags;
-            $item['user_url'] = '/user/index_' . $model['user_id'] . '.html';
+            $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
             $res = [
                 'data' => $model,
@@ -99,6 +98,7 @@ class FanController extends Controller
                 'pre_title' => $preTitle,
                 'next_title' => $nextTitle,
                 'keywords' => $model['keywords'],
+                'keywords_url' => '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags,
                 'reading' => substr(time(), 3) + rand(99, 1000)
             ];
 
