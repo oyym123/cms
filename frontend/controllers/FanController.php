@@ -139,6 +139,9 @@ class FanController extends Controller
      *       "$item['is_hot']": "是否热门 0=不热门 1=热门",
      *       "$item['is_top']": "是否置顶 0=不置顶 1=置顶",
      *       "$item['is_recommend']": "是否推荐 0=不推荐 1=推荐",
+     *       "$item['keywords_url']": "关键词URL",
+     *       "$item['column_info']['name']": "当前栏目名称",
+     *       "$item['column_info']['url']": "当前栏目URL",
      *     }
      *     )
      *   ),
@@ -279,7 +282,7 @@ class FanController extends Controller
      *     {
      *       "BaiduKeywords::hotKeywords()": "【热门标签】   用于循环  $item['url']         $item['keywords']",
      *       "PushArticle::newArticle()": "   【最新文章】   用于循环  $item['url']         $item['title']",
-     *       "PushArticle::hotArticle()": "   【热门文章】   用于循环  $item['title_img']   $item['url']        $item['title']   $item['push_time']",
+     *       "PushArticle::hotArticle()": "   【热门文章】   用于循环  $item['title_img']   $item['url']    $item['title']   $item['push_time'] $item['nickname']   $item['avatar']  $item['user_url']",
      *       "DomainColumn::getColumn(0, '', 'person')": " 【导航栏】   用于循环  $item['name'] = url   $item['zh_name']",
      *     }
      *     )

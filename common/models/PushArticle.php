@@ -107,7 +107,7 @@ class PushArticle extends Modelx
     public static function hotArticle($num = 10)
     {
         $article = PushArticle::find()
-            ->select('key_id,id,title_img,push_time,title,column_name')
+            ->select('key_id,id,user_id,title_img,push_time,title,column_name')
             ->orderBy('user_id desc')
             ->where(['like', 'title_img', 'http'])
             ->asArray()
@@ -115,8 +115,14 @@ class PushArticle extends Modelx
             ->all();
 
         foreach ($article as $key => &$item) {
-
-
+            if ($user = FanUser::findOne($item['user_id'])) {
+                $item['nickname'] = $user->username;
+                $item['avatar'] = $user->avatar;
+            } else {
+                $item['nickname'] = '佚名';
+                $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+            }
+            $item['user_url'] = '/user/index_' . $item['user_id']. '.html';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
