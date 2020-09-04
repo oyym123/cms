@@ -197,6 +197,7 @@ class SiteController extends Controller
 
         foreach ($models as &$item) {
             $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
@@ -221,6 +222,7 @@ class SiteController extends Controller
             'title' => $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
+            'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
         ];
 
         return $this->render($render, [
