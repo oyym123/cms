@@ -87,9 +87,12 @@ class FanController extends Controller
             } else {
                 $nextTitle = '没有更多内容啦！';
             }
+
             $domain = Domain::getDomainInfo();
+            
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
+            $model['title'] = $model['keywords'];
 
             $res = [
                 'data' => $model,
@@ -108,7 +111,7 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
-                'title' => $model['title'],
+                'title' => $model['keywords'],
                 'keywords' => $model['keywords'],
                 'description' => $desc,
                 'og_type' => 'news',
@@ -203,7 +206,10 @@ class FanController extends Controller
             $andWhere = ['between', 'id', $minRand, $maxRand];
         }
 
-        $query = PushArticle::find()->select('id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')->andWhere($andWhere)->limit(10);
+        $query = PushArticle::find()->select('id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')
+            ->andWhere($andWhere)
+            ->andWhere(['column_id' => $column->id])
+            ->limit(10);
 
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);

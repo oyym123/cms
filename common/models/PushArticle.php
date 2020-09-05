@@ -171,7 +171,7 @@ class PushArticle extends Modelx
             'user_id' => $migrate->string(30)->defaultValue('')->comment('用户id'),
             'rules_id' => $migrate->integer(11)->defaultValue(0)->comment('规则id'),
             'content' => $migrate->text()->comment('内容'),
-            'title_img' => $migrate->integer(11)->defaultValue(0)->comment('关键词'),
+            'title_img' => $migrate->string(255)->defaultValue('')->comment('图片'),
             'status' => $migrate->smallInteger()->defaultValue(10)->comment('10=状态有效 20=无效'),
             'intro' => $migrate->string(255)->defaultValue('')->comment('文章简介'),
             'title' => $migrate->string(255)->defaultValue('')->comment('标题'),

@@ -390,10 +390,9 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     {
         $domain = Domain::getDomainInfo();
 
-        $keywords = LongKeywords::find()
-            ->select('id,name as keywords')
+        $keywords = AllBaiduKeywords::find()
+            ->select('id, keywords')
             ->where(['domain_id' => $domain->id])
-            ->andWhere(['from' => 10])
             ->limit($num)
             ->asArray()
             ->all();
