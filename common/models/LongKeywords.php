@@ -443,6 +443,7 @@ class LongKeywords extends Base
 
         $url = Tools::reptileUrl() . '/cms/article';
 
+
         foreach ($domainColumn as $column) {
             //查询分类规则
             $rules = ArticleRules::find()->where([
@@ -451,94 +452,89 @@ class LongKeywords extends Base
 
             //只拉取有规则的
             if (!empty($rules)) {
-                //根据栏目获取短尾关键词
-                $baiduKeywords = BaiduKeywords::find()->select('id,keywords,type')->where([
-                    'column_id' => $column['id']
-                ])->asArray()->all();
+                //根据短尾关键词 获取长尾关键词 小指数词
+                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid')->where([
+                    'like', 'keywords', $column['zh_name'],
+                ])
+                    ->andWhere(['>=', 'm_pv', 1])
+                    ->andWhere(['<=', 'm_pv', 10])
+                    ->andWhere(['type' => $column['type']])
+                    ->andWhere(['column_id' => null])
+                    ->limit(1000)
+                    ->asArray()
+                    ->all();
 
-                foreach ($baiduKeywords as $keyword) {
+                echo '<pre>';
+                print_r($longKeywords);exit;
 
-//                    //检验是否拉取过数据
-                    $oldArticle = PushArticle::findx($column['domain_id'])->where(['fan_key_id' => $keyword['id']])->one();
-                    if (!empty($oldArticle)) {
-                        Tools::writeLog($column['zh_name'] . ' ---  ' . $keyword['keywords'] . '  已经拉取过了', 'set_rules.log');
+                foreach ($longKeywords as $key => $longKeyword) {
+                    //检验是否拉取过数据
+                    $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
+
+                    if (!empty($oldArticleKey)) {
+                        Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
                         continue;
                     }
 
-                    //根据短尾关键词 获取长尾关键词
-                    $longKeywords = LongKeywords::find()->select('id,name')->where([
-                        'keywords' => $keyword['keywords'],
-                        'from' => 10,
-                    ])->asArray()->all();
+                    echo $longKeyword['name'] . "<br/>";
 
+                    //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
+                    $data = [
+                        'key_id' => $longKeyword['id'],
+                        'keywords' => $longKeyword['name'],
+                        'type' => strtoupper($column['type']),
+                        'one_page_num_min' => $rules['one_page_num_min'],
+                        'one_page_num_max' => $rules['one_page_num_max'],
+                        'one_page_word_min' => $rules['one_page_word_min'],
+                        'one_page_word_max' => $rules['one_page_word_max'],
+                    ];
 
-                    foreach ($longKeywords as $key => $longKeyword) {
-                        //检验是否拉取过数据
-                        $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
+                    $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+                    $bd->domain_id = $column['domain_id'];
+                    $bd->column_id = $column['id'];
+                    $bd->save();
 
-                        if (!empty($oldArticleKey)) {
-                            Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
-                            continue;
+                    //发送请求至爬虫库
+                    $res = Tools::curlPost($url, $data);
+
+                    $res = json_decode($res, true);
+                    $saveData = [];
+                    if (isset($res[0]['from_path'])) {
+                        foreach ($res as $re) {
+                            //存储入库
+                            $saveData[] = [
+                                'column_id' => $column['id'],
+                                'from_path' => $re['from_path'],
+                                'domain_id' => $column['domain_id'],
+                                'key_id' => $longKeyword['id'],
+                                'title_img' => $re['title_img'],
+                                'keywords' => $longKeyword['name'],
+                                'column_name' => $column['name'],
+                                'fan_key_id' => $longKeyword['pid'],
+                                'rules_id' => $rules['id'],
+                                'content' => $re['content'],
+                                'intro' => $re['intro'],
+                                'title' => $re['title'],
+                                'user_id' => rand(1, 3822),
+                                'push_time' => Tools::randomDate('20200501', ''),
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s'),
+                            ];
                         }
-
-                        echo $longKeyword['name'] . "<br/>";
-
-                        //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
-                        $data = [
-                            'fan_key_id' => $keyword['id'],
-                            'key_id' => $longKeyword['id'],
-                            'keywords' => $longKeyword['name'],
-                            'type' => strtoupper($column['type']),
-                            'one_page_num_min' => $rules['one_page_num_min'],
-                            'one_page_num_max' => $rules['one_page_num_max'],
-                            'one_page_word_min' => $rules['one_page_word_min'],
-                            'one_page_word_max' => $rules['one_page_word_max'],
-                        ];
-
-                        //发送请求至爬虫库
-                        $res = Tools::curlPost($url, $data);
-
-                        $res = json_decode($res, true);
-                        $saveData = [];
-                        if (isset($res[0]['from_path'])) {
-                            foreach ($res as $re) {
-                                //存储入库
-                                $saveData[] = [
-                                    'column_id' => $column['id'],
-                                    'from_path' => $re['from_path'],
-                                    'domain_id' => $column['domain_id'],
-                                    'key_id' => $longKeyword['id'],
-                                    'title_img' => $re['title_img'],
-                                    'keywords' => $longKeyword['name'],
-                                    'column_name' => $column['name'],
-                                    'fan_key_id' => $keyword['id'],
-                                    'rules_id' => $rules['id'],
-                                    'content' => $re['content'],
-                                    'intro' => $re['intro'],
-                                    'title' => $re['title'],
-                                    'user_id' => rand(1, 3822),
-                                    'push_time' => Tools::randomDate('20200501', ''),
-                                    'created_at' => date('Y-m-d H:i:s'),
-                                    'updated_at' => date('Y-m-d H:i:s'),
-                                ];
-                            }
-                        }
+                    }
 //
-                        if (!empty($saveData)) {
-                            Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
-
-                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
-//                            sleep(1);
-                        } else {
-                            Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+                    if (!empty($saveData)) {
+                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+                        PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+//                        sleep(1);
+                    } else {
+                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
 //                            echo '<pre>';
 //                            var_export($data);
 //                            exit;
-                        }
-
-//                        sleep(5);
                     }
                 }
+//                        sleep(5);
             }
         }
         exit;
