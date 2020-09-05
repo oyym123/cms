@@ -451,7 +451,7 @@ class FanController extends Controller
             $model = PushArticle::find()
                 ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time')
                 ->where(['key_id' => $arr])
-                ->andWhere(['like', 'title_img', 'http'])
+//                ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
