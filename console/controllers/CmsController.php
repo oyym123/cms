@@ -115,4 +115,10 @@ class CmsController extends \yii\console\Controller
         return BaiduKeywords::pushKeywords();
     }
 
+    public function actionSetRules()
+    {
+        LongKeywords::setRules();
+    }
+
+
 }

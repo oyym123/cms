@@ -105,8 +105,9 @@ class LongKeywords extends Base
     /** 标签 */
     public static function hotKeywords()
     {
-        $keywords = LongKeywords::find()
+        $keywords = AllBaiduKeywords::find()
             ->select('id,name as keywords')
+
             ->limit(15)
             ->orderBy('id desc')
             ->asArray()
@@ -463,9 +464,6 @@ class LongKeywords extends Base
                     ->limit(1000)
                     ->asArray()
                     ->all();
-
-                echo '<pre>';
-                print_r($longKeywords);exit;
 
                 foreach ($longKeywords as $key => $longKeyword) {
                     //检验是否拉取过数据
