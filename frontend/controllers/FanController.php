@@ -93,7 +93,11 @@ class FanController extends Controller
 
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
-            $model['title'] = $model['keywords'];
+
+
+            $titleMain  = explode(',',$model['title'])[0];
+            $titleOther  = explode(',',$model['title'])[1];
+            $model['title'] = $titleMain.'（'.$titleOther.'）';
 
             $res = [
                 'data' => $model,
@@ -220,6 +224,9 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
+            $titleMain  = explode(',',$item['title'])[0];
+            $titleOther  = explode(',',$item['title'])[1];
+            $item['title'] = $titleMain.'（'.$titleOther.'）';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
@@ -459,6 +466,10 @@ class FanController extends Controller
                 ->where(['key_id' => $arr])
 //                ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
+
+            $titleMain  = explode(',',$model['title'])[0];
+            $titleOther  = explode(',',$model['title'])[1];
+            $model['title'] = $titleMain.'（'.$titleOther.'）';
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
             $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $model['column_name'] . '/' . $model['id'] . '.html';
