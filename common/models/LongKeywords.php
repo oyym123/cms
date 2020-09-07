@@ -430,10 +430,158 @@ class LongKeywords extends Base
         }
     }
 
+
     /**
-     * 设定规则 定时拉取文章
+     * 设定规则 定时拉取文章 栏目广度
      */
     public static function setRules()
+    {
+        set_time_limit(0);
+
+        //查询所有栏目
+        $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
+            'status' => self::STATUS_BASE_NORMAL,
+        ])->asArray()->all();
+
+        $url = Tools::reptileUrl() . '/cms/article';
+
+        foreach ($domainColumn as $column) {
+            //查询分类规则
+            $rules = ArticleRules::find()->where([
+                'column_id' => $column['id']
+            ])->asArray()->one();
+
+            //只拉取有规则的
+            if (!empty($rules)) {
+                //查询短尾词
+                $bdKeywords = BaiduKeywords::find()->select('id,keywords')
+                    ->andWhere(['type' => $column['type']])      //只搜索某一大类的词
+                    ->limit(10)                            //随机分配200个短尾词
+                    ->orderBy('Rand()')
+                    ->asArray()
+                    ->all();
+
+                foreach ($bdKeywords as $bdKeyword) {
+                    //每个短尾词扩展  6个小指数长尾词
+                    $longKeywords = LongKeywords::find()->select('id,name')->where([
+                        'keywords' => $bdKeyword['keywords'],
+                    ])
+                        ->andWhere(['from' => 10])
+                        ->limit(6)
+                        ->asArray()
+                        ->all();
+
+                    foreach ($longKeywords as $key => $longKeyword) {
+                        //检验是否拉取过数据
+                        $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
+                        if (!empty($oldArticleKey)) {
+                            Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
+                            continue;
+                        }
+
+                        echo $longKeyword['name'] . "<br/>";
+
+                        //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
+                        $data = [
+                            'key_id' => $longKeyword['id'],
+                            'keywords' => $longKeyword['name'],
+                            'type' => strtoupper($column['type']),
+                            'one_page_num_min' => 2,
+                            'one_page_num_max' => 3,
+                            'one_page_word_min' => 20,
+                            'one_page_word_max' => $rules['one_page_word_max'],
+                            'num' => 2,
+                        ];
+
+                        if (($key + 1) % 2 == 0 && $key > 0) { //副词
+                            $data['num'] = 1;
+                        } else {
+                            $data['num'] = 2;                  //主词
+                        }
+
+                        //将已经做的词标记上
+                        $bd = LongKeywords::findOne($longKeyword['id']);
+                        $bd->from = 20;
+                        $bd->save();
+
+                        //发送请求至爬虫库
+                        $res = Tools::curlPost($url, $data);
+                        $res = json_decode($res, true);
+                        $saveData = [];
+                        if (isset($res[0]['from_path'])) {
+                            foreach ($res as $re) {
+                                //存储入库
+                                $saveData[] = [
+                                    'column_id' => $column['id'],
+                                    'from_path' => $re['from_path'],
+                                    'domain_id' => $column['domain_id'],
+                                    'key_id' => $longKeyword['id'],
+                                    'title_img' => $re['title_img'],
+                                    'keywords' => $longKeyword['name'],
+                                    'column_name' => $column['name'],
+                                    'fan_key_id' => $longKeyword['id'],
+                                    'rules_id' => $rules['id'],
+                                    'content' => $re['content'],
+                                    'intro' => $re['intro'],
+                                    'title' => $re['title'],
+                                    'user_id' => rand(1, 3822),
+                                    'push_time' => Tools::randomDate('20200501', ''),
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s'),
+                                ];
+                            }
+                        }
+
+                        $doubleK[] = $saveData;
+
+//                        echo '<pre>';
+//                        print_r($doubleK);
+//                        exit;
+
+                        //组双词
+                        if (($key + 1) % 2 == 0 && $key > 0) {
+                            if (!empty($saveData)) {
+                                //内容合并
+                                $doubleK[0][0]['title'] = $doubleK[0][0]['keywords'] . ',' . $doubleK[1][0]['keywords'];
+                                $doubleK[0][0]['content'] = $doubleK[0][0]['content'] . $doubleK[1][0]['content'];
+//                                echo '<pre>';
+//                                print_r($doubleK);
+////
+
+                                Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+                                PushArticle::batchInsertOnDuplicatex($column['domain_id'], $doubleK[0]);
+
+                                $doubleK = [];
+//                                exit;
+//                        sleep(1);
+                            } else {
+                                Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+                                $doubleK = [];
+//                            echo '<pre>';
+//                            var_export($data);
+                                exit;
+                            }
+
+                        }
+
+
+//                        echo '<pre>';
+//                        print_r($saveData);
+
+                    }
+                }
+
+//                        sleep(5);
+            }
+        }
+        exit;
+    }
+
+
+    /**
+     * 设定规则 定时拉取文章 栏目深度
+     */
+    public static function setRulesDeep()
     {
         set_time_limit(0);
 
@@ -461,7 +609,7 @@ class LongKeywords extends Base
                     ->andWhere(['<=', 'm_pv', 10])
                     ->andWhere(['type' => $column['type']])
                     ->andWhere(['column_id' => null])
-                    ->limit(1000)
+                    ->limit(3)
                     ->asArray()
                     ->all();
 
