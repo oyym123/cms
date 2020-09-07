@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\AllBaiduKeywords;
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\Domain;
@@ -89,7 +90,7 @@ class FanController extends Controller
             }
 
             $domain = Domain::getDomainInfo();
-            
+
             $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
             $model['title'] = $model['keywords'];
@@ -377,10 +378,9 @@ class FanController extends Controller
             ->where(['name' => $columnName, 'domain_id' => $domain->id])
             ->one();
 
-        $query = LongKeywords::find()
+        $query = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
-            ->andWhere(['from' => 10])
-            ->select('id,name')->limit(10);
+            ->select('id,keywords as name')->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
 
