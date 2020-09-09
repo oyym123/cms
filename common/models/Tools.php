@@ -384,6 +384,7 @@ class Tools extends \yii\db\ActiveRecord
         return PHP_OS == 'WINNT' ? \Yii::$app->params['local_reptile_url'] : \Yii::$app->params['online_reptile_url'];
     }
 
+
     /** 格式化时间 */
     public static function formatTime($time)
     {

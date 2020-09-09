@@ -336,6 +336,7 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
+            $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['id'] . '.html';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;

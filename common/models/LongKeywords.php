@@ -497,6 +497,7 @@ class LongKeywords extends Base
     public static function setRules()
     {
         set_time_limit(0);
+        $urlPush = \Yii::$app->params['local_fan_url'] . '/article/pull';
 
         //查询所有栏目
         $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
@@ -504,7 +505,7 @@ class LongKeywords extends Base
         ])->asArray()->all();
 
         $url = Tools::reptileUrl() . '/cms/article';
-
+        $_GET['domain'] =0;
         foreach ($domainColumn as $column) {
             //查询分类规则
             $rules = ArticleRules::find()->where([
@@ -544,7 +545,6 @@ class LongKeywords extends Base
                             Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
                             continue;
                         }
-
 //                            echo $longKeyword->name . "<br/>";
 
                         //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
@@ -594,6 +594,7 @@ class LongKeywords extends Base
                         }
 
                         if (!empty($saveData)) {
+
                             //表示没有双词 则匹配
                             if (strpos($saveData[0]['title'], ',') === false) {
                                 list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
@@ -610,18 +611,23 @@ class LongKeywords extends Base
                                             $arrTitle[] = $item;
                                         }
                                     }
+
                                     $saveData[0]['title'] = str_replace(',', '', $saveData[0]['title']);
                                     $saveData[0]['title'] = $saveData[0]['title'] . ',' . $arrTitle[0];
 
-                                    $bd = AllBaiduKeywords::findOne($longKeyword['id']);
-                                    $bd->domain_id = $column['domain_id'];
-                                    $bd->column_id = $column['id'];
-                                    $bd->save();
+//                                    $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+//                                    $bd->domain_id = $column['domain_id'];
+//                                    $bd->column_id = $column['id'];
+//                                    $bd->save();
 
 //                                    echo '<pre>';
 //                                    print_r($saveData);
 //                                    exit;
-                                    PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+
+                                    //推送至远程线上
+                                    $res = Tools::curlPost($urlPush, $data);
+                                    print_r($res);exit;
+//                                  PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                                 }
                             } else {
                                 $bd = AllBaiduKeywords::findOne($longKeyword['id']);
