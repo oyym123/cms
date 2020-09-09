@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\data\Pagination;
 
 /**
  * This is the model class for table "baidu_keywords".
@@ -155,6 +156,22 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
         } else {
             return [1, $model];
         }
+    }
+
+
+    public static function getKeywordsUrl($flag)
+    {
+        $domain = Domain::getDomainInfo();
+        $models = AllBaiduKeywords::find()
+            ->where(['domain_id' => $domain->id])
+            ->select('id')
+            ->asArray()
+            ->all();
+
+        foreach ($models as &$item) {
+            $item['url'] = 'http://' . $flag . Tools::getDoMain($_SERVER['HTTP_HOST']) . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+        }
+        return $models;
     }
 
     /**

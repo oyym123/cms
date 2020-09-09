@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use common\models\AllBaiduKeywords;
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\Domain;
@@ -108,6 +109,19 @@ class SiteController extends Controller
                     ';
 
         }
+
+        foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
+            $urlPc = $item['url'];
+            $data .= '
+                    <url>
+                    <loc>' . $urlPc . '</loc>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    ';
+        }
+
         $data .= '
                     </urlset>';
         //存入缓存文件
@@ -148,13 +162,25 @@ class SiteController extends Controller
                     ';
         }
 
+        foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
+            $urlPc = $item['url'];
+            $data .= '
+                    <url>
+                    <loc>' . $urlPc . '</loc>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    ';
+        }
+
         $data .= '
                     </urlset>';
         //存入缓存文件
         file_put_contents($filePath, $data);
         exit($data);
     }
-    
+
     public function actionSiteMtxt()
     {
         $num = Yii::$app->request->get('num', 50000);
@@ -170,6 +196,10 @@ class SiteController extends Controller
                 $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             }
 
+            foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
+                $data[] = $item['url'];
+            }
+            
             $data = implode(PHP_EOL, $data);
             //存入缓存文件
             file_put_contents($filePath, $data);
@@ -196,6 +226,10 @@ class SiteController extends Controller
             foreach ($articles as $article) {
                 $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             }
+            foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
+                $data[] = $item['url'];
+            }
+
             $data = implode(PHP_EOL, $data);
             //存入缓存文件
             file_put_contents($filePath, $data);
