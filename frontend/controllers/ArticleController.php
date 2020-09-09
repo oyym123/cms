@@ -6,6 +6,7 @@ namespace frontend\controllers;
 
 use common\models\ArticleRules;
 use common\models\PushArticle;
+use common\models\Tools;
 use common\models\WhiteArticle;
 
 class ArticleController extends BaseController
@@ -276,6 +277,7 @@ class ArticleController extends BaseController
         );
 
         $data = \Yii::$app->request->post();
-        PushArticle::setArticle($data[0]);
+
+        PushArticle::setArticle($data);
     }
 }
