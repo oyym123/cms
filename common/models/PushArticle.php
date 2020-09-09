@@ -42,7 +42,7 @@ class PushArticle extends Modelx
     {
         //根据域名请求，判断该使用哪个表
         $domain = Domain::getDomainInfo();
-        if ($domain) {
+        if ($domain && Yii::$app->request->get('domain', 1)) {
             return 'push_article_' . $domain->id;
         }
         return static::$originalName . '_' . (static::$targetKey);
@@ -123,7 +123,7 @@ class PushArticle extends Modelx
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['user_url'] = '/user/index_' . $item['user_id']. '.html';
+            $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
@@ -186,10 +186,40 @@ class PushArticle extends Modelx
         $migrate->createIndex('key_id-index', 'push_article_' . $id, ['key_id'], false);
         $initSql = file_get_contents(__DIR__ . '/../../frontend/web/init.sql');
 
-        $initSql = str_replace('push_article_5','push_article_'.$id,$initSql);
+        $initSql = str_replace('push_article_5', 'push_article_' . $id, $initSql);
 
         //插入初始数据
-        $db=Yii::$app->db;
+        $db = Yii::$app->db;
         $db->createCommand($initSql)->execute();
     }
+
+    //拉取文章数据
+    public static function setArticle($data)
+    {
+        $_GET['domain'] = 0;
+
+
+        //当第一个 id = 455709 清空表 因为是测试数据
+        $first = PushArticle::findx($data['domain_id'])->select('id')->orderBy('id asc')->one();
+
+        if ($first->id == 455709) {
+            $db = Yii::$app->db;
+            $sql1 = 'truncate table `push_article_' . $data['domain_id'] . '`;';
+            $db->createCommand($sql1)->execute();
+
+            //自增变为0开始
+            $sql = ' alter table `push_article_' . $data['domain_id'] . '` auto_increment=0';
+            $db->createCommand($sql)->execute();
+        }
+
+        $bd = AllBaiduKeywords::findOne($data['key_id']);
+
+        if ($bd->column_id == 0) {
+            $bd->domain_id = $data['domain_id'];
+            $bd->column_id = $data['column_id'];
+            $bd->save();
+            PushArticle::batchInsertOnDuplicatex($data['domain_id'], [$data]);
+        }
+    }
+
 }

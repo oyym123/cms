@@ -199,7 +199,7 @@ class SiteController extends Controller
             foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
                 $data[] = $item['url'];
             }
-            
+
             $data = implode(PHP_EOL, $data);
             //存入缓存文件
             file_put_contents($filePath, $data);
