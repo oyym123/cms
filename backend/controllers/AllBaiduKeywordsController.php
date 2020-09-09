@@ -2,7 +2,9 @@
 
 namespace backend\controllers;
 
+use common\models\AllBaiduKeywords;
 use common\models\Keywords;
+use common\models\search\AllBaiduKeywordsSearch;
 use Yii;
 use common\models\BaiduKeywords;
 use common\models\search\BaiduKeywordsSearch;
@@ -13,7 +15,7 @@ use yii\filters\VerbFilter;
 /**
  * BaiduKeywordsController implements the CRUD actions for BaiduKeywords model.
  */
-class BaiduKeywordsController extends Controller
+class AllBaiduKeywordsController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -36,7 +38,7 @@ class BaiduKeywordsController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new BaiduKeywordsSearch();
+        $searchModel = new AllBaiduKeywordsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -65,15 +67,11 @@ class BaiduKeywordsController extends Controller
      */
     public function actionCreate()
     {
-        $model = new BaiduKeywords();
+        $model = new AllBaiduKeywords();
         if ($model->load(Yii::$app->request->post())) {
-
-            Yii::$app->getSession()->setFlash('error', '暂停一级拓展词');
-            return $this->redirect(['create']);
-
             $data = Yii::$app->request->post();
             ignore_user_abort();
-            list($code, $msg) = BaiduKeywords::setKeywords($data['BaiduKeywords']);
+            list($code, $msg) = AllBaiduKeywords::setKeywords($data['AllBaiduKeywords']);
             if ($code < 0) {
                 Yii::$app->getSession()->setFlash('error', json_encode($msg, JSON_UNESCAPED_UNICODE));
                 return $this->redirect(['create']);
@@ -131,7 +129,7 @@ class BaiduKeywordsController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = BaiduKeywords::findOne($id)) !== null) {
+        if (($model = AllBaiduKeywords::findOne($id)) !== null) {
             return $model;
         }
 
@@ -149,7 +147,7 @@ class BaiduKeywordsController extends Controller
             return $out;
         }
 
-        $data = BaiduKeywords::find()
+        $data = AllBaiduKeywords::find()
             ->select('id, keywords as text,m_pv,pc_pv,competition')
             ->andFilterWhere(['like', 'keywords', $q])
             ->limit(50)

@@ -261,21 +261,103 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     {
         //233061
         //231954
-        for ($i = 231954; $i <= 233061; $i++) {
-            echo $i . PHP_EOL;
-            //搜索 下拉词栏目
-            $bd = BaiduKeywords::find()->select('id,keywords')->where(['id' => $i])->asArray()->one();
-            $long = LongKeywords::find()->where(['keywords' => $bd['keywords']])->orderBy('RAND()')->limit(20)->all();
+//        for ($i = 231954; $i <= 233061; $i++) {
+//       echo $i . PHP_EOL;
+
+        //搜索 下拉词栏目
+        $bd = BaiduKeywords::find()->select('id,keywords')
+//            ->where(['type' => 'LEA'])
+            ->andWhere(['not like', 'keywords', '驾校'])
+            ->andWhere(['not like', 'keywords', '翻译'])
+            ->andWhere(['not like', 'keywords', '签证'])
+            ->orderBy('Rand()')
+//            ->limit(100)
+            ->asArray()
+            ->all();
+
+
+        foreach ($bd as $item) {
+            $long = AllBaiduKeywords::find()
+                ->select('id,keywords as name, type as type_name,from_keywords as keywords,m_pv')
+                ->where(['pid' => $item['id']])
+                ->andWhere([
+                    '>', 'm_pv', 0
+                ])
+                ->andWhere([
+                    '<=', 'm_pv', 10
+                ])
+                ->andWhere([
+                    'status' => 1
+                ])
+                ->limit(1)
+                ->asArray()
+                ->all();
 
             //标记长尾词
             foreach ($long as $l) {
-                $l->from = 10;
-                $l->save(false);
-                LongKeywords::bdPushReptile($l, $bd['id']);
+                sleep(1);
+                //匹配下拉词
+                list($code, $msg) = LongKeywords::getBaiduKey(['keywords' => $l['name']], 1);
+
+                if ($code < 0) {
+                    echo '<pre>';
+                    print_r($msg);
+                    LongKeywords::bdPushReptileNew($l, $bd['id']);
+                    continue;
+                } else {
+                    $arrTitle = [];
+                    foreach ($msg as $item) {
+                        if ($item != $l['name'] && (strlen($item) > strlen($l['name']))) {
+                            $arrTitle[] = $item;
+                        }
+                    }
+                    print_r('下拉词  ' . $arrTitle[0]);
+                    $all = AllBaiduKeywords::findOne($l['id']);
+                    $all->status = 10;
+                    $all->save(false);
+                    LongKeywords::bdPushReptileNew($l, $bd['id'], $arrTitle[0]);
+//                    print_r($l);exit;
+                }
+
+//                echo '<pre>';
+//                print_r($l['name']);
+//                echo ' 1232 ';
+//                print_r($arrTitle[0]);
+//                exit;
+
+
             }
         }
+//        }
     }
 
+    public static function pushPa()
+    {
+        $long = AllBaiduKeywords::find()
+            ->select('id,keywords as name, type as type_name,from_keywords as keywords,m_pv')
+            ->where([
+                'catch_status' => 100,
+                'status' => 1,
+            ])
+            ->andWhere([
+                '>', 'm_pv', 0
+            ])
+            ->andWhere([
+                '<', 'm_pv', 20
+            ])
+            ->asArray()
+            ->all();
+//            echo '<pre>';
+//            print_r($long);
+//            exit;
+        //标记长尾词
+        foreach ($long as $l) {
+            $all = AllBaiduKeywords::findOne($l['id']);
+            $all->status = 10;
+            $all->save(false);
+            LongKeywords::bdPushReptileNew($l, 0);
+        }
+    }
 
     /**
      * 新增关键词 并且调用百度营销词接口获取相应的参数
@@ -295,7 +377,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             //判重 不可有所有重复的关键词 减少接口请求次数
             $oldInfo = self::find()->where([
                 'keywords' => $item,
-                'column_id' => $postData['column_id']
+//                'column_id' => $postData['column_id']
             ])->one();
 
             if (!empty($oldInfo)) {
@@ -390,9 +472,9 @@ class BaiduKeywords extends \yii\db\ActiveRecord
     {
         $domain = Domain::getDomainInfo();
 
-        $keywords = LongKeywords::find()
-            ->select('id,name as keywords')
-            ->where(['from' => 20])
+        $keywords = AllBaiduKeywords::find()
+            ->select('id,keywords')
+            ->where(['domain_id' => $domain->id])
             ->limit($num)
             ->asArray()
             ->all();
@@ -402,7 +484,6 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                 $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
             }
         }
-
         return $keywords;
     }
 

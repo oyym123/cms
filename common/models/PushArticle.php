@@ -122,6 +122,7 @@ class PushArticle extends Modelx
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
+            $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id']. '.html';
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
@@ -146,6 +147,7 @@ class PushArticle extends Modelx
             ->all();
 
         foreach ($article as &$item) {
+            $item['title'] = Tools::getKTitle($item['title']);
             $item['url'] = '/wen/' . $item['id'] . '.html';
         }
 
