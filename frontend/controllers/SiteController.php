@@ -85,15 +85,59 @@ class SiteController extends Controller
     public function actionSiteXml()
     {
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+        $num = Yii::$app->request->get('num', 50000);
 
-        if (Yii::$app->request->get('m', 0) == 1) {
-            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(6)->orderBy('id desc')->all();
-            $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">';
-            foreach ($articles as $article) {
-                $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.xml';
+        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
+            $data = file_get_contents($filePath);
+            exit($data);
+        }
 
-                $data .= '
+        $articles = PushArticle::find()->select('id,column_name,push_time')->limit($num)->orderBy('id desc')->all();
+        $data = '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+        foreach ($articles as $article) {
+            $urlPc = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $data .= '
+                    <url>
+                    <loc>' . $urlPc . '</loc>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    ';
+
+        }
+        $data .= '
+                    </urlset>';
+        //存入缓存文件
+        file_put_contents($filePath, $data);
+        exit($data);
+
+    }
+
+
+    /**
+     *
+     */
+    public function actionSiteMxml()
+    {
+        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+        $num = Yii::$app->request->get('num', 50000);
+
+        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.xml';
+        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
+            $data = file_get_contents($filePath);
+            exit($data);
+        }
+
+        $articles = PushArticle::find()->select('id,column_name,push_time')->limit($num)->orderBy('id desc')->all();
+        $data = '<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+        foreach ($articles as $article) {
+            $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+
+            $data .= '
                     <url>
                     <loc>' . $urlM . '</loc>
                     <mobile:mobile type="mobile"/>
@@ -101,54 +145,58 @@ class SiteController extends Controller
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
                     </url>
-                    <br/>';
-            }
-
-            $data .= '
-                    </urlset>';
-            exit($data);
-
-        } else {
-            $articles = PushArticle::find()->select('id,column_name,push_time')->limit(6)->orderBy('id desc')->all();
-            $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">';
-            foreach ($articles as $article) {
-                $urlPc = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                $data .= '
-                    <url>
-                    <loc>' . $urlPc . '</loc>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    <br/>';
-
-            }
-            $data .= '
-                    </urlset>';
-            exit($data);
-
+                    ';
         }
 
+        $data .= '
+                    </urlset>';
+        //存入缓存文件
+        file_put_contents($filePath, $data);
+        exit($data);
     }
+    
+    public function actionSiteMtxt()
+    {
+        $num = Yii::$app->request->get('num', 50000);
+        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
+        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
+            $data = file_get_contents($filePath);
+            exit($data);
+        } else {
+            $articles = PushArticle::find()->select('id,column_name')->limit($num)->orderBy('id desc')->all();
+            $data = [];
+            foreach ($articles as $article) {
+                $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            }
+
+            $data = implode(PHP_EOL, $data);
+            //存入缓存文件
+            file_put_contents($filePath, $data);
+            exit($data);
+        }
+    }
+
 
     /**
      *
      */
     public function actionSiteTxt()
     {
+        $num = Yii::$app->request->get('num', 50000);
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
+
         $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
         if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
             $data = file_get_contents($filePath);
             exit($data);
         } else {
-            $articles = PushArticle::find()->select('id,column_name')->orderBy('id desc')->all();
+            $articles = PushArticle::find()->select('id,column_name')->limit($num)->orderBy('id desc')->all();
             $data = [];
             foreach ($articles as $article) {
-                $data[] = 'http://' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             }
-            $data = implode('<br/>', $data);
+            $data = implode(PHP_EOL, $data);
             //存入缓存文件
             file_put_contents($filePath, $data);
             exit($data);

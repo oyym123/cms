@@ -50,6 +50,8 @@ class Fan extends BaseController
                 'index_<id:\d+>.html' => '/site/index',
                 'site.xml' => '/site/site-xml',
                 'site.txt' => '/site/site-txt',
+                'm_site.xml' => '/site/site-mxml',
+                'm_site.txt' => '/site/site-mtxt',
                 //end 正则注释识别 勿删" . $domainInfo;
         $res = preg_replace("@'rules'(.*)?//end 正则注释识别 勿删(.*)?&end_url@s", $dataStr, $main);
         file_put_contents(__DIR__ . '/../../frontend/config/' . $topDomain . '_main.php', $res);
