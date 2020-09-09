@@ -436,11 +436,26 @@ class Tools extends \yii\db\ActiveRecord
     }
 
     /** 修改 */
-    public static function getLocalUrl()
+    public static function getLocalUrl($protocolFlag = 0)
     {
         $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ?
             "https://" : "http://";
         $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        if ($protocolFlag) {
+            return $protocol . $_SERVER['HTTP_HOST'];
+        }
         return $url;//输出完整的url
+    }
+
+    /** 获取标题 */
+    public static function getKTitle($title)
+    {
+        if (strpos($title, ',') !== false) {
+            $titleMain = explode(',', $title)[0];
+            $titleOther = explode(',', $title)[1];
+            return $titleMain . '（' . $titleOther . '）';
+        } else {
+            return $title;
+        }
     }
 }

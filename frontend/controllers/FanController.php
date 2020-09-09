@@ -90,14 +90,37 @@ class FanController extends Controller
             }
 
             $domain = Domain::getDomainInfo();
+            $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
+            $model['content'] = str_replace(['。'], ['。<br/><br/>'], $model['content']);
 
-            $model['content'] = str_replace(['。', '；', '：'], '<br/><br/>', $model['content']);
+//            //前面转换
+//            $upArr = [
+//                '一，', '二，', '三，', '四，', '五，',
+//                '一、', '二、', '三、', '四、', '五、',
+//                '一,', '二,', '三,', '四,', '五,',
+//                '1、', '2、', '3、', '4、', '5、',
+//                '1，', '2，', '3，', '4，', '5，',
+//                '1,', '2,', '3,', '4,', '5,'
+//            ];
+//
+//            //后面转换
+//            $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
+//            $replaceArrUp = $replaceArrDown = [];
+//
+//            foreach ($upArr as $item) {
+//                $replaceArrUp[] = '<br/>' . $item;
+//            }
+//
+//            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
+//
+//            foreach ($downArr as $item) {
+//                $replaceArrDown[] = $item . '<br/>';
+//            }
+//            $model['content']= str_replace($downArr, $replaceArrDown, $model['content']);
+
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
-
-            $titleMain  = explode(',',$model['title'])[0];
-            $titleOther  = explode(',',$model['title'])[1];
-            $model['title'] = $titleMain.'（'.$titleOther.'）';
+            $model['title'] = Tools::getKTitle($model['title']);
 
             $res = [
                 'data' => $model,
@@ -108,8 +131,15 @@ class FanController extends Controller
                 'keywords' => $model['keywords'],
                 'keywords_url' => '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags,
                 'reading' => substr(time(), 3) + rand(99, 1000),
-
+                'column_info' => [
+                    'name' => $columnInfo['zh_name'],
+                    'url' => Tools::getLocalUrl(1) . '/' . $column
+                ],
             ];
+
+//            echo '<pre>';
+//            print_r($res);
+//            exit;
 
             $desc = mb_substr($model['title'], 0, 28);
 
@@ -224,9 +254,7 @@ class FanController extends Controller
             ->asArray()->all();
 
         foreach ($models as &$item) {
-            $titleMain  = explode(',',$item['title'])[0];
-            $titleOther  = explode(',',$item['title'])[1];
-            $item['title'] = $titleMain.'（'.$titleOther.'）';
+            $item['title'] = Tools::getKTitle($item['title']);
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
@@ -247,7 +275,7 @@ class FanController extends Controller
             'home_list' => $models,
             'column_info' => [
                 'name' => $columnName,
-                'url' => $_SERVER['HTTP_HOST'] . '/' . $columnName
+                'url' => Tools::getLocalUrl(1) . '/' . $columnName
             ],
         ];
 
@@ -385,9 +413,11 @@ class FanController extends Controller
             ->where(['name' => $columnName, 'domain_id' => $domain->id])
             ->one();
 
-        $query = LongKeywords::find()
-            ->where(['from' => 20])
-            ->select('id,name')->limit(10);
+        $query = AllBaiduKeywords::find()
+            ->where(['domain_id' => $domain->id])
+            ->select('id,keywords as name')
+            ->limit(10);
+
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
 
@@ -467,9 +497,7 @@ class FanController extends Controller
 //                ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
 
-            $titleMain  = explode(',',$model['title'])[0];
-            $titleOther  = explode(',',$model['title'])[1];
-            $model['title'] = $titleMain.'（'.$titleOther.'）';
+            $model['title'] = Tools::getKTitle($model['title']);
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
             $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $model['column_name'] . '/' . $model['id'] . '.html';

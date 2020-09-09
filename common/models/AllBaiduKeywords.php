@@ -69,7 +69,7 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
     {
         return [
             [['domain_id', 'column_id', 'keywords'], 'required'],
-            [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
+            [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status', 'catch_status'], 'integer'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
             [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
@@ -154,6 +154,117 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
             return [-1, $model->getErrors()];
         } else {
             return [1, $model];
+        }
+    }
+
+    /**
+     * 新增关键词 并且调用百度营销词接口获取相应的参数
+     */
+    public static function setKeywords($postData)
+    {
+        set_time_limit(0);
+        $keywords = Tools::cleanKeywords($postData['keywords']);
+
+        if (count($keywords) > 1000) {
+            return [-1, '最多一次只能导入1000个词'];
+        }
+
+        $error = [];
+
+        foreach ($keywords as $item) {
+            //判重 不可有所有重复的关键词 减少接口请求次数
+            $oldInfo = self::find()->where([
+                'keywords' => $item,
+//                'column_id' => $postData['column_id']
+            ])->one();
+
+            if (!empty($oldInfo)) {
+                $oldInfo->catch_status = 100;
+                $oldInfo->save(false);
+                $error[] = $item . '  已经重复了！';
+                continue;
+            }
+
+            $data = (new BaiDuSdk())->getRank($item);
+            if ($data === false) {
+                $error[] = $item . '  没有请求请成功！';
+                continue;
+            }
+
+            $info = $data[0];
+
+            $saveData = [
+                'show_reasons' => '后台添加',
+                'm_pv' => $info['mobile']['pv'],
+                'm_show' => $info['mobile']['show'],
+                'type' => $postData['type'],
+                'pid' => 0,
+                'm_ctr' => $info['mobile']['ctr'],
+                'm_click' => $info['mobile']['click'],
+                'm_rec_bid' => $info['mobile']['recBid'],
+                'm_charge' => $info['mobile']['charge'],
+                'm_rank' => $info['mobile']['rank'],
+                'm_show_rate' => $info['mobile']['showRate'],
+                'all_cpc' => $info['all']['cpc'],
+                'all_ctr' => $info['all']['ctr'],
+                'all_click' => $info['all']['cpc'],
+                'all_pv' => $info['all']['pv'],
+                'all_charge' => $info['all']['charge'],
+                'all_show' => $info['all']['show'],
+                'all_rank' => $info['all']['rank'],
+                'all_show_rate' => $info['all']['showRate'],
+                'all_rec_bid' => $info['all']['recBid'],
+                'pc_ctr' => $info['pc']['ctr'],
+                'pc_show' => $info['pc']['show'],
+                'pc_pv' => $info['pc']['pv'],
+                'pc_rank' => $info['pc']['rank'],
+                'pc_show_rate' => $info['pc']['showRate'],
+                'pc_click' => $info['pc']['click'],
+                'bid' => $info['bid'],
+                'catch_status' => 100,  //表示人工
+                'word_package' => '',
+                'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'keywords' => $info['word'],
+                'from_keywords' => '',
+                'similar' => '',
+                'domain_id' => $postData['domain_id'] ?? 0,
+                'column_id' => $postData['column_id'] ?? 0,
+                'competition' => $info['competition'],
+                'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
+            ];
+
+            //保存所有的关键词
+            list($code, $msg) = self::createOne($saveData);
+
+            //只保存主词
+            if ($code < 0) {
+                $error[] = $msg;
+            } else {
+
+                //保存主词
+//                $dataSave = [
+//                    'name' => $info['word'],
+//                    'key_id' => $msg->id,
+//                    'type_name' => $msg->type,
+//                    'keywords' => $info['word'],
+//                ];
+//
+//                list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
+//
+//                if ($codeKey > 0) {
+//                    LongKeywords::bdPushReptile($msgKey);
+//                }
+
+
+                //保存扩展词
+//                self::getSdkWords($msg->id);
+            }
+        }
+
+        if (!empty($error)) {
+            return [-1, $error];
+        } else {
+            return [1, 'success'];
         }
     }
 
