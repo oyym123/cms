@@ -200,10 +200,16 @@ class SiteController extends Controller
                 $data[] = $item['url'];
             }
 
-            $data = implode(PHP_EOL, $data);
+            $str = '';
+            foreach ($data as $datum) {
+                $str .= $datum . '<br/>';
+            }
+
             //存入缓存文件
-            file_put_contents($filePath, $data);
-            exit($data);
+            file_put_contents($filePath, $str);
+
+            echo $str;
+
         }
     }
 
@@ -230,10 +236,16 @@ class SiteController extends Controller
                 $data[] = $item['url'];
             }
 
-            $data = implode(PHP_EOL, $data);
+            $str = '';
+            foreach ($data as $datum) {
+                $str .= $datum . '<br/>';
+            }
+
             //存入缓存文件
-            file_put_contents($filePath, $data);
-            exit($data);
+            file_put_contents($filePath, $str);
+
+            echo $str;
+            exit();
         }
     }
 
