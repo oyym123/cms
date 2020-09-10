@@ -129,6 +129,7 @@ class FanController extends Controller
                 'pre_title' => $preTitle,
                 'next_title' => $nextTitle,
                 'keywords' => $model['keywords'],
+                'user_url' => '/user/index_' . $model['user_id'] . '.html',
                 'keywords_url' => '/' . $domain->start_tags . $model['key_id'] . $domain->end_tags,
                 'reading' => substr(time(), 3) + rand(99, 1000),
                 'column_info' => [
