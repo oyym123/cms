@@ -81,9 +81,10 @@ class DomainController extends Controller
             //自动创建一个泛目录
             $data = [
                 'name' => $model->start_tags,
-                'tags' => '标签',
+                'tags' => '泛目录',
                 'domain_id' => $model->id,
             ];
+            
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
             //自动创建一个label

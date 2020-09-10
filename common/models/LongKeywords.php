@@ -522,7 +522,7 @@ class LongKeywords extends Base
                     ->andWhere(['not like', 'keywords', '驾校'])
                     ->andWhere(['not like', 'keywords', '翻译'])
                     ->andWhere(['not like', 'keywords', '签证'])
-                    ->limit(100)
+                    ->limit(10)
                     ->orderBy('Rand()')
                     ->asArray()
                     ->all();

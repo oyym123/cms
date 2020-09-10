@@ -38,7 +38,7 @@
 //                            ['label' => '后台用户', 'icon' => 'fa fa-circle-o', 'url' => ['/user'],],
                             ['label' => '权限管理', 'icon' => 'fa fa-circle-o', 'url' => ['/admin/role'],
                                 'items' => [
-                                  ['label' => '菜单', 'icon' => 'file-code-o', 'url' => ['/admin/menu'],],
+                                    ['label' => '菜单', 'icon' => 'file-code-o', 'url' => ['/admin/menu'],],
                                     ['label' => '权限', 'icon' => 'file-code-o', 'url' => ['/admin/permission'],],
                                     ['label' => '角色', 'icon' => 'file-code-o', 'url' => ['/admin/role'],],
                                     ['label' => '分配', 'icon' => 'file-code-o', 'url' => ['/admin/assignment'],],
@@ -66,7 +66,8 @@
                     ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],
                     ['label' => '关键词', 'icon' => 'dashboard', 'url' => ['#'],
                         'items' => [
-                            ['label' => '百度营销词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
+                            ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
+                            ['label' => '百度营销一级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
                             ['label' => '下拉框关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/long-keywords/index']],
                             ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],
                         ]

@@ -37,6 +37,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->domain->name;
                 }
             ],
+            [
+                'label' => '类型',
+                'attribute' => 'type',
+                'filter' => \common\models\DomainColumn::getType(),
+                'filterInputOptions' => ['prompt' => '所有类型', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->type . '【' . \common\models\DomainColumn::getType($model->type) . '】';
+                }
+            ],
             'zh_name',
             'name',
             'tags',
