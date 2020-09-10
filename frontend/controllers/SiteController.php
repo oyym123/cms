@@ -512,4 +512,11 @@ class SiteController extends Controller
             'model' => $model
         ]);
     }
+
+    public function actionFavicon()
+    {
+        $domainId = Domain::getDomainInfo()->id;
+        header("Content-type: image/jpeg");
+        readfile(Tools::getLocalUrl(1) . '/images/favicon/' . $domainId . ' favicon.ico');
+    }
 }
