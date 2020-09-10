@@ -515,6 +515,7 @@ class FanController extends Controller
             $res = [
                 'data' => $model
             ];
+            
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
                 'title' => $model['keywords'],
