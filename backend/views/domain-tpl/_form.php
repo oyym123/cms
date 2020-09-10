@@ -99,7 +99,7 @@ use yii\widgets\ActiveForm;
 
     $("#domaintpl-tpl_id").change(function () {
         var html = '';
-       
+
     });
 </script>
 
