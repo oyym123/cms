@@ -131,9 +131,10 @@ class DomainColumn extends Base
                 } else {
                     $arr[$key + 1] = $item;
                 }
+                $item['name'] = '/' . $item['name'];
             }
             ksort($arr);
-            
+
             return $arr;
         }
 
