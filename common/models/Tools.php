@@ -455,6 +455,7 @@ class Tools extends \yii\db\ActiveRecord
             $titleMain = explode(',', $title)[0];
             $titleOther = explode(',', $title)[1];
             if (empty($titleOther)) {
+                $title = str_replace(',', '', $title);
                 return $title;
             } else {
                 return $titleMain . '（' . $titleOther . '）';
