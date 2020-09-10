@@ -501,6 +501,7 @@ class LongKeywords extends Base
 
         //查询所有栏目
         $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
+            'id' => 220,
             'status' => self::STATUS_BASE_NORMAL,
         ])->asArray()->all();
 
@@ -512,6 +513,7 @@ class LongKeywords extends Base
             $rules = ArticleRules::find()->where([
                 'column_id' => $column['id']
             ])->asArray()->one();
+
 
             //只拉取有规则的
             if (!empty($rules)) {
@@ -600,6 +602,8 @@ class LongKeywords extends Base
                             //表示没有双词 则匹配
                             if (strpos($saveData[0]['title'], ',') === false) {
                                 list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
+//                                print_r($msg);
+//                                exit;
                                 if ($code < 0) {
                                     echo '<pre>';
                                     print_r($msg);
@@ -625,16 +629,17 @@ class LongKeywords extends Base
 //                                    echo '<pre>';
 //                                    print_r($saveData);
 //                                    exit;
-                                    Tools::writeLog('保存' .  $saveData[0]['domain_id'], 'set_rules.log');
+                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
                                     //推送至远程线上
                                     $res = Tools::curlPost($urlPush, $saveData[0]);
 //                                  PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                                 }
                             } else {
-                                Tools::writeLog('保存' .  $saveData[0]['domain_id'], 'set_rules.log');
+                                Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
                                 //推送至远程线上
                                 $res = Tools::curlPost($urlPush, $saveData[0]);
-
+                                print_r($res);
+                                exit;
 
 //                                $bd = AllBaiduKeywords::findOne($longKeyword['id']);
 //                                $bd->domain_id = $column['domain_id'];
@@ -648,7 +653,7 @@ class LongKeywords extends Base
 //                            exit;
 //                            sleep(1);
                         } else {
-                            Tools::writeLog('保存' . $longKeyword->name, 'set_rules.log');
+                            Tools::writeLog('保存失败!' . $longKeyword->name, 'set_rules.log');
                             $doubleK = [];
 //                            echo ' < pre>';
 //                            var_export($data);
