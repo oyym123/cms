@@ -41,24 +41,29 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'home' => '/fan',
+                'home/<id:\d+>.html' => '/fan/detail',            
+                'home/index_<id:\d+>.html' => '/fan',
+                
                 'animals' => '/fan',
-                'animals/<id:\d+>.html' => '/fan/detail',
+                'animals/<id:\d+>.html' => '/fan/detail',            
                 'animals/index_<id:\d+>.html' => '/fan',
                 
                 'flowers' => '/fan',
-                'flowers/<id:\d+>.html' => '/fan/detail',
+                'flowers/<id:\d+>.html' => '/fan/detail',            
                 'flowers/index_<id:\d+>.html' => '/fan',
                 
                 'water' => '/fan',
-                'water/<id:\d+>.html' => '/fan/detail',
+                'water/<id:\d+>.html' => '/fan/detail',            
                 'water/index_<id:\d+>.html' => '/fan',
                 
-                'home' => '/fan',
-                'home/<id:\d+>.html' => '/fan/detail',
-                'home/index_<id:\d+>.html' => '/fan',
-                
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删
+                'site.xml' => '/site/site-xml',
+                'site.txt' => '/site/site-txt',
+                'm_site.xml' => '/site/site-mxml',
+                'm_site.txt' => '/site/site-mtxt',
+                'favicon.ico' => '/site/favicon',
+                //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
 

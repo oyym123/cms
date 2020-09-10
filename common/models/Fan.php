@@ -88,6 +88,15 @@ class Fan extends BaseController
         return [$layout, $render];
     }
 
+    public static function refreshAll()
+    {
+        //刷新所有的规则
+        $domain = Domain::find()->all();
+        foreach ($domain as $item) {
+            echo $item->name . '生成规则<br/>';
+            self::getRules($item->id);
+        }
+    }
 
     /** 进行一切初始化操作 */
     public function init()

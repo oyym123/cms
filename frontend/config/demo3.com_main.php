@@ -45,22 +45,12 @@ return [
                 'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
                 
-                'jaks' => '/fan',
-                'jaks/<id:\d+>.html' => '/fan/detail',            
-                'jaks/index_<id:\d+>.html' => '/fan',
-                
-                'label' => '/fan/tags-list',        
-                'label/index_<id:\d+>.html' => '/fan/tags-list',
-                
-                'jaks<id:\d+>mq/' => '/fan/tags-detail',
-                'customize_<id:\d+>.html' => '/site/customize',
-                'wen' => '/fan',
-                'wen/<id:\d+>.html' => '/fan/detail',            
-                'wen/index_<id:\d+>.html' => '/fan',
-                
                 'index_<id:\d+>.html' => '/site/index',
                 'site.xml' => '/site/site-xml',
                 'site.txt' => '/site/site-txt',
+                'm_site.xml' => '/site/site-mxml',
+                'm_site.txt' => '/site/site-mtxt',
+                'favicon.ico' => '/site/favicon',
                 //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
