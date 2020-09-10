@@ -276,7 +276,7 @@ class SiteController extends Controller
 
         list($layout, $render) = Fan::renderView(Template::TYPE_HOME);
         $this->layout = $layout;
-
+        $url = Tools::getLocalUrl(1);
         foreach ($models as &$item) {
             $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['title'] = Tools::getKTitle($item['title']);
@@ -292,10 +292,18 @@ class SiteController extends Controller
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
+            $item['column_info'] = [
+                'name' => $columnName,
+                'url' => $url
+            ];
         }
 
         $res = [
             'home_list' => $models,
+            'column_info' => [
+                'name' => $columnName,
+                'url' => $url
+            ],
         ];
 
 
