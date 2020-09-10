@@ -514,7 +514,6 @@ class LongKeywords extends Base
                 'column_id' => $column['id']
             ])->asArray()->one();
 
-
             //只拉取有规则的
             if (!empty($rules)) {
 //                echo '<pre>';
@@ -524,7 +523,7 @@ class LongKeywords extends Base
                     ->andWhere(['not like', 'keywords', '驾校'])
                     ->andWhere(['not like', 'keywords', '翻译'])
                     ->andWhere(['not like', 'keywords', '签证'])
-                    ->limit(10)
+                    ->limit(100)
                     ->orderBy('Rand()')
                     ->asArray()
                     ->all();
@@ -536,12 +535,14 @@ class LongKeywords extends Base
                     ])
                         ->andWhere(['>', 'm_pv', 0])
                         ->andWhere(['<=', 'm_pv', 10])
-                        ->andWhere(['status' => 10])
+                        ->andWhere(['catch_status' => 10])
                         ->andWhere(['column_id' => 0])
                         ->limit(3)
                         ->asArray()
                         ->all();
-
+                    echo '<pre>';
+                    print_r($longKeywords);
+                    exit;
                     foreach ($longKeywords as $key => $longKeyword) {
                         //检验是否拉取过数据
 //                        $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
@@ -562,6 +563,7 @@ class LongKeywords extends Base
                             'one_page_word_max' => $rules['one_page_word_max'],
                             'num' => 3,
                         ];
+
 
                         //发送请求至爬虫库
                         $res = Tools::curlPost($url, $data);
@@ -610,7 +612,9 @@ class LongKeywords extends Base
                                     exit;
                                 } else {
                                     Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
-
+                                    echo '<pre>';
+                                    print_r($saveData);
+                                    exit;
                                     $arrTitle = [];
                                     foreach ($msg as $item) {
                                         if ($item != $saveData[0]['title'] && (strlen($item) > strlen($saveData[0]['title']))) {
@@ -628,9 +632,7 @@ class LongKeywords extends Base
 
                                     PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
 
-//                                    echo '<pre>';
-//                                    print_r($saveData);
-//                                    exit;
+
 //                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
 //                                    //推送至远程线上
 //                                    $res = Tools::curlPost($urlPush, $saveData[0]);
@@ -638,6 +640,10 @@ class LongKeywords extends Base
                                 }
                             } else {
                                 Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
+
+                                echo ' < pre>';
+                                print_r($saveData);
+                                exit;
 
 //                                //推送至远程线上
 //                                $res = Tools::curlPost($urlPush, $saveData[0]);
@@ -648,9 +654,7 @@ class LongKeywords extends Base
                                 $bd->domain_id = $column['domain_id'];
                                 $bd->column_id = $column['id'];
                                 $bd->save();
-//                                    echo ' < pre>';
-//                                    print_r($saveData);
-//                                    exit;
+
                                 PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                             }
 //                            exit;
