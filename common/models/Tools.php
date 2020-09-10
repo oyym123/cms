@@ -454,7 +454,11 @@ class Tools extends \yii\db\ActiveRecord
         if (strpos($title, ',') !== false) {
             $titleMain = explode(',', $title)[0];
             $titleOther = explode(',', $title)[1];
-            return $titleMain . '（' . $titleOther . '）';
+            if (empty($titleOther)) {
+                return $title;
+            } else {
+                return $titleMain . '（' . $titleOther . '）';
+            }
         } else {
             return $title;
         }
