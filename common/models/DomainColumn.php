@@ -130,7 +130,9 @@ class DomainColumn extends Base
                     $arr[0] = $item;
                 } else {
                     $arr[$key + 1] = $item;
-                    $arr[$key + 1]['name'] = '/' . $item['name'];
+                    if ($from != 'fan') {
+                        $arr[$key + 1]['name'] = '/' . $item['name'];
+                    }
                 }
             }
 

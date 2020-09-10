@@ -25,7 +25,7 @@ class Fan extends BaseController
 
         $dataStr = "'rules' => [";
 
-        foreach (DomainColumn::getColumn($domainId) as $item) {
+        foreach (DomainColumn::getColumn($domainId,'','fan') as $item) {
             if ($item['name'] == 'label') {
                 $dataStr .= "
                 '" . $item['name'] . "' => '/fan/tags-list',        
