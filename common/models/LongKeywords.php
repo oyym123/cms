@@ -622,34 +622,37 @@ class LongKeywords extends Base
                                     $saveData[0]['title'] = str_replace(',', '', $saveData[0]['title']);
                                     $saveData[0]['title'] = $saveData[0]['title'] . ',' . $arrTitle[0];
 
-//                                    $bd = AllBaiduKeywords::findOne($longKeyword['id']);
-//                                    $bd->domain_id = $column['domain_id'];
-//                                    $bd->column_id = $column['id'];
-//                                    $bd->save();
+                                    $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+                                    $bd->domain_id = $column['domain_id'];
+                                    $bd->column_id = $column['id'];
+                                    $bd->save();
+
+                                    PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
 
 //                                    echo '<pre>';
 //                                    print_r($saveData);
 //                                    exit;
-                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
-                                    //推送至远程线上
-                                    $res = Tools::curlPost($urlPush, $saveData[0]);
-//                                  PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+//                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
+//                                    //推送至远程线上
+//                                    $res = Tools::curlPost($urlPush, $saveData[0]);
+
                                 }
                             } else {
                                 Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
-                                //推送至远程线上
-                                $res = Tools::curlPost($urlPush, $saveData[0]);
-                                print_r($res);
-                                exit;
 
-//                                $bd = AllBaiduKeywords::findOne($longKeyword['id']);
-//                                $bd->domain_id = $column['domain_id'];
-//                                $bd->column_id = $column['id'];
-//                                $bd->save();
-////                                    echo ' < pre>';
-////                                    print_r($saveData);
-////                                    exit;
-//                                PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
+//                                //推送至远程线上
+//                                $res = Tools::curlPost($urlPush, $saveData[0]);
+//                                print_r($res);
+//                                exit;
+
+                                $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+                                $bd->domain_id = $column['domain_id'];
+                                $bd->column_id = $column['id'];
+                                $bd->save();
+//                                    echo ' < pre>';
+//                                    print_r($saveData);
+//                                    exit;
+                                PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                             }
 //                            exit;
 //                            sleep(1);
