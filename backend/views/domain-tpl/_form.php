@@ -99,13 +99,7 @@ use yii\widgets\ActiveForm;
 
     $("#domaintpl-tpl_id").change(function () {
         var html = '';
-        $("#domaintpl-t_inside").hide();
-        $("#domaintpl-t_home").hide();
-        $("#domaintpl-t_detail").hide();
-        $("#domaintpl-t_common").hide();
-        $("#domaintpl-t_tags").hide();
-        $("#domaintpl-t_list").hide();
-        $("#domaintpl-t_customize").hide();
+       
     });
 </script>
 
