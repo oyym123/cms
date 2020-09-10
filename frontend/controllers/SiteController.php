@@ -278,7 +278,7 @@ class SiteController extends Controller
         $this->layout = $layout;
 
         foreach ($models as &$item) {
-            $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
