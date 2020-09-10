@@ -15,14 +15,13 @@ use yii\widgets\ActiveForm;
     <?php
 
     if (strpos(Yii::$app->request->url, 'create') !== false) {
-        $model->start_tags = 'jaks';
-        $model->end_tags = 'mq';
+        $model->start_tags = \common\models\Tools::makeCode(3);
+        $model->end_tags = \common\models\Tools::makeCode(2);
         $model->is_jump = 0;
         $model->jump_url = 'http://www.baidu.com';
     }
 
     echo $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'zh_name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'intro')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'ip')->textInput(['maxlength' => true]) ?>

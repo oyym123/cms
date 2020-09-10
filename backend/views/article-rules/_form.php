@@ -10,11 +10,23 @@ use yii\widgets\ActiveForm;
 
 <div class="article-rules-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin();
+
+    if (strpos(Yii::$app->request->url, 'create') !== false) {
+        $model->one_page_num_min = 10;
+        $model->one_page_num_max = 20;
+        $model->one_page_word_min = 20;
+        $model->one_page_word_max = 5000;
+        $model->one_day_push_num = 50;
+        $model->push_time_sm = '12:00';
+        $model->push_time_bd = '12:00';
+    }
+    ?>
+
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'category_id')->dropDownList(\common\models\Category::getCate(),['prompt' => '--请选择分类--']) ?>
+<!--    --><?//= $form->field($model, 'category_id')->dropDownList(\common\models\Category::getCate(),['prompt' => '--请选择分类--']) ?>
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
 

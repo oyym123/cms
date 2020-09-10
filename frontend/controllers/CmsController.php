@@ -9,6 +9,8 @@ use common\models\BlackArticle;
 use common\models\CmsAction;
 use common\models\DbName;
 use common\models\DirCatch;
+use common\models\Domain;
+use common\models\DomainColumn;
 use common\models\KeywordLongAll;
 use common\models\Keywords;
 use common\models\LongKeywords;
@@ -221,5 +223,17 @@ class CmsController extends Controller
     }
 
 
-
+    public function actionCleanData()
+    {
+        $models = DomainColumn::find()->all();
+        foreach ($models as $column) {
+            if ($column->name == 'jaks') {
+                $domain = Domain::find()->where(['id' => $column->domain_id])->one();
+                if (!empty($domain)) {
+                    $column->name = $domain->start_tags;
+                    $column->save(false);
+                }
+            }
+        }
+    }
 }

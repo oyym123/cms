@@ -18,7 +18,7 @@ class DomainColumnSearch extends DomainColumn
     {
         return [
             [['id', 'domain_id', 'user_id', 'status'], 'integer'],
-            [['name', 'tags', 'domain_name', 'created_at', 'updated_at','zh_name'], 'safe'],
+            [['name', 'tags', 'domain_name', 'created_at', 'updated_at', 'zh_name', 'type'], 'safe'],
         ];
     }
 
@@ -67,6 +67,7 @@ class DomainColumnSearch extends DomainColumn
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
+            ->andFilterWhere(['like', 'type', $this->type])
             ->andFilterWhere(['like', 'zh_name', $this->zh_name])
             ->andFilterWhere(['like', 'tags', $this->tags])
             ->andFilterWhere(['like', 'domain_name', $this->domain_name]);

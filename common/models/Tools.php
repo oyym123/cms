@@ -459,4 +459,14 @@ class Tools extends \yii\db\ActiveRecord
             return $title;
         }
     }
+
+    public static function makeCode($num = 4)
+    {
+        $re = '';
+        $s = 'abcdefghijklmnopqrstuvwxyz';
+        while (strlen($re) < $num) {
+            $re .= $s[rand(0, strlen($s) - 1)]; //从$s中随机产生一个字符
+        }
+        return $re;
+    }
 }

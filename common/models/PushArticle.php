@@ -148,7 +148,7 @@ class PushArticle extends Modelx
 
         foreach ($article as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/wen/' . $item['id'] . '.html';
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
         return $article;

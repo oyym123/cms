@@ -28,5 +28,5 @@ return [
     'online_reptile_url' => 'http://pa.jk8818.com',
     'local_reptile_url' => 'http://127.0.0.1:88',
     'local_fan_url' => 'http://127.0.0.1:89',
-    'online_fan_url' => 'http://0ww9.com',
+    'online_fan_url' => 'http://www.0ww9.com',
 ];

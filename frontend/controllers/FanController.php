@@ -91,7 +91,7 @@ class FanController extends Controller
 
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
-            $model['content'] = str_replace(['。'], ['。<br/><br/>'], $model['content']);
+            $model['content'] = str_replace(['。'], ['。<br/>'], $model['content']);
 
 //            //前面转换
 //            $upArr = [

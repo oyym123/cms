@@ -34,7 +34,8 @@ class DomainTpl extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'domain_id', 'column_id', 't_home', 't_common', 't_detail', 't_inside','t_tags', 't_list', 'cate',], 'required'],
+           // [['id', 'domain_id', 'column_id', 't_home', 't_common', 't_detail', 't_inside','t_tags', 't_list', 'cate',], 'required'],
+            [['id', 'domain_id', 'column_id',  'cate',], 'required'],
             [['domain_id', 'template_id', 'column_id', 'type', 'status', 'user_id', 'tpl_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['en_name'], 'unique'],
