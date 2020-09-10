@@ -124,7 +124,7 @@ class PushArticle extends Modelx
             }
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] ='/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
         return $article;
@@ -140,7 +140,7 @@ class PushArticle extends Modelx
     public static function newArticle($num = 10)
     {
         $article = PushArticle::find()
-            ->select('id,title_img,push_time,title')
+            ->select('id,title_img,push_time,column_name,title')
             ->limit($num)
             ->orderBy('id desc')
             ->asArray()
