@@ -147,7 +147,7 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
-                'title' => $model['keywords'],
+                'title' => $model['title'],
                 'keywords' => $model['keywords'],
                 'description' => $desc,
                 'og_type' => 'news',
