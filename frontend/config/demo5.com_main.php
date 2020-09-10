@@ -45,6 +45,10 @@ return [
                 'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
                 
+                'jaks' => '/fan',
+                'jaks/<id:\d+>.html' => '/fan/detail',            
+                'jaks/index_<id:\d+>.html' => '/fan',
+                
                 'index_<id:\d+>.html' => '/site/index',
                 'site.xml' => '/site/site-xml',
                 'site.txt' => '/site/site-txt',

@@ -25,7 +25,7 @@ class Fan extends BaseController
 
         $dataStr = "'rules' => [";
 
-        foreach (DomainColumn::getColumn($domainId,'','fan') as $item) {
+        foreach (DomainColumn::getColumn($domainId, '', 'fan') as $item) {
             if ($item['name'] == 'label') {
                 $dataStr .= "
                 '" . $item['name'] . "' => '/fan/tags-list',        
@@ -52,6 +52,7 @@ class Fan extends BaseController
                 'site.txt' => '/site/site-txt',
                 'm_site.xml' => '/site/site-mxml',
                 'm_site.txt' => '/site/site-mtxt',
+                'favicon.ico' => '/site/favicon',
                 //end 正则注释识别 勿删" . $domainInfo;
         $res = preg_replace("@'rules'(.*)?//end 正则注释识别 勿删(.*)?&end_url@s", $dataStr, $main);
         file_put_contents(__DIR__ . '/../../frontend/config/' . $topDomain . '_main.php', $res);
@@ -87,6 +88,15 @@ class Fan extends BaseController
         return [$layout, $render];
     }
 
+    public static function refreshAll()
+    {
+        //刷新所有的规则
+        $domain = Domain::find()->all();
+        foreach ($domain as $item) {
+            echo $item->name . '生成规则<br/>';
+            self::getRules($item->id);
+        }
+    }
 
     /** 进行一切初始化操作 */
     public function init()

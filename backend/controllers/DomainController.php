@@ -84,7 +84,7 @@ class DomainController extends Controller
                 'tags' => '泛目录',
                 'domain_id' => $model->id,
             ];
-            
+
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
             //自动创建一个label
@@ -168,5 +168,10 @@ class DomainController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionRefresh()
+    {
+        Fan::refreshAll();
     }
 }

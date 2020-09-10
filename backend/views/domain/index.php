@@ -9,8 +9,10 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = '域名';
+
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<a target="_blank" href="/index.php/domain/refresh">刷新所有跳转规则</a>
 <div class="domain-index">
     <h1><?= Html::encode($this->title) ?></h1>
     <p>
@@ -25,10 +27,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'name:url',
             'ip',
+            'start_tags',
+            'end_tags',
+            'zh_name',
+            'end_tags',
             [
                 'label' => '状态',
                 'attribute' => 'status',

@@ -45,6 +45,18 @@ return [
                 'home/<id:\d+>.html' => '/fan/detail',            
                 'home/index_<id:\d+>.html' => '/fan',
                 
+                'animals' => '/fan',
+                'animals/<id:\d+>.html' => '/fan/detail',            
+                'animals/index_<id:\d+>.html' => '/fan',
+                
+                'flowers' => '/fan',
+                'flowers/<id:\d+>.html' => '/fan/detail',            
+                'flowers/index_<id:\d+>.html' => '/fan',
+                
+                'water' => '/fan',
+                'water/<id:\d+>.html' => '/fan/detail',            
+                'water/index_<id:\d+>.html' => '/fan',
+                
                 'index_<id:\d+>.html' => '/site/index',
                 'site.xml' => '/site/site-xml',
                 'site.txt' => '/site/site-txt',
