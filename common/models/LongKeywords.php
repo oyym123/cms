@@ -535,7 +535,7 @@ class LongKeywords extends Base
                     ])
                         ->andWhere(['>', 'm_pv', 0])
                         ->andWhere(['<=', 'm_pv', 10])
-                        ->andWhere(['catch_status' => 10])
+                        ->andWhere(['status' => 10])
                         ->andWhere(['column_id' => 0])
                         ->limit(3)
                         ->asArray()
