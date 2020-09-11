@@ -284,7 +284,9 @@ class SiteController extends Controller
             $andWhere = ['between', 'id', $minRand, $maxRand];
         }
 
-        $query = PushArticle::find()->andWhere($andWhere)->limit(10);
+        $andWhere = [];
+        $query = PushArticle::find()->select('id,column_id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')
+            ->andWhere($andWhere)->orderBy('Rand()')->limit(10);
 
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
@@ -296,8 +298,18 @@ class SiteController extends Controller
         list($layout, $render) = Fan::renderView(Template::TYPE_HOME);
         $this->layout = $layout;
         $url = Tools::getLocalUrl(1);
+
+        $columnZhName = '';
+        if (!empty($models)) {
+            $columnObj = DomainColumn::findOne($models[0]['column_id']);
+            if (!empty($columnObj)) {
+                $columnZhName = $columnObj->zh_name;
+                $columnEnName = $columnObj->name;
+            }
+        }
+
         foreach ($models as &$item) {
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
@@ -311,8 +323,9 @@ class SiteController extends Controller
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
             }
+
             $item['column_info'] = [
-                'name' => $columnName,
+                'name' => $column->zh_name,
                 'url' => $url
             ];
         }
@@ -320,11 +333,10 @@ class SiteController extends Controller
         $res = [
             'home_list' => $models,
             'column_info' => [
-                'name' => $columnName,
+                'name' => $columnZhName,
                 'url' => $url
             ],
         ];
-
 
         $view = Yii::$app->view;
 

@@ -107,12 +107,21 @@ class PushArticle extends Modelx
     public static function hotArticle($num = 10)
     {
         $article = PushArticle::find()
-            ->select('key_id,id,user_id,title_img,push_time,title,column_name')
+            ->select('key_id,id,user_id,title_img,push_time,title,column_id,column_name')
             ->orderBy('user_id desc')
             ->where(['like', 'title_img', 'http'])
             ->asArray()
             ->limit($num)
             ->all();
+
+        $columnZhName = '';
+        if (!empty($article)) {
+            $columnObj = DomainColumn::findOne($article[0]['column_id']);
+            if (!empty($columnObj)) {
+                $columnZhName = $columnObj->zh_name;
+                $columnEnName = $columnObj->name;
+            }
+        }
 
         foreach ($article as $key => &$item) {
             if ($user = FanUser::findOne($item['user_id'])) {
@@ -124,7 +133,7 @@ class PushArticle extends Modelx
             }
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
         }
 
         return $article;
@@ -140,15 +149,25 @@ class PushArticle extends Modelx
     public static function newArticle($num = 10)
     {
         $article = PushArticle::find()
-            ->select('id,title_img,push_time,column_name,title')
+            ->select('id,title_img,push_time,column_name,column_id,title')
             ->limit($num)
             ->orderBy('id desc')
             ->asArray()
             ->all();
 
+        $columnZhName = '';
+        if (!empty($article)) {
+            $columnObj = DomainColumn::findOne($article[0]['column_id']);
+            if (!empty($columnObj)) {
+                $columnZhName = $columnObj->zh_name;
+                $columnEnName = $columnObj->name;
+            }
+        }
+
+
         foreach ($article as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' .$columnEnName. '/' . $item['id'] . '.html';
         }
 
         return $article;
