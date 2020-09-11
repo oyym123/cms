@@ -202,13 +202,17 @@ class SiteController extends Controller
 
             $str = '';
             foreach ($data as $datum) {
-                $str .= $datum . '<br/>';
+                $str .= $datum . PHP_EOL;
             }
 
             //存入缓存文件
             file_put_contents($filePath, $str);
+            $str2 = '';
+            foreach ($data as $datum) {
+                $str2 .= $datum . '<br/>';
+            }
 
-            echo $str;
+            echo $str2;
 
         }
     }
@@ -238,14 +242,17 @@ class SiteController extends Controller
 
             $str = '';
             foreach ($data as $datum) {
-                $str .= $datum . '<br/>';
+                $str .= $datum . PHP_EOL;
             }
 
             //存入缓存文件
             file_put_contents($filePath, $str);
-
-            echo $str;
-            exit();
+            $str2 = '';
+            foreach ($data as $datum) {
+                $str2 .= $datum . '<br/>';
+            }
+            echo $str2;
+            exit;
         }
     }
 
