@@ -40,6 +40,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
+                'label' => '状态',
+                'attribute' => 'status',
+                'filter' => \common\models\Base::getBaseStatus(),
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    if ($model->status == \common\models\Base::STATUS_BASE_NORMAL) {
+                        return '<b style="color: green">已上线</b>';
+                    } else {
+                        return '<b style="color: red">测试中</b>';
+                    }
+                }
+            ],
+            [
                 'label' => '域名',
                 'attribute' => 'domain_id',
 
@@ -57,15 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
             //'push_time_sm',
             //'push_time_bd',
             //'use  r_id',
-            [
-                'label' => '状态',
-                'attribute' => 'status',
-                'filter' => \common\models\Base::getBaseStatus(),
-                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
-                'content' => function ($model, $key, $index, $column) {
-                    return \common\models\Base::getBaseStatus($model->status);
-                }
-            ],
+
 
             [
                 'label' => '拉取文章',
