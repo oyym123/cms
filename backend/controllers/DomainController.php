@@ -68,7 +68,15 @@ class DomainController extends Controller
     public function actionCreate()
     {
         $model = new Domain();
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post('Domain');
+            $oldDomain = Domain::find()->where(['name' => $post['name']])->one();
+            if (!empty($oldDomain)) {
+                Yii::$app->getSession()->setFlash('error', '该域名已经存在');
+                return $this->redirect(['create', 'model' => $model]);
+            }
+
+
             //自动创建一个home 类目
             $data = [
                 'name' => 'home',
@@ -106,6 +114,8 @@ class DomainController extends Controller
                 Yii::$app->getSession()->setFlash('error', $msg);
                 return $this->redirect(['create', 'model' => $model]);
             }
+
+            $model->save();
 
             //创建一个新push_article表
             $_GET['from_id'] = $model->id;

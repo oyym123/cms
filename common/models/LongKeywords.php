@@ -501,7 +501,7 @@ class LongKeywords extends Base
 
         //查询所有栏目
         $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
-//            'id' => 192,
+//            'id' => 90,
             'status' => self::STATUS_BASE_NORMAL,
         ])->asArray()->all();
 
@@ -536,7 +536,8 @@ class LongKeywords extends Base
                         ->andWhere(['>', 'm_pv', 0])
                         ->andWhere(['<=', 'm_pv', 20])
                         ->andWhere(['status' => 10])
-                        ->andWhere(['column_id' => 0])
+                        ->orderBy('Rand()')
+//                        ->andWhere(['column_id' => 0])
                         ->limit(10)
                         ->asArray()
                         ->all();
