@@ -110,6 +110,9 @@ class FanController extends Controller
 //            foreach ($upArr as $item) {
 //                $replaceArrUp[] = '<br/>' . $item;
 //            }
+            $upArr = ['知乎', '百度知道', '360', '头条'];
+
+            $model['content'] = str_replace($upArr, '', $model['content']);
 //
 //            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
 //
