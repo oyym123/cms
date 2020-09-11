@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'name',
             [
-                'label' => '类　　　　型',
+                'label' => '类　　　　　　　　型',
                 'attribute' => 'type',
                 'filter' => \common\models\DomainColumn::getType(),
                 'filterInputOptions' => ['prompt' => '所有类型', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
@@ -60,7 +60,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->domain->id . '【' . $model->domain->name . '】';
                 }
             ],
-            'column_id',
+            [
+                'label' => '栏　　　　　　　　　　　　　　　　目',
+                'attribute' => 'column_id',
+
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->column->id . '【' . $model->column->name . '】'. '【' . $model->column->zh_name . '】';
+                }
+            ],
             //'method_ids',
             //'one_page_num_min',
             //'one_page_num_max',
