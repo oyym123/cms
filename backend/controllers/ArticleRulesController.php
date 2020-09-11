@@ -3,6 +3,7 @@
 namespace backend\controllers;
 
 use common\models\DomainColumn;
+use common\models\LongKeywords;
 use common\models\NewsClass;
 use Yii;
 use common\models\ArticleRules;
@@ -138,5 +139,11 @@ class ArticleRulesController extends Controller
         }
         echo json_encode($arr);
         exit;
+    }
+
+    /** 获取文章 */
+    public function actionArticle()
+    {
+        LongKeywords::setRules(\Yii::$app->request->get('column_id'));
     }
 }
