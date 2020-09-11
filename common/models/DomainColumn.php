@@ -179,4 +179,5 @@ class DomainColumn extends Base
         $res = DomainColumn::find()->where(['domain_id' => $domainId])->asArray()->all();
         return ArrayHelper::map($res, 'id', 'name');
     }
+
 }

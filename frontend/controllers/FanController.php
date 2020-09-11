@@ -241,9 +241,10 @@ class FanController extends Controller
             $minRand = rand($lastId - 280, $lastId - 201);
             $andWhere = ['between', 'id', $minRand, $maxRand];
         }
-
-        $query = PushArticle::find()->select('id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')
+        $andWhere = [];
+        $query = PushArticle::find()->select('id,column_id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')
             ->andWhere($andWhere)
+            ->orderBy('Rand()')
             ->andWhere(['column_id' => $column->id])
             ->limit(10);
 
@@ -254,9 +255,10 @@ class FanController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
+
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $column->name . '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
@@ -275,7 +277,7 @@ class FanController extends Controller
         $res = [
             'home_list' => $models,
             'column_info' => [
-                'name' => $columnName,
+                'name' => $column->zh_name,
                 'url' => Tools::getLocalUrl(1) . '/' . $columnName
             ],
         ];
@@ -493,16 +495,26 @@ class FanController extends Controller
     {
         $url = Yii::$app->request->url;
         if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $model = PushArticle::find()
-                ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time')
+            $modelInfo = PushArticle::find()
+                ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time,column_id')
                 ->where(['key_id' => $arr])
 //                ->andWhere(['like', 'title_img', 'http'])
                 ->asArray()->one();
 
+            $columnZhName = '';
+            $model = $modelInfo;
+            if (!empty($model)) {
+                $columnObj = DomainColumn::findOne($model['column_id']);
+                if (!empty($columnObj)) {
+                    $columnZhName = $columnObj->zh_name;
+                    $columnEnName = $columnObj->name;
+                }
+            }
+
             $model['title'] = Tools::getKTitle($model['title']);
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
-            $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $model['column_name'] . '/' . $model['id'] . '.html';
+            $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
             if ($user = FanUser::findOne($model['user_id'])) {
@@ -515,7 +527,7 @@ class FanController extends Controller
             $res = [
                 'data' => $model
             ];
-            
+
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
                 'title' => $model['keywords'],
@@ -523,6 +535,10 @@ class FanController extends Controller
                 'intro' => $model['keywords'],
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
+
+            if (empty($modelInfo)) {
+                return $this->render($render, ['models' => ['data' => ['title' => '没有内容了!']]]);
+            }
 
             return $this->render($render, ['models' => $res]);
         }
