@@ -26,7 +26,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-<!--    --><?//= $form->field($model, 'category_id')->dropDownList(\common\models\Category::getCate(),['prompt' => '--请选择分类--']) ?>
+    <!--    --><? //= $form->field($model, 'category_id')->dropDownList(\common\models\Category::getCate(),['prompt' => '--请选择分类--']) ?>
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
 
@@ -56,6 +56,7 @@ use yii\widgets\ActiveForm;
     <!---->
     <!--    --><? //= $form->field($model, 'updated_at')->textInput() ?>
 
+    <?= $form->field($model, 'status')->radioList(\common\models\Base::getBaseS(), ['maxlength' => true])->hint('测试成功改为正常') ?>
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

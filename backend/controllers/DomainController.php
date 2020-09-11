@@ -76,6 +76,7 @@ class DomainController extends Controller
                 return $this->redirect(['create', 'model' => $model]);
             }
 
+            $model->save();
 
             //自动创建一个home 类目
             $data = [
@@ -101,6 +102,7 @@ class DomainController extends Controller
                 'tags' => '标签',
                 'domain_id' => $model->id,
             ];
+      
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
             if ($codeFan < 0) {
@@ -115,7 +117,7 @@ class DomainController extends Controller
                 return $this->redirect(['create', 'model' => $model]);
             }
 
-            $model->save();
+
 
             //创建一个新push_article表
             $_GET['from_id'] = $model->id;
