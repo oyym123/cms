@@ -275,7 +275,6 @@ class BaiduKeywords extends \yii\db\ActiveRecord
             ->asArray()
             ->all();
 
-
         foreach ($bd as $item) {
             $long = AllBaiduKeywords::find()
                 ->select('id,keywords as name, type as type_name,from_keywords as keywords,m_pv')
@@ -284,7 +283,7 @@ class BaiduKeywords extends \yii\db\ActiveRecord
                     '>', 'm_pv', 0
                 ])
                 ->andWhere([
-                    '<=', 'm_pv', 10
+                    '<=', 'm_pv', 20
                 ])
                 ->andWhere([
                     'status' => 1
