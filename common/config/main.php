@@ -9,7 +9,9 @@ return [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-
+        'errorHandler' => [
+            'errorAction' => 'site/error',
+        ],
         'redis' => [
             'class' => 'yii\redis\Connection',
             'hostname' => 'localhost',
