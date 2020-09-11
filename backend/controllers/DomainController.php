@@ -102,7 +102,7 @@ class DomainController extends Controller
                 'tags' => '标签',
                 'domain_id' => $model->id,
             ];
-      
+
             list($codeFan, $msgFan) = DomainColumn::createOne($data);
 
             if ($codeFan < 0) {

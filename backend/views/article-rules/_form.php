@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'domain_id')->dropDownList(\common\models\Domain::getDomianName(), ['prompt' => '--请选择数据库--']) ?>
 
-    <?= $form->field($model, 'column_id')->dropDownList([], ['prompt' => '--请选择栏目--']) ?>
+    <?= $form->field($model, 'column_id')->dropDownList([\common\models\DomainColumn::getColumnData($model->domain_id)], ['prompt' => '--请选择栏目--']) ?>
 
     <?= $form->field($model, 'method_ids')->checkboxList(\common\models\ArticleWay::getWayName(), ['class' => 'label-group']) ?>
 
@@ -56,7 +56,7 @@ use yii\widgets\ActiveForm;
     <!---->
     <!--    --><? //= $form->field($model, 'updated_at')->textInput() ?>
 
-    <?= $form->field($model, 'status')->radioList(\common\models\Base::getBaseS(), ['maxlength' => true])->hint('测试成功改为正常') ?>
+    <?= $form->field($model, 'status')->radioList(\common\models\Base::getBaseStatus(), ['maxlength' => true])->hint('测试成功改为正常') ?>
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>
