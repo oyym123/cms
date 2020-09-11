@@ -30,8 +30,23 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'name',
-            'category_id',
-            'domain_id',
+            [
+                'label' => '类　　　　型',
+                'attribute' => 'type',
+                'filter' => \common\models\DomainColumn::getType(),
+                'filterInputOptions' => ['prompt' => '所有类型', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->column->type . '【' . \common\models\DomainColumn::getType($model->column->type) . '】';
+                }
+            ],
+            [
+                'label' => '域名',
+                'attribute' => 'domain_id',
+
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->domain->id . '【' . $model->domain->name . '】';
+                }
+            ],
             'column_id',
             //'method_ids',
             //'one_page_num_min',
@@ -51,12 +66,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     return \common\models\Base::getBaseStatus($model->status);
                 }
             ],
+
             [
                 'label' => '拉取文章',
                 'attribute' => 'status',
 
                 'content' => function ($model, $key, $index, $column) {
-                    return '<a target="_blank" href="/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
+                    return '<a target="_blank" href="http://192.168.74.5/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
                 }
             ],
 

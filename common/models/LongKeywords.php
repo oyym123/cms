@@ -497,7 +497,7 @@ class LongKeywords extends Base
      */
     public static function setRules($columnId = 0)
     {
-
+//        $columnId =136;
         set_time_limit(0);
         $urlPush = \Yii::$app->params['online_fan_url'] . '/article/pull';
         $andWhere = [];
@@ -541,12 +541,12 @@ class LongKeywords extends Base
                 $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id')->where([
                     'type' => $column['type'],
                 ])
-                    ->andWhere(['>', 'm_pv', 0])
+                    ->andWhere(['>=', 'm_pv', 0])
                     ->andWhere(['<=', 'm_pv', 20])
                     ->andWhere(['status' => 10])
                     ->orderBy('Rand()')
 //                        ->andWhere(['column_id' => 0])
-                    ->limit(10)
+                    ->limit(20)
                     ->asArray()
                     ->all();
 
@@ -647,9 +647,9 @@ class LongKeywords extends Base
 //                                PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                                 PushArticle::setArticle($saveData[0]);
 
-//                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
-//                                    //推送至远程线上
-//                                    $res = Tools::curlPost($urlPush, $saveData[0]);
+                                Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
+                                //推送至远程线上
+                                $res = Tools::curlPost($urlPush, $saveData[0]);
 
                             }
                         } else {
@@ -659,10 +659,8 @@ class LongKeywords extends Base
 //                                print_r($saveData);
 //                                exit;
 
-//                                //推送至远程线上
-//                                $res = Tools::curlPost($urlPush, $saveData[0]);
-//                                print_r($res);
-//                                exit;
+                            //推送至远程线上
+                            $res = Tools::curlPost($urlPush, $saveData[0]);
 
                             PushArticle::setArticle($saveData[0]);
 
@@ -676,7 +674,8 @@ class LongKeywords extends Base
 //                            exit;
 //                            sleep(1);
                     } else {
-                        Tools::writeLog('保存失败!' . $longKeyword->name, 'set_rules.log');
+                        Tools::writeLog('保存失败!' . $longKeyword['name'], 'set_rules.log');
+                        echo '保存失败!';
                         $doubleK = [];
 //                            echo ' < pre>';
 //                            var_export($data);

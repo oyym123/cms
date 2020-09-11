@@ -124,7 +124,7 @@ class PushArticle extends Modelx
             }
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] ='/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
         }
 
         return $article;
@@ -219,7 +219,8 @@ class PushArticle extends Modelx
             $bd->column_id = $data['column_id'];
             $bd->save();
             PushArticle::batchInsertOnDuplicatex($data['domain_id'], [$data]);
+        } else {
+            echo '该词已被' . $bd->domain_id . '使用!';
         }
     }
-
 }
