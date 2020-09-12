@@ -91,7 +91,8 @@ class FanController extends Controller
 
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
-            $model['content'] = str_replace(['。'], ['。<br/>'], $model['content']);
+
+            $model['content'] = str_replace(['。'], ['。<p>'], $model['content']);
 
 //            //前面转换
 //            $upArr = [
@@ -110,6 +111,7 @@ class FanController extends Controller
 //            foreach ($upArr as $item) {
 //                $replaceArrUp[] = '<br/>' . $item;
 //            }
+
             $upArr = ['知乎', '百度知道', '360', '头条'];
 
             $model['content'] = str_replace($upArr, '', $model['content']);
@@ -269,7 +271,7 @@ class FanController extends Controller
 
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' . $columnEnName. '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {

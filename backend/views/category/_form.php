@@ -12,12 +12,12 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'pid')->label('一级父类')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择一级父类--']) ?>
+    <?= $form->field($model, 'pid')->label('一级父类')->dropDownList(\common\models\Category::getCatePid(0)) ?>
 
-    <?= $form->field($model, 'pid2')->label('二级')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择二级父类--']) ?>
+    <?= $form->field($model, 'pid2')->label('二级')->dropDownList(\common\models\Category::getCate($model->pid3, 0)) ?>
 
-    <?= $form->field($model, 'pid3')->label('三级')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择三级父类--']) ?>
-    
+    <?= $form->field($model, 'pid3')->label('三级')->dropDownList(\common\models\Category::getCate($model->pid4, 0)) ?>
+
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'intro')->textInput(['maxlength' => true]) ?>
