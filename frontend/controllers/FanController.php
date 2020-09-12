@@ -258,8 +258,6 @@ class FanController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
-
-
         $columnZhName = '';
         if (!empty($models)) {
             $columnObj = DomainColumn::findOne($models[0]['column_id']);

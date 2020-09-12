@@ -326,7 +326,7 @@ class SiteController extends Controller
 
             $item['column_info'] = [
                 'name' => $columnZhName,
-                'url' => $url
+                'url' => '/' . $columnEnName 
             ];
         }
 
