@@ -70,20 +70,31 @@ class CategoryController extends Controller
         if ($model->load($post)) {
             $data = $post['Category'];
 
-            if ($data['pid2'] != 0 && $data['pid3'] !=0) {
-
+            if ($data['pid'] != 0 && $data['pid2'] == 0) {
+                $model->pid = $data['pid2'];
+                $model->level = 2;
             }
 
-            if ($data['pid3'] == 1) {
-
+            //表示该分类是2级
+            if ($data['pid2'] != 0 && $data['pid3'] != 0) {
+                $model->pid = $data['pid3'];
+                $model->level = 3;
             }
 
-            echo '<pre>';
-            print_r($post);
-            exit;
+            //表示该分类是3级
+            if ($data['pid3'] != 0) {
+                $model->pid = $data['pid3'];
+                $model->level = 4;
+            }
+
+            $model->pid2 = $data['pid'];
+            $model->pid3 = $data['pid2'];
+            $model->pid4 = $data['pid3'];
+
             if ($model->save()) {
 
             }
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -157,5 +168,37 @@ class CategoryController extends Controller
         }
         echo json_encode($arr);
         exit;
+    }
+
+    /** 获取模板 */
+    public function actionGetCategory()
+    {
+        $q = Yii::$app->request->get('q', '');
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!$q) {
+            return $out;
+        }
+
+        $data = Category::find()
+            ->where([
+                'status' => Base::STATUS_BASE_NORMAL,
+            ])
+            ->select('id,level,name as text,name,pid2')
+            ->andFilterWhere(['like', 'name', $q])
+            ->limit(30)
+            ->asArray()
+            ->all();
+
+        foreach ($data as &$item) {
+            $topName = Category::findOne($item['pid2']);
+            if ($topName) {
+                $tname = $topName->name;
+            }
+            $item['text'] = '<strong>' . $item['text'] . '</strong>        　等级:' . $item['level'] . '  　　顶级父类:' . $tname;
+        }
+
+        $out['results'] = array_values($data);
+        return $out;
     }
 }

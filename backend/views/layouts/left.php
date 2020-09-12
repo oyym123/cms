@@ -72,6 +72,7 @@
                             ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],
                         ]
                     ],
+                    ['label' => '敏感词库', 'icon' => 'dashboard', 'url' => ['/special-keywords/index']],
                     ['label' => 'CMS 推送日志', 'icon' => 'dashboard', 'url' => ['/mip-flag/index']],
                     ['label' => 'CMS 数据库', 'icon' => 'dashboard', 'url' => ['/db-name/index']],
                     ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],

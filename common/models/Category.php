@@ -35,7 +35,7 @@ class Category extends Base
     public function rules()
     {
         return [
-            [['pid', 'level', 'user_id', 'status','pid2','pid3','pid4','pid5'], 'integer'],
+            [['pid', 'level', 'user_id', 'status', 'pid2', 'pid3', 'pid4', 'pid5'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'en_name', 'intro'], 'string', 'max' => 255],
             [['en_name'], 'unique'],
@@ -63,7 +63,21 @@ class Category extends Base
     }
 
     /** 根据类型获取模板 */
-    public static function getCate($pid = 0)
+    public static function getCate($id = 0, $pid = 0)
+    {
+        if (!empty($id)) {
+            $dbs = self::find()->where([
+                'status' => self::STATUS_BASE_NORMAL,
+                'id' => $id
+            ])->asArray()->all();
+            return ArrayHelper::map($dbs, 'id', 'name');
+        } else {
+            return [0 => '请选择分类'];
+        }
+    }
+
+    /** 根据类型获取模板 */
+    public static function getCatePid($pid = 0)
     {
         $dbs = self::find()->where([
             'status' => self::STATUS_BASE_NORMAL,
