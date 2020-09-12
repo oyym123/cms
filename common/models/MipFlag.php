@@ -103,4 +103,46 @@ class MipFlag extends \yii\db\ActiveRecord
             return $model->getErrors();
         }
     }
+
+    /** 推送URL */
+    public static function pushUrl($domainId = 0)
+    {
+        if ($domainId) {
+            $where = [
+                'id' => $domainId
+            ];
+        }
+
+        $res = Domain::find()->where($where)->all();
+
+        $urls = $errorArr = [];
+        $info = [];
+
+        //获取所有的文章进行
+        foreach ($res as $re) {
+            //判断是否已经提交过了
+            $flag = MipFlag::checkIsMip($re->id, MipFlag::TYPE_TAG, $re->tagid);
+            if (!empty($flag)) { //表示已经提交过了
+                $errorArr[] = $re->tagid;
+            } else {
+                $info[] = [
+                    'type_id' => $re->tagid,
+//                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
+                ];
+
+            }
+        }
+
+        if (empty($urls)) {
+            Tools::writeLog($re->name . "没有更新的Tag链接可以提交");
+            return 1;
+        }
+
+        //获取第一条 推送，然后获取到剩余条数，根据剩余条数 再推送
+        $urlFirst = [$urls[0]];
+
+//        $resData = $this->push($db->baidu_token, $domain, $urlFirst);
+
+
+    }
 }

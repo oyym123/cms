@@ -325,7 +325,7 @@ class SiteController extends Controller
             }
 
             $item['column_info'] = [
-                'name' => $column->zh_name,
+                'name' => $columnZhName,
                 'url' => $url
             ];
         }
@@ -337,6 +337,7 @@ class SiteController extends Controller
                 'url' => $url
             ],
         ];
+
 
         $view = Yii::$app->view;
 

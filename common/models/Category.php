@@ -63,7 +63,7 @@ class Category extends Base
     }
 
     /** 根据类型获取模板 */
-    public static function getCate()
+    public static function getCate($pid)
     {
         $dbs = self::find()->where([
             'status' => self::STATUS_BASE_NORMAL,
