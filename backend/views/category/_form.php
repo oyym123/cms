@@ -12,21 +12,17 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'en_name')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'intro')->textInput(['maxlength' => true]) ?>
-
     <?= $form->field($model, 'pid')->label('一级父类')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择一级父类--']) ?>
 
     <?= $form->field($model, 'pid2')->label('二级')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择二级父类--']) ?>
 
     <?= $form->field($model, 'pid3')->label('三级')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择三级父类--']) ?>
+    
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'pid4')->label('四级')->dropDownList(\common\models\Category::getCate(0), ['prompt' => '--请选择四级--']) ?>
+    <?= $form->field($model, 'intro')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'level')->textInput() ?>
+    <?= $form->field($model, 'status')->radioList(\common\models\Base::getBaseStatus()) ?>
 
     <!--    --><? //= $form->field($model, 'user_id')->textInput() ?>
     <!---->
@@ -43,31 +39,54 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
-
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script>
     $("#category-pid").change(function () {
         var html = '';
         $.ajax({
-            url: '/index.php/category/get-name',
+            url: '/index.php/category/get-cate',
             type: 'GET',
             dataType: 'json',
-            data: {type: $("#template-type").find("option:selected").val(), cate: $('input:radio:checked').val()},
+            data: {id: $("#category-pid").find("option:selected").val()},
             success: function (msg) {
-                $("#category-pid2").val(msg.name);
+                $.each(msg, function (key, val) {
+                    html += '<option value="' + key + '">' + val + '</option>';
+                });
+                $("#category-pid2").html(html);
             }
         })
     });
 
-    $("#category-pid").change(function () {
+    $("#category-pid2").change(function () {
         var html = '';
         $.ajax({
-            url: '/index.php/category/get-name',
+            url: '/index.php/category/get-cate',
             type: 'GET',
             dataType: 'json',
-            data: {type: $("#template-type").find("option:selected").val(), cate: $('input:radio:checked').val()},
+            data: {id: $("#category-pid2").find("option:selected").val()},
             success: function (msg) {
-                $("#category-pid2").val(msg.name);
+                $.each(msg, function (key, val) {
+                    html += '<option value="' + key + '">' + val + '</option>';
+                });
+                $("#category-pid3").html(html);
             }
         })
     });
+
+    $("#category-pid3").change(function () {
+        var html = '';
+        $.ajax({
+            url: '/index.php/category/get-cate',
+            type: 'GET',
+            dataType: 'json',
+            data: {id: $("#category-pid3").find("option:selected").val()},
+            success: function (msg) {
+                $.each(msg, function (key, val) {
+                    html += '<option value="' + key + '">' + val + '</option>';
+                });
+                $("#category-pid4").html(html);
+            }
+        })
+    });
+
 </script>
