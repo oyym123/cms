@@ -273,21 +273,22 @@ class FanController extends Controller
             } else {
                 $item['nickname'] = '佚名';
                 $item['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
-                $item['column_info'] = [
-                    'name' => $column->zh_name,
-                    'url' => Tools::getLocalUrl(1) . '/' . $columnName
-                ];
-            }
-        }
 
+            }
+            $item['column_info'] = [
+                'name' => $columnZhName,
+                'url' => Tools::getLocalUrl(1) . '/' . $columnName
+            ];
+        }
 //        print_r( $this->layout );exit;
         $res = [
             'home_list' => $models,
             'column_info' => [
-                'name' => $column->zh_name,
+                'name' => $columnZhName,
                 'url' => Tools::getLocalUrl(1) . '/' . $columnName
             ],
         ];
+
 
         $view = Yii::$app->view;
 

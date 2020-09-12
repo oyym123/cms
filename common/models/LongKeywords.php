@@ -496,7 +496,7 @@ class LongKeywords extends Base
      */
     public static function setRules($columnId = 0)
     {
-        $columnId = 358;
+//        $columnId = 307;
         set_time_limit(0);
         $urlPush = \Yii::$app->params['online_fan_url'] . '/article/pull';
         $andWhere = [];
@@ -545,7 +545,7 @@ class LongKeywords extends Base
                     ->andWhere(['status' => 10])
                     ->orderBy('Rand()')
                     ->andWhere(['column_id' => 0])
-                    ->limit(20)
+                    ->limit(10)
                     ->asArray()
                     ->all();
 

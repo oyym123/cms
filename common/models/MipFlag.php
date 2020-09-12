@@ -127,7 +127,7 @@ class MipFlag extends \yii\db\ActiveRecord
             } else {
                 $info[] = [
                     'type_id' => $re->tagid,
-                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
+//                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
                 ];
 
             }
@@ -141,7 +141,7 @@ class MipFlag extends \yii\db\ActiveRecord
         //获取第一条 推送，然后获取到剩余条数，根据剩余条数 再推送
         $urlFirst = [$urls[0]];
 
-        $resData = $this->push($db->baidu_token, $domain, $urlFirst);
+//        $resData = $this->push($db->baidu_token, $domain, $urlFirst);
 
 
     }
