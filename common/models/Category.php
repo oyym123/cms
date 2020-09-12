@@ -35,7 +35,7 @@ class Category extends Base
     public function rules()
     {
         return [
-            [['pid', 'level', 'user_id', 'status'], 'integer'],
+            [['pid', 'level', 'user_id', 'status','pid2','pid3','pid4','pid5'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'en_name', 'intro'], 'string', 'max' => 255],
             [['en_name'], 'unique'],
@@ -63,10 +63,11 @@ class Category extends Base
     }
 
     /** 根据类型获取模板 */
-    public static function getCate($pid)
+    public static function getCate($pid = 0)
     {
         $dbs = self::find()->where([
             'status' => self::STATUS_BASE_NORMAL,
+            'pid' => $pid
         ])->asArray()->all();
         return ArrayHelper::map($dbs, 'id', 'name');
     }

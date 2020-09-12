@@ -124,4 +124,17 @@ class CategoryController extends Controller
 
         throw new NotFoundHttpException('The requested page does not exist.');
     }
+
+
+    public function actionGetCate()
+    {
+        $res = Category::find()->where(['pid' => Yii::$app->request->get('pid')])->asArray()->all();
+
+        $arr = [];
+        foreach ($res as $item) {
+            $arr[$item['id']] = $item['name'];
+        }
+        echo json_encode($arr);
+        exit;
+    }
 }
