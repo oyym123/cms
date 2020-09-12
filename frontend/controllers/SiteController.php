@@ -326,7 +326,7 @@ class SiteController extends Controller
 
             $item['column_info'] = [
                 'name' => $columnZhName,
-                'url' => '/' . $columnEnName 
+                'url' => '/' . $columnEnName
             ];
         }
 
@@ -334,7 +334,7 @@ class SiteController extends Controller
             'home_list' => $models,
             'column_info' => [
                 'name' => $columnZhName,
-                'url' => $url
+                'url' => '/' . $columnEnName
             ],
         ];
 

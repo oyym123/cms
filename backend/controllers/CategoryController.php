@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Base;
 use Yii;
 use common\models\Category;
 use common\models\search\CategorySearch;
@@ -65,8 +66,24 @@ class CategoryController extends Controller
     public function actionCreate()
     {
         $model = new Category();
+        $post = Yii::$app->request->post();
+        if ($model->load($post)) {
+            $data = $post['Category'];
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($data['pid2'] != 0 && $data['pid3'] !=0) {
+
+            }
+
+            if ($data['pid3'] == 1) {
+
+            }
+
+            echo '<pre>';
+            print_r($post);
+            exit;
+            if ($model->save()) {
+
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -128,10 +145,14 @@ class CategoryController extends Controller
 
     public function actionGetCate()
     {
-        $res = Category::find()->where(['pid' => Yii::$app->request->get('pid')])->asArray()->all();
+        $res = Category::find()->where([
+            'pid' => Yii::$app->request->get('id'),
+            'status' => Base::STATUS_BASE_NORMAL
+        ])->asArray()->all();
 
         $arr = [];
         foreach ($res as $item) {
+            $arr[0] = '请选择类型';
             $arr[$item['id']] = $item['name'];
         }
         echo json_encode($arr);

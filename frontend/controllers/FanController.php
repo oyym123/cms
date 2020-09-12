@@ -375,6 +375,10 @@ class FanController extends Controller
                 $item['is_hot'] = 1;
                 $item['is_top'] = 1;
                 $item['is_recommend'] = 1;
+                $item['column_info'] = [
+                    'name' => $columnZhName,
+                    'url' => Tools::getLocalUrl(1) . '/' . $columnEnName
+                ];
             }
         }
 
