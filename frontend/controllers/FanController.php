@@ -259,9 +259,19 @@ class FanController extends Controller
             ->asArray()->all();
 
 
+
+        $columnZhName = '';
+        if (!empty($models)) {
+            $columnObj = DomainColumn::findOne($models[0]['column_id']);
+            if (!empty($columnObj)) {
+                $columnZhName = $columnObj->zh_name;
+                $columnEnName = $columnObj->name;
+            }
+        }
+
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' . $column->name . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName. '/' . $item['id'] . '.html';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
@@ -346,10 +356,19 @@ class FanController extends Controller
             ->limit($pages->limit)
             ->asArray()->all();
 
+        $columnZhName = '';
+        if (!empty($models)) {
+            $columnObj = DomainColumn::findOne($models[0]['column_id']);
+            if (!empty($columnObj)) {
+                $columnZhName = $columnObj->zh_name;
+                $columnEnName = $columnObj->name;
+            }
+        }
+
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] = '/' . $item['column_name'] . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['push_time'] = Tools::formatTime(strtotime($item['push_time']));
