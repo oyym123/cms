@@ -346,7 +346,7 @@ class FanController extends Controller
      */
     public function user($userId, $domain)
     {
-        $query = PushArticle::find()->select('id,column_name,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
+        $query = PushArticle::find()->select('id,column_id,column_name,user_id,keywords,key_id,title_img,title,intro,push_time')->where(['user_id' => $userId])->limit(10);
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count()]);
 
