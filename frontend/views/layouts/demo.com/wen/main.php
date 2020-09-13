@@ -100,7 +100,7 @@ $domain = \common\models\Domain::getDomainInfo();
 
                     if ($item['name'] != 'home') {
                         ?>
-                        <li id="tabnav_btn_<?= $key + 1 ?>" class="<?= $active ?>"><a href="<?= '/' . $item['name'] ?>"
+                        <li id="tabnav_btn_<?= $key + 1 ?>" class="<?= $active ?>"><a href="<?=  $item['name'] ?>"
                                                                                       title=""><?= $item['zh_name'] ?></a>
                         </li>
                         <?php
