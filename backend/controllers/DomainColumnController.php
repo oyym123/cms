@@ -101,20 +101,12 @@ class DomainColumnController extends Controller
      */
     public function actionUpdate($id)
     {
+        set_time_limit(0);
         $model = $this->findModel($id);
         $post = Yii::$app->request->post()['DomainColumn'];
         if ($model->load(Yii::$app->request->post())) {
-            $old = DomainColumn::find()->where([
-                'domain_id' => $post['domain_id'],
-                'name' => $post['name']
-            ])->one();
-
-            if (!empty($old) && $old->id != $id) {
-                Yii::$app->getSession()->setFlash('error', '此域名已存在该栏目');
-                return $this->redirect(['update', 'id' => $model->id]);
-            }
-
-            if ($old->name != $post['name']) {
+            $modelOld = $this->findModel($id);
+            if ($modelOld->name != $post['name']) {
                 //将文章表所有的文章栏目名替换掉
                 PushArticle::replaceColumn($model);
             }
