@@ -215,6 +215,7 @@ class PushArticle extends Modelx
     /** 替换掉栏目名称 */
     public static function replaceColumn($column)
     {
+        $_GET['domain'] = 0;
         PushArticle::updateAllx($column->domain_id, ['column_name' => $column->name], ['column_id' => $column->id]);
     }
 
