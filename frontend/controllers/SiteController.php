@@ -98,17 +98,8 @@ class SiteController extends Controller
         $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
 
-        $columnZhName = '';
-        if (!empty($articles)) {
-            $columnObj = DomainColumn::findOne($articles[0]['column_id']);
-            if (!empty($columnObj)) {
-                $columnZhName = $columnObj->zh_name;
-                $columnEnName = $columnObj->name;
-            }
-        }
-
         foreach ($articles as $article) {
-            $urlPc = 'http://www.' . $domain . '/' . $columnEnName . '/' . $article['id'] . '.html';
+            $urlPc = 'http://www.' . $domain . '/' . $article['column_id'] . '/' . $article['id'] . '.html';
             $data .= '
                     <url>
                     <loc>' . $urlPc . '</loc>
@@ -158,17 +149,8 @@ class SiteController extends Controller
         $articles = PushArticle::find()->select('id,column_name,column_id,push_time')->limit($num)->orderBy('id desc')->all();
         $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
-        $columnZhName = '';
-        if (!empty($articles)) {
-            $columnObj = DomainColumn::findOne($articles[0]['column_id']);
-            if (!empty($columnObj)) {
-                $columnZhName = $columnObj->zh_name;
-                $columnEnName = $columnObj->name;
-            }
-        }
-
         foreach ($articles as $article) {
-            $urlM = 'http://m.' . $domain . '/' . $columnEnName . '/' . $article['id'] . '.html';
+            $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
 
             $data .= '
                     <url>
