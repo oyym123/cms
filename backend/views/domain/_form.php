@@ -27,6 +27,10 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'ip')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'start_tags')->textInput(['maxlength' => true])->hint('一旦创建请勿修改') ?>
     <?= $form->field($model, 'end_tags')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'baidu_token')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'baidu_password')->passwordInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'baidu_account')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'mip_time')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'is_jump')->radioList(\common\models\Base::getBaseS(), ['maxlength' => true])->hint('请确保有流量时才开启') ?>
     <?= $form->field($model, 'jump_url')->textInput(['maxlength' => true]) ?>
 

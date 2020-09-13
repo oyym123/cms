@@ -32,4 +32,10 @@ class Base extends \yii\db\ActiveRecord
         return $key === 'all' ? $data : $data[$key];
     }
 
+    public static function dd($data)
+    {
+        echo '<pre>';
+        print_r($data);
+        exit;
+    }
 }

@@ -14,6 +14,7 @@ use common\models\DomainColumn;
 use common\models\KeywordLongAll;
 use common\models\Keywords;
 use common\models\LongKeywords;
+use common\models\MipFlag;
 use common\models\NewsClass;
 use common\models\NewsClassTags;
 use common\models\NewsData;
@@ -225,15 +226,20 @@ class CmsController extends Controller
 
     public function actionCleanData()
     {
-        $models = DomainColumn::find()->all();
-        foreach ($models as $column) {
-            if ($column->name == 'jaks') {
-                $domain = Domain::find()->where(['id' => $column->domain_id])->one();
-                if (!empty($domain)) {
-                    $column->name = $domain->start_tags;
-                    $column->save(false);
-                }
-            }
-        }
+//        $models = DomainColumn::find()->all();
+//        foreach ($models as $column) {
+//            if ($column->name == 'jaks') {
+//                $domain = Domain::find()->where(['id' => $column->domain_id])->one();
+//                if (!empty($domain)) {
+//                    $column->name = $domain->start_tags;
+//                    $column->save(false);
+//                }
+//            }
+//        }
+    }
+
+    public function actionPushMip()
+    {
+        MipFlag::pushUrl(3);
     }
 }

@@ -18,7 +18,7 @@ use Yii;
  * @property string|null $created_at
  * @property string|null $updated_at 创建时间
  */
-class MipFlag extends \yii\db\ActiveRecord
+class MipFlag extends Base
 {
     const TYPE_ARTICLE = 1; //文章类型
     const TYPE_TAG = 2;     //标签类型
@@ -78,12 +78,11 @@ class MipFlag extends \yii\db\ActiveRecord
     }
 
     //查询是否已经推送过了
-    public static function checkIsMip($dbId, $type, $typeId)
+    public static function checkIsMip($dbId, $url)
     {
         $res = self::find()->where([
             'db_id' => $dbId,
-            'type' => $type,
-            'type_id' => $typeId,
+            'url' => $url,
         ])->one();
         return $res;
     }
@@ -104,6 +103,17 @@ class MipFlag extends \yii\db\ActiveRecord
         }
     }
 
+    public static function getAllUrl($name)
+    {
+        $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
+        $resM = array_filter(explode(PHP_EOL, file_get_contents($filePathM)));
+
+        $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
+
+        $resPc = array_filter(explode(PHP_EOL, file_get_contents($filePathPC)));
+        return [$resM, $resPc];
+    }
+
     /** 推送URL */
     public static function pushUrl($domainId = 0)
     {
@@ -113,36 +123,121 @@ class MipFlag extends \yii\db\ActiveRecord
             ];
         }
 
-        $res = Domain::find()->where($where)->all();
+        $errorArr = [];
+        $domains = Domain::find()->where($where)->all();
+        foreach ($domains as $domain) {
+            list($resM, $resPc) = self::getAllUrl($domain->name);
+            //获取所有的文章进行
+            foreach ($resPc as $re) {
+                //判断是否已经提交过了
+                $flag = MipFlag::checkIsMip($domain->id, MipFlag::TYPE_ARTICLE, $re);
+                if (!empty($flag)) {          //表示已经提交过了
+                    $errorArr[] = $re;
+                } else {
+                    $info[] = $re;
+                }
+            }
 
-        $urls = $errorArr = [];
-        $info = [];
-
-        //获取所有的文章进行
-        foreach ($res as $re) {
-            //判断是否已经提交过了
-            $flag = MipFlag::checkIsMip($re->id, MipFlag::TYPE_TAG, $re->tagid);
-            if (!empty($flag)) { //表示已经提交过了
-                $errorArr[] = $re->tagid;
+            //推送
+            $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], 'pc');
+            $jsonres = json_decode($resData);
+            Tools::writeLog($jsonres);
+            if ($jsonres->success >= 400) {
+                Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
+                return 1;
             } else {
-                $info[] = [
-                    'type_id' => $re->tagid,
-//                    'url' => $domain . '/e/tags/?tagid=' . $re->tagid,
+                Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+                //更新插入 标记已经推送过了
+                $saveData = [
+                    'db_id' => $domain->id,
+                    'db_name' => $domain->name,
+                    'type' => MipFlag::TYPE_TAG,
+                    'type_id' => 0,
+                    'url' => $info[0],
+                    'remain' => $jsonres->remain,
                 ];
+                MipFlag::createOne($saveData);
+                $remain = $jsonres->remain;
+            }
 
+            if ($remain == 0) {
+                Tools::writeLog($domain->name . "Tag推送次数用完");
+                return 1;
+            } else {
+                $urls = array_slice($info, 1, $remain);
+            }
+
+            exit;
+
+            //按照剩余次数进行推送
+            $resData = self::push($domain->baidu_token, $domain, $info);
+            $jsonres = json_decode($resData);
+
+            if ($jsonres->success >= 400) {
+                Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
+                return 1;
+            } else {
+                Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+                foreach ($urls as $key => $url) {
+                    if ($key > 0) {
+                        //更新插入 标记已经推送过了
+                        $saveData = [
+                            'db_id' => $domain->id,
+                            'db_name' => $domain->name,
+                            'type' => MipFlag::TYPE_TAG,
+                            'type_id' => 0,
+                            'url' => $url,
+                        ];
+                        MipFlag::createOne($saveData);
+                        $remain = $jsonres->remain;
+                    }
+                }
             }
         }
 
-        if (empty($urls)) {
-            Tools::writeLog($re->name . "没有更新的Tag链接可以提交");
-            return 1;
+        echo '<pre>';
+        print_r($errorArr);
+        exit;
+    }
+
+
+    //mip推送
+    public static function push($token, $domain, $urls, $type = 'm')
+    {
+        $domain = '0ww9.com';
+        if ($type == 'pc') {
+            $api = CmsAction::BAIDU_URL . '?site=http://m.' . $domain . '&token=' . $token;
+        } elseif ($type == 'm') {
+            $api = CmsAction::BAIDU_URL . '?site=http://www.' . $domain . '&token=' . $token;
         }
 
-        //获取第一条 推送，然后获取到剩余条数，根据剩余条数 再推送
-        $urlFirst = [$urls[0]];
+        $ch = curl_init();
+        $options = array(
+            CURLOPT_URL => $api,
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => implode("\n", $urls),
+            CURLOPT_HTTPHEADER => array('Content-Type: text/plain'),
+        );
+        curl_setopt_array($ch, $options);
+        $result = curl_exec($ch);
+        return $result;
+    }
 
-//        $resData = $this->push($db->baidu_token, $domain, $urlFirst);
-
-
+    //mip推送
+    public static function pushFast($token, $domain, $urls)
+    {
+        $api = CmsAction::BAIDU_URL . '?site=' . $domain . '&token=' . $token . '&type=daily';
+        $ch = curl_init();
+        $options = array(
+            CURLOPT_URL => $api,
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => implode("\n", $urls),
+            CURLOPT_HTTPHEADER => array('Content-Type: text/plain'),
+        );
+        curl_setopt_array($ch, $options);
+        $result = curl_exec($ch);
+        return $result;
     }
 }
