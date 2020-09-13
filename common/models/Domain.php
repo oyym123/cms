@@ -32,10 +32,10 @@ class Domain extends Base
     public function rules()
     {
         return [
-            [['name', 'end_tags', 'start_tags', 'jump_url','zh_name','intro'], 'required'],
+            [['name', 'end_tags', 'start_tags', 'jump_url', 'zh_name', 'intro'], 'required'],
             [['status', 'user_id', 'is_jump'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
-            [['name', 'ip'], 'string', 'max' => 255],
+            [['name', 'ip', 'baidu_token', 'mip_time', 'baidu_password', 'baidu_account'], 'string', 'max' => 255],
         ];
     }
 
@@ -56,6 +56,10 @@ class Domain extends Base
             'jump_url' => '流量化跳转时的地址',
             'status' => '状态',
             'user_id' => '创建者',
+            'baidu_token' => '推送token',
+            'baidu_password' => '百度账号密码',
+            'baidu_account' => '百度账号',
+            'mip_time' => '推送时间',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
