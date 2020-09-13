@@ -167,7 +167,7 @@ class PushArticle extends Modelx
 
         foreach ($article as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' .$columnEnName. '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
         }
 
         return $article;
@@ -210,6 +210,12 @@ class PushArticle extends Modelx
         //插入初始数据
         $db = Yii::$app->db;
         $db->createCommand($initSql)->execute();
+    }
+
+    /** 替换掉栏目名称 */
+    public static function replaceColumn($column)
+    {
+        PushArticle::updateAllx($column->domain_id, ['column_name' => $column->name], ['column_id' => $column->id]);
     }
 
     //拉取文章数据

@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\DomainTpl;
 use common\models\Fan;
+use common\models\PushArticle;
 use Yii;
 use common\models\DomainColumn;
 use common\models\search\DomainColumnSearch;
@@ -103,7 +104,6 @@ class DomainColumnController extends Controller
         $model = $this->findModel($id);
         $post = Yii::$app->request->post()['DomainColumn'];
         if ($model->load(Yii::$app->request->post())) {
-
             $old = DomainColumn::find()->where([
                 'domain_id' => $post['domain_id'],
                 'name' => $post['name']
@@ -112,6 +112,11 @@ class DomainColumnController extends Controller
             if (!empty($old) && $old->id != $id) {
                 Yii::$app->getSession()->setFlash('error', '此域名已存在该栏目');
                 return $this->redirect(['update', 'id' => $model->id]);
+            }
+
+            if ($old->name != $post['name']) {
+                //将文章表所有的文章栏目名替换掉
+                PushArticle::replaceColumn($model);
             }
 
             if ($model->save()) {
