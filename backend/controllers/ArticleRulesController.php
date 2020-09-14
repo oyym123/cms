@@ -69,7 +69,7 @@ class ArticleRulesController extends Controller
     {
         $model = new ArticleRules();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save(false)) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -91,7 +91,7 @@ class ArticleRulesController extends Controller
         $post = Yii::$app->request->post()['ArticleRules'];
         if ($model->load(Yii::$app->request->post())) {
             $model->method_ids = implode(',', $post['method_ids']);
-            if ($model->save()) {
+            if ($model->save(false)) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         }

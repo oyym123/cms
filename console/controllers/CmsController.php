@@ -117,7 +117,9 @@ class CmsController extends \yii\console\Controller
 
     public function actionSetRules()
     {
-        LongKeywords::setRules();
+        global $argv;
+        $domainId = $argv[2] ?? '';
+        LongKeywords::setRules($domainId);
     }
 
 

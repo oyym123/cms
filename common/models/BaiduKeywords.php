@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use function GuzzleHttp\Psr7\str;
 
 /**
  * This is the model class for table "baidu_keywords".
@@ -259,6 +260,8 @@ class BaiduKeywords extends Base
     /** 推送关键词 */
     public static function pushKeywords()
     {
+        set_time_limit(0);
+        ignore_user_abort();
         //233061
         //231954
 //        for ($i = 231954; $i <= 233061; $i++) {
@@ -294,10 +297,10 @@ class BaiduKeywords extends Base
             ->andWhere([
                 '>', 'type_id', 0
             ])
-            ->limit(1000)
+            ->orderBy('id desc')
+            ->limit(10000)
             ->asArray()
             ->all();
-
 
         //标记长尾词
         foreach ($long as $l) {
@@ -317,15 +320,16 @@ class BaiduKeywords extends Base
                         $arrTitle[] = $item;
                     }
                 }
-                print_r('下拉词  ' . $arrTitle[0]) . '<br/>';
+
+                $downKeywords = str_replace(',', '', $arrTitle[0]);
+                echo '下拉词:  ' . $downKeywords . '<br/>';
                 $all = AllBaiduKeywords::findOne($l['id']);
                 $all->status = 10;
                 $all->save(false);
-                LongKeywords::bdPushReptileNew($l, $l['pid'], $arrTitle[0]);
+                LongKeywords::bdPushReptileNew($l, $l['pid'], $downKeywords);
 //                    print_r($l);exit;
             }
         }
-
 //                echo '<pre>';
 //                print_r($l['name']);
 //                echo ' 1232 ';

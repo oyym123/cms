@@ -41,8 +41,8 @@ class ArticleRules extends Base
     public function rules()
     {
         return [
-            [['method_ids', 'domain_id', 'column_id'], 'required'],
-            [['one_page_num_min', 'one_page_num_max', 'one_page_word_min', 'one_page_word_max', 'one_day_push_num', 'user_id', 'status'], 'integer'],
+            [['method_ids', 'domain_id', 'column_id', 'category_id'], 'required'],
+            [['one_page_num_min', 'one_page_num_max', 'one_page_word_min', 'one_page_word_max', 'one_day_push_num', 'user_id', 'status', 'category_id'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'push_time_sm', 'push_time_bd'], 'string', 'max' => 255],
         ];
@@ -136,6 +136,13 @@ class ArticleRules extends Base
     {
         return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
     }
+
+    /** 获取类型 */
+    public function getCategory()
+    {
+        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+    }
+
 
     /** 获取类目 */
     public function getColumn()

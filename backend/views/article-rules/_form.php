@@ -33,7 +33,7 @@ use yii\widgets\ActiveForm;
                     return rs.taskId;
                 }"),
             'placeholder' => 'search ...',
-            'multiple' => true,
+            'multiple' => false,
             'allowClear' => true,
             'language' => [
                 'errorLoading' => new \yii\web\JsExpression("function () { return 'Waiting...'; }"),
