@@ -311,6 +311,9 @@ class BaiduKeywords extends Base
             if ($code < 0) {
                 echo '<pre>';
                 print_r($msg);
+                $all = AllBaiduKeywords::findOne($l['id']);
+                $all->status = 10;
+                $all->save(false);
                 LongKeywords::bdPushReptileNew($l, $l['pid']);
                 continue;
             } else {
