@@ -127,7 +127,10 @@ class DomainColumn extends Base
             //将home 放第一位
             foreach ($column as $key => $item) {
                 if ($item['name'] == 'home') {
-                    $item['name'] = '/';
+                    //表示真人浏览 则判断是否显示
+                    if ($from === 'person') {
+                        $item['name'] = '/';
+                    }
                     $arr[0] = $item;
                 } else {
                     $arr[$key + 1] = $item;
@@ -138,7 +141,7 @@ class DomainColumn extends Base
             }
 
             ksort($arr);
-  
+
             return $arr;
         }
 

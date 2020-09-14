@@ -25,7 +25,7 @@ return [
         'exchange' => 'kd_sms_send_ex',
         'queue' => 'kd_sms_send_q'
     ],
-    'online_reptile_url' => 'http://pa.jk8818.com',
+    'online_reptile_url' => 'http://116.193.169.122:999',
     'local_reptile_url' => 'http://127.0.0.1:88',
     'local_fan_url' => 'http://127.0.0.1:89',
     'online_fan_url' => 'http://www.0ww9.com',
