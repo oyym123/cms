@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\web\Controller;
 
 /**
  * This is the model class for table "long_keywords".
@@ -234,7 +235,7 @@ class LongKeywords extends Base
         if (!empty($resDown)) {
             $resDown = array_column($resDown, 'q');
         } else {
-            return [-1, '下拉词没有抓取成功'];
+            return [-1, $data['keywords'] . '    下拉词没有抓取成功'];
         }
 
         if ($from == 1) {
@@ -491,7 +492,6 @@ class LongKeywords extends Base
         return $this->hasOne(AllBaiduKeywords::className(), ['id' => 'key_id']);
     }
 
-
     /**
      * 设定规则 定时拉取文章 栏目广度
      */
@@ -499,10 +499,15 @@ class LongKeywords extends Base
     {
 //        $columnId = 307;
         set_time_limit(0);
-        $urlPush = \Yii::$app->params['online_fan_url'] . '/article/pull';
-        $andWhere = [];
+
         if ($columnId) {
             $andWhere = ['id' => $columnId];
+        } else {
+            $andWhere = ['id' => 1];
+        }
+
+        if ($columnId == 'all') {
+            $andWhere = [];
         }
 
         //查询所有栏目
@@ -538,25 +543,26 @@ class LongKeywords extends Base
 
 //                foreach ($bdKeywords as $bdKeyword) {
                 //每个短尾词扩展  6个小指数长尾词 联表查询
-                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id')
-                    ->where(['type' => 'UNC'])
+                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id,type')
 //                    ->andWhere(['like', 'keywords', '风水'])
-                    ->andWhere(['>=', 'm_pv', 0])
-                    ->andWhere(['<=', 'm_pv', 20])
-                    ->andWhere(['catch_status' => 100])              //表示已经推送到爬虫库中的数据
-                    ->andWhere(['status' => 10])              //表示已经推送到爬虫库中的数据
-//                    ->andWhere([['>'], 'type_id', 0])       //表示已经有类目的
-                    ->orderBy('Rand()')
-                    ->andWhere(['column_id' => 0])
-                    ->limit(50)
+//                    ->andWhere(['>=', 'm_pv', 0])
+//                    ->andWhere(['<=', 'm_pv', 20])
+                    ->andWhere(['catch_status' => 100])              //表示后台输入的词
+                    ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
+                    ->andWhere(['type_id' => $rules['category_id']])
+//                    ->orderBy('Rand()')
+//                    ->andWhere(['column_id' => 0])                  //表示没有栏目使用过
+//                    ->limit(50)
                     ->asArray()
                     ->all();
 
-//                echo '<pre>';
-//                print_r($longKeywords);
-//                exit;
+                if (empty($longKeywords)) {
+                    exit('<h1> 没有符合条件的词 可以组合文章 </h1>');
+                }
 
-                $column['type'] ='UNC';
+                echo '<pre>';
+                print_r($longKeywords);
+
                 foreach ($longKeywords as $key => $longKeyword) {
                     //检验是否拉取过数据
                     $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
@@ -564,13 +570,14 @@ class LongKeywords extends Base
                         Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
                         continue;
                     }
+
                     echo $longKeyword['name'] . "<br/>";
 
                     //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
                     $data = [
                         'key_id' => $longKeyword['id'],
                         'keywords' => $longKeyword['name'],
-                        'type' => strtoupper($column['type']),
+                        'type' => strtoupper($longKeyword['type']),
                         'one_page_num_min' => 10,
                         'one_page_num_max' => 20,
                         'one_page_word_min' => 20,
@@ -585,7 +592,7 @@ class LongKeywords extends Base
                     //发送请求至爬虫库
                     $res = Tools::curlPost($url, $data);
                     if (strpos($res, '还未采集') !== false) {
-                        echo $res . PHP_EOL;
+                        echo $res . '<br/>';
                         continue;
                     }
 
@@ -617,7 +624,6 @@ class LongKeywords extends Base
                     }
 
                     if (!empty($saveData)) {
-
                         //表示没有双词 则匹配
                         if (strpos($saveData[0]['title'], ',') === false) {
                             list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
@@ -650,7 +656,7 @@ class LongKeywords extends Base
 
                                 Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
                                 //推送至远程线上
-                                $res = Tools::curlPost($urlPush, $saveData[0]);
+//                                $res = Tools::curlPost($urlPush, $saveData[0]);
                             }
                         } else {
 //                            echo '<pre>';
@@ -663,7 +669,7 @@ class LongKeywords extends Base
 //                                exit;
 
                             //推送至远程线上
-                            $res = Tools::curlPost($urlPush, $saveData[0]);
+//                            $res = Tools::curlPost($urlPush, $saveData[0]);
 
                             PushArticle::setArticle($saveData[0]);
 
@@ -671,7 +677,7 @@ class LongKeywords extends Base
                             $bd->domain_id = $column['domain_id'];
                             $bd->column_id = $column['id'];
                             $bd->save();
-//
+
 //                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                         }
 //                            exit;

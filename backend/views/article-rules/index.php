@@ -36,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\DomainColumn::getType(),
                 'filterInputOptions' => ['prompt' => '所有类型', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
                 'content' => function ($model, $key, $index, $column) {
-                    return $model->column->type . '【' . \common\models\DomainColumn::getType($model->column->type) . '】';
+                    return $model->category->id . '【' . $model->category->name . '】';
                 }
             ],
             [
@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'column_id',
 
                 'content' => function ($model, $key, $index, $column) {
-                    return $model->column->id . '【' . $model->column->name . '】'. '【' . $model->column->zh_name . '】';
+                    return $model->column->id . '【' . $model->column->name . '】' . '【' . $model->column->zh_name . '】';
                 }
             ],
             //'method_ids',
