@@ -71,6 +71,11 @@ class AllBaiduKeywordsController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             $data = Yii::$app->request->post();
             ignore_user_abort();
+            if (empty($data['AllBaiduKeywords']['type_id'])) {
+                Yii::$app->getSession()->setFlash('error', '请填写分类');
+                return $this->redirect(['create']);
+            }
+
             list($code, $msg) = AllBaiduKeywords::setKeywords($data['AllBaiduKeywords']);
             if ($code < 0) {
                 Yii::$app->getSession()->setFlash('error', json_encode($msg, JSON_UNESCAPED_UNICODE));
@@ -159,5 +164,11 @@ class AllBaiduKeywordsController extends Controller
         }
         $out['results'] = array_values($data);
         return $out;
+    }
+
+    /** 推入爬虫库 */
+    public function actionSetPa()
+    {
+        BaiduKeywords::pushKeywords();
     }
 }

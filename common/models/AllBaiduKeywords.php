@@ -49,7 +49,7 @@ use yii\data\Pagination;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class AllBaiduKeywords extends \yii\db\ActiveRecord
+class AllBaiduKeywords extends Base
 {
     const CATCH_STATUS_ENABLE = 10; //正常
     const CATCH_STATUS_START = 20;  //可抓取
@@ -74,7 +74,8 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
             [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
-            [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
+            [['from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
+            [['keywords', 'json_info', 'type'], 'string'],
             [['m_cpc'], 'string', 'max' => 11],
         ];
     }
@@ -202,51 +203,60 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
                 continue;
             }
 
-            $data = (new BaiDuSdk())->getRank($item);
+            $data = [[]];
+//            $data = (new BaiDuSdk())->getRank($item);
             if ($data === false) {
-                $error[] = $item . '  没有请求请成功！';
-                continue;
+//                $error[] = $item . '  没有请求请成功！';
+//                continue;
             }
 
             $info = $data[0];
+            $tname = '';
+
+            //获取词的顶级分类名称
+            $topName = Category::findOne($postData['type_id']);
+            if ($topName) {
+                $tname = $topName->en_name;
+            }
 
             $saveData = [
                 'show_reasons' => '后台添加',
-                'm_pv' => $info['mobile']['pv'],
-                'm_show' => $info['mobile']['show'],
-                'type' => $postData['type'],
+                'm_pv' => $info['mobile']['pv'] ?? 0,
+                'm_show' => $info['mobile']['show'] ?? 0,
+                'type' => $tname,
+                'type_id' => $postData['type_id'],
                 'pid' => 0,
-                'm_ctr' => $info['mobile']['ctr'],
-                'm_click' => $info['mobile']['click'],
-                'm_rec_bid' => $info['mobile']['recBid'],
-                'm_charge' => $info['mobile']['charge'],
-                'm_rank' => $info['mobile']['rank'],
-                'm_show_rate' => $info['mobile']['showRate'],
-                'all_cpc' => $info['all']['cpc'],
-                'all_ctr' => $info['all']['ctr'],
-                'all_click' => $info['all']['cpc'],
-                'all_pv' => $info['all']['pv'],
-                'all_charge' => $info['all']['charge'],
-                'all_show' => $info['all']['show'],
-                'all_rank' => $info['all']['rank'],
-                'all_show_rate' => $info['all']['showRate'],
-                'all_rec_bid' => $info['all']['recBid'],
-                'pc_ctr' => $info['pc']['ctr'],
-                'pc_show' => $info['pc']['show'],
-                'pc_pv' => $info['pc']['pv'],
-                'pc_rank' => $info['pc']['rank'],
-                'pc_show_rate' => $info['pc']['showRate'],
-                'pc_click' => $info['pc']['click'],
-                'bid' => $info['bid'],
+                'm_ctr' => $info['mobile']['ctr'] ?? 0,
+                'm_click' => $info['mobile']['click'] ?? 0,
+                'm_rec_bid' => $info['mobile']['recBid'] ?? 0,
+                'm_charge' => $info['mobile']['charge'] ?? 0,
+                'm_rank' => $info['mobile']['rank'] ?? 0,
+                'm_show_rate' => $info['mobile']['showRate'] ?? 0,
+                'all_cpc' => $info['all']['cpc'] ?? 0,
+                'all_ctr' => $info['all']['ctr'] ?? 0,
+                'all_click' => $info['all']['cpc'] ?? 0,
+                'all_pv' => $info['all']['pv'] ?? 0,
+                'all_charge' => $info['all']['charge'] ?? 0,
+                'all_show' => $info['all']['show'] ?? 0,
+                'all_rank' => $info['all']['rank'] ?? 0,
+                'all_show_rate' => $info['all']['showRate'] ?? 0,
+                'all_rec_bid' => $info['all']['recBid'] ?? 0,
+                'pc_ctr' => $info['pc']['ctr'] ?? 0,
+                'pc_show' => $info['pc']['show'] ?? 0,
+                'pc_pv' => $info['pc']['pv'] ?? 0,
+                'pc_rank' => $info['pc']['rank'] ?? 0,
+                'pc_show_rate' => $info['pc']['showRate'] ?? 0,
+                'pc_click' => $info['pc']['click'] ?? 0,
+                'bid' => $info['bid'] ?? 0,
                 'catch_status' => 100,  //表示人工
                 'word_package' => '',
                 'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
-                'keywords' => $info['word'],
+                'keywords' =>$item,
                 'from_keywords' => '',
                 'similar' => '',
                 'domain_id' => $postData['domain_id'] ?? 0,
                 'column_id' => $postData['column_id'] ?? 0,
-                'competition' => $info['competition'],
+                'competition' => $info['competition'] ?? 0,
                 'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
             ];
 
@@ -256,6 +266,8 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
             //只保存主词
             if ($code < 0) {
                 $error[] = $msg;
+                print_r($msg);
+                exit;
             } else {
 
                 //保存主词
@@ -285,5 +297,8 @@ class AllBaiduKeywords extends \yii\db\ActiveRecord
         }
     }
 
-
+    public function getCategory()
+    {
+        return $this->hasOne(Category::className(), ['id' => 'type_id']);
+    }
 }

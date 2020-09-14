@@ -38,7 +38,7 @@ class Category extends Base
             [['pid', 'level', 'user_id', 'status', 'pid2', 'pid3', 'pid4', 'pid5'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['name', 'en_name', 'intro'], 'string', 'max' => 255],
-            [['en_name'], 'unique'],
+//            [['en_name'], 'unique'],
             [['name'], 'unique'],
         ];
     }

@@ -17,9 +17,10 @@ class AllBaiduKeywordsSearch extends AllBaiduKeywords
      */
     public function rules()
     {
+
         return [
-            [['id', 'pc_show_rate', 'pc_rank','domain_id','column_id', 'competition', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
-            [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_cpc', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'word_package', 'json_info', 'similar', 'created_at', 'updated_at','type'], 'safe'],
+            [['id', 'pc_show_rate', 'pc_rank', 'domain_id', 'column_id', 'competition', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status'], 'integer'],
+            [['keywords', 'from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_cpc', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'word_package', 'json_info', 'similar', 'created_at', 'updated_at', 'type', 'type_id'], 'safe'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
         ];
     }
@@ -62,6 +63,7 @@ class AllBaiduKeywordsSearch extends AllBaiduKeywords
             $query->andFilterWhere(['between', 'm_pv', \Yii::$app->request->get('m_pv_min'), \Yii::$app->request->get('m_pv_max')]);
         }
 
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
@@ -90,10 +92,15 @@ class AllBaiduKeywordsSearch extends AllBaiduKeywords
             'm_rec_bid' => $this->m_rec_bid,
             'm_click' => $this->m_click,
             'm_pv' => $this->m_pv,
-            'status' => $this->status,
+            'all_baidu_keywords.status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        $query->andFilterWhere([
+            'category.id' => $this->type_id[0],
+        ])
+            ->innerJoinWith('category', 'category.id = all_baidu_keywords.type_id');
 
         $query->andFilterWhere(['like', 'keywords', $this->keywords])
             ->andFilterWhere(['like', 'from_keywords', $this->from_keywords])

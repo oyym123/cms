@@ -537,22 +537,25 @@ class LongKeywords extends Base
 
 //                foreach ($bdKeywords as $bdKeyword) {
                 //每个短尾词扩展  6个小指数长尾词 联表查询
-                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id')->where([
-                    'type' => $column['type'],
-                ])
+                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id')
+                    ->where(['type' => 'UNC'])
+//                    ->andWhere(['like', 'keywords', '风水'])
                     ->andWhere(['>=', 'm_pv', 0])
                     ->andWhere(['<=', 'm_pv', 20])
-                    ->andWhere(['status' => 10])
+                    ->andWhere(['catch_status' => 100])              //表示已经推送到爬虫库中的数据
+                    ->andWhere(['status' => 10])              //表示已经推送到爬虫库中的数据
+//                    ->andWhere([['>'], 'type_id', 0])       //表示已经有类目的
                     ->orderBy('Rand()')
                     ->andWhere(['column_id' => 0])
-                    ->limit(10)
+                    ->limit(50)
                     ->asArray()
                     ->all();
 
-//                    echo '<pre>';
-//                    print_r($longKeywords);
-//                    exit;
+//                echo '<pre>';
+//                print_r($longKeywords);
+//                exit;
 
+                $column['type'] ='UNC';
                 foreach ($longKeywords as $key => $longKeyword) {
                     //检验是否拉取过数据
                     $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
@@ -616,9 +619,7 @@ class LongKeywords extends Base
 
                         //表示没有双词 则匹配
                         if (strpos($saveData[0]['title'], ',') === false) {
-
                             list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
-
                             if ($code < 0) {
                                 echo '<pre>';
                                 print_r($msg);
@@ -638,10 +639,10 @@ class LongKeywords extends Base
                                 $saveData[0]['title'] = str_replace(',', '', $saveData[0]['title']);
                                 $saveData[0]['title'] = $saveData[0]['title'] . ',' . $arrTitle[0];
 
-//                                $bd = AllBaiduKeywords::findOne($longKeyword['id']);
-//                                $bd->domain_id = $column['domain_id'];
-//                                $bd->column_id = $column['id'];
-//                                $bd->save();
+                                $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+                                $bd->domain_id = $column['domain_id'];
+                                $bd->column_id = $column['id'];
+                                $bd->save();
 //
 //                                PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                                 PushArticle::setArticle($saveData[0]);
@@ -649,9 +650,11 @@ class LongKeywords extends Base
                                 Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'], 'set_rules.log');
                                 //推送至远程线上
                                 $res = Tools::curlPost($urlPush, $saveData[0]);
-
                             }
                         } else {
+//                            echo '<pre>';
+//                            print_r($saveData);
+//                            exit;
                             Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
 
 //                                echo ' < pre>';
@@ -663,10 +666,10 @@ class LongKeywords extends Base
 
                             PushArticle::setArticle($saveData[0]);
 
-//                            $bd = AllBaiduKeywords::findOne($longKeyword['id']);
-//                            $bd->domain_id = $column['domain_id'];
-//                            $bd->column_id = $column['id'];
-//                            $bd->save();
+                            $bd = AllBaiduKeywords::findOne($longKeyword['id']);
+                            $bd->domain_id = $column['domain_id'];
+                            $bd->column_id = $column['id'];
+                            $bd->save();
 //
 //                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
                         }
@@ -704,7 +707,7 @@ class LongKeywords extends Base
             'status' => self::STATUS_BASE_NORMAL,
         ])->asArray()->all();
 
-        $url = Tools::reptileUrl() . ' / cms / article';
+        $url = Tools::reptileUrl() . ' /cms/article';
 
 
         foreach ($domainColumn as $column) {
@@ -716,13 +719,11 @@ class LongKeywords extends Base
             //只拉取有规则的
             if (!empty($rules)) {
                 //根据短尾关键词 获取长尾关键词 小指数词
-                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid')->where([
-                    'like', 'keywords', $column['zh_name'],
-                ])
-                    ->andWhere([' >= ', 'm_pv', 1])
-                    ->andWhere([' <= ', 'm_pv', 10])
-                    ->andWhere(['type' => $column['type']])
-                    ->andWhere(['column_id' => null])
+                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid')
+                    ->where(['>=', 'm_pv', 1])
+                    ->andWhere(['<=', 'm_pv', 10])
+                    ->andWhere(['type_id' => $rules->category_id])
+//                    ->andWhere(['column_id' => null])
                     ->limit(3)
                     ->asArray()
                     ->all();
@@ -732,7 +733,7 @@ class LongKeywords extends Base
                     $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
 
                     if (!empty($oldArticleKey)) {
-                        Tools::writeLog($column['zh_name'] . '-- - ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules . log');
+                        Tools::writeLog($column['zh_name'] . '--- ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules . log');
                         continue;
                     }
 
@@ -777,18 +778,18 @@ class LongKeywords extends Base
                                 'title' => $re['title'],
                                 'user_id' => rand(1, 3822),
                                 'push_time' => Tools::randomDate('20200501', ''),
-                                'created_at' => date('Y - m - d H:i:s'),
-                                'updated_at' => date('Y - m - d H:i:s'),
+                                'created_at' => date('Y-m-d H:i:s'),
+                                'updated_at' => date('Y-m-d H:i:s'),
                             ];
                         }
                     }
 //
                     if (!empty($saveData)) {
-                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules . log');
+                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
                         PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
 //                        sleep(1);
                     } else {
-                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules . log');
+                        Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
 //                            echo ' < pre>';
 //                            var_export($data);
 //                            exit;

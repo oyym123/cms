@@ -48,7 +48,7 @@ use Yii;
  * @property string|null $created_at 创建时间
  * @property string|null $updated_at 修改时间
  */
-class BaiduKeywords extends \yii\db\ActiveRecord
+class BaiduKeywords extends Base
 {
     const CATCH_STATUS_ENABLE = 10; //正常
     const CATCH_STATUS_START = 20;  //可抓取
@@ -265,58 +265,66 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 //       echo $i . PHP_EOL;
 
         //搜索 下拉词栏目
-        $bd = BaiduKeywords::find()->select('id,keywords')
-//            ->where(['type' => 'LEA'])
-            ->andWhere(['not like', 'keywords', '驾校'])
-            ->andWhere(['not like', 'keywords', '翻译'])
-            ->andWhere(['not like', 'keywords', '签证'])
-            ->orderBy('Rand()')
-//            ->limit(100)
+//        $bd = BaiduKeywords::find()->select('id,keywords')
+////            ->where(['type' => 'LEA'])
+//            ->andWhere(['not like', 'keywords', '驾校'])
+//            ->andWhere(['not like', 'keywords', '翻译'])
+//            ->andWhere(['not like', 'keywords', '签证'])
+//            ->orderBy('Rand()')
+////            ->limit(100)
+//            ->asArray()
+//            ->all();
+
+//        foreach ($bd as $item) {
+
+        $long = AllBaiduKeywords::find()
+            ->select('id,keywords as name, type as type_name,from_keywords as keywords,pid,m_pv')
+//            ->where([
+//                '>', 'm_pv', 0
+//            ])
+//            ->andWhere([
+//                '<=', 'm_pv', 20
+//            ])
+            ->where([
+                'status' => 1
+            ])
+            ->andWhere([
+                'catch_status' => 100
+            ])
+            ->andWhere([
+                '>', 'type_id', 0
+            ])
+            ->limit(1000)
             ->asArray()
             ->all();
 
-        foreach ($bd as $item) {
-            $long = AllBaiduKeywords::find()
-                ->select('id,keywords as name, type as type_name,from_keywords as keywords,m_pv')
-                ->where(['pid' => $item['id']])
-                ->andWhere([
-                    '>', 'm_pv', 0
-                ])
-                ->andWhere([
-                    '<=', 'm_pv', 20
-                ])
-                ->andWhere([
-                    'status' => 1
-                ])
-                ->limit(1)
-                ->asArray()
-                ->all();
 
-            //标记长尾词
-            foreach ($long as $l) {
-                sleep(1);
-                //匹配下拉词
-                list($code, $msg) = LongKeywords::getBaiduKey(['keywords' => $l['name']], 1);
+        //标记长尾词
+        foreach ($long as $l) {
+            sleep(1);
+            //匹配下拉词
+            list($code, $msg) = LongKeywords::getBaiduKey(['keywords' => $l['name']], 1);
 
-                if ($code < 0) {
-                    echo '<pre>';
-                    print_r($msg);
-                    LongKeywords::bdPushReptileNew($l, $bd['id']);
-                    continue;
-                } else {
-                    $arrTitle = [];
-                    foreach ($msg as $item) {
-                        if ($item != $l['name'] && (strlen($item) > strlen($l['name']))) {
-                            $arrTitle[] = $item;
-                        }
+            if ($code < 0) {
+                echo '<pre>';
+                print_r($msg);
+                LongKeywords::bdPushReptileNew($l, $l['pid']);
+                continue;
+            } else {
+                $arrTitle = [];
+                foreach ($msg as $item) {
+                    if ($item != $l['name'] && (strlen($item) > strlen($l['name']))) {
+                        $arrTitle[] = $item;
                     }
-                    print_r('下拉词  ' . $arrTitle[0]);
-                    $all = AllBaiduKeywords::findOne($l['id']);
-                    $all->status = 10;
-                    $all->save(false);
-                    LongKeywords::bdPushReptileNew($l, $bd['id'], $arrTitle[0]);
-//                    print_r($l);exit;
                 }
+                print_r('下拉词  ' . $arrTitle[0]) . '<br/>';
+                $all = AllBaiduKeywords::findOne($l['id']);
+                $all->status = 10;
+                $all->save(false);
+                LongKeywords::bdPushReptileNew($l, $l['pid'], $arrTitle[0]);
+//                    print_r($l);exit;
+            }
+        }
 
 //                echo '<pre>';
 //                print_r($l['name']);
@@ -324,9 +332,11 @@ class BaiduKeywords extends \yii\db\ActiveRecord
 //                print_r($arrTitle[0]);
 //                exit;
 
-
-            }
+        if (empty($long)) {
+            echo '没有符合条件m_pv > 0 && m_pv < 20 的数据 推送';
+            exit;
         }
+//        }
 //        }
     }
 
