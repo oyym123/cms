@@ -381,7 +381,7 @@ class Tools extends \yii\db\ActiveRecord
     /** 获取爬虫地址 */
     public static function reptileUrl()
     {
-        return PHP_OS != 'WINNT' ? \Yii::$app->params['local_reptile_url'] : \Yii::$app->params['online_reptile_url'];
+        return PHP_OS == 'WINNT' ? \Yii::$app->params['local_reptile_url'] : \Yii::$app->params['online_reptile_url'];
     }
 
 
