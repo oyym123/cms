@@ -27,7 +27,8 @@
         "yiisoft/yii2-smarty": "^2.0",
         "dmstr/yii2-adminlte-asset": "^2.6",
         "mdmsoft/yii2-admin": "~2.0",
-        "zircote/swagger-php": "^3.0"
+        "zircote/swagger-php": "^3.0",
+        "kartik-v/yii2-grid": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
