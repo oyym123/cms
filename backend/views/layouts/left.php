@@ -48,8 +48,8 @@
                             ],
                         ],
                     ],
-                    ['label' => '泛目录之升级打怪', 'icon' => 'dashboard', 'url' => ['#'],
-                        'items' => [
+//                    ['label' => '泛目录之升级打怪', 'icon' => 'dashboard', 'url' => ['#'],
+//                        'items' => [
                             ['label' => '域名    人物', 'icon' => 'file-code-o', 'url' => ['/domain/index']],
                             ['label' => '栏目    职业', 'icon' => 'file-code-o', 'url' => ['/domain-column/index']],
                             ['label' => '模板    服饰 ', 'icon' => 'file-code-o', 'url' => ['/template/index']],
@@ -59,14 +59,16 @@
                             ['label' => '手法    技能', 'icon' => 'file-code-o', 'url' => ['/article-way/index']],
                             ['label' => '规则    经验', 'icon' => 'file-code-o', 'url' => ['/article-rules/index']],
                             ['label' => '文章    金币', 'icon' => 'file-code-o', 'url' => ['/push-article/index']],
-                        ]
-                    ],
-                    ['label' => '兔子队列', 'icon' => 'dashboard', 'url' => ['/rabbitemq/index']],
-                    ['label' => '黑帽文章', 'icon' => 'dashboard', 'url' => ['/black-article/index']],
-                    ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],
+//                        ]
+//                    ],
+                    ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
+//                    ['label' => '兔子队列', 'icon' => 'dashboard', 'url' => ['/rabbitemq/index']],
+//                    ['label' => '黑帽文章', 'icon' => 'dashboard', 'url' => ['/black-article/index']],
+//                    ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],
+
                     ['label' => '关键词', 'icon' => 'dashboard', 'url' => ['#'],
                         'items' => [
-                            ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
+
                             ['label' => '百度营销一级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
                             ['label' => '下拉框关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/long-keywords/index']],
                             ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],

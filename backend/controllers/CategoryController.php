@@ -65,19 +65,20 @@ class CategoryController extends Controller
      */
     public function actionCreate()
     {
+
         $model = new Category();
         $post = Yii::$app->request->post();
         if ($model->load($post)) {
             $data = $post['Category'];
 
             if ($data['pid'] != 0 && $data['pid2'] == 0) {
-                $model->pid = $data['pid2'];
+                $model->pid = $data['pid'];
                 $model->level = 2;
             }
 
             //表示该分类是2级
-            if ($data['pid2'] != 0 && $data['pid3'] != 0) {
-                $model->pid = $data['pid3'];
+            if ($data['pid2'] != 0 && $data['pid3'] == 0) {
+                $model->pid = $data['pid2'];
                 $model->level = 3;
             }
 
@@ -88,10 +89,17 @@ class CategoryController extends Controller
             }
 
             $model->pid2 = $data['pid'];
-            $model->pid3 = $data['pid2'];
-            $model->pid4 = $data['pid3'];
+            $model->pid3 = $data['pid2'] ?: 0;
+            $model->pid4 = $data['pid3'] ?: 0;
+            $tname = '';
+            $topName = Category::findOne($model->pid2);
+            if ($topName) {
+                $tname = $topName->en_name;
+            }
+            $model->en_name = $tname;
+            $model->status = Base::STATUS_BASE_NORMAL;
 
-            if ($model->save()) {
+            if ($model->save(false)) {
 
             }
 
@@ -113,8 +121,45 @@ class CategoryController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $post = Yii::$app->request->post();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $data = $post['Category'];
+            if ($data['pid'] != 0 && $data['pid2'] == 0) {
+                $model->pid = $data['pid'];
+                $model->level = 2;
+            }
+
+            //表示该分类是2级
+            if ($data['pid2'] != 0 && $data['pid3'] == 0) {
+                $model->pid = $data['pid2'];
+                $model->level = 3;
+            }
+
+            //表示该分类是3级
+            if ($data['pid3'] != 0) {
+                $model->pid = $data['pid3'];
+                $model->level = 4;
+            }
+
+            if ($model->pid == $model->id) {
+                Yii::$app->getSession()->setFlash('error', '父类不能选择自己!');
+                return $this->redirect(['update', 'id' => $model->id]);
+            }
+
+            $model->pid2 = $data['pid'];
+            $model->pid3 = $data['pid2'] ?: 0;
+            $model->pid4 = $data['pid3'] ?: 0;
+
+            $tname = '';
+
+            $topName = Category::findOne($model->pid2);
+            if ($topName) {
+                $tname = $topName->en_name;
+            }
+            $model->status = Base::STATUS_BASE_NORMAL;
+            $model->en_name = $tname;
+            $model->save(false);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

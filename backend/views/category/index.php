@@ -32,8 +32,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'name',
             'en_name',
             'intro',
-            'pid',
-            //'level',
+            [
+                'label' => '顶级父类信息',
+                'attribute' => 'pid',
+                'filter' => \common\models\Base::getBaseStatus(),
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return ($x = \common\models\Category::findOne($model->pid2)) ? $x->name . ' 【' . $x->pid2 . '】' : '';
+                }
+            ],
+            'level',
             //'user_id',
             [
                 'label' => '状态',

@@ -224,7 +224,6 @@ class PushArticle extends Modelx
     {
         $_GET['domain'] = 0;
 
-
         //当第一个 id = 455709 清空表 因为是测试数据
         $first = PushArticle::findx($data['domain_id'])->select('id')->orderBy('id asc')->one();
 
