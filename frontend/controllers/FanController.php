@@ -89,6 +89,8 @@ class FanController extends Controller
                 $nextTitle = '没有更多内容啦！';
             }
 
+
+
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
 
