@@ -84,7 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'status',
 
                 'content' => function ($model, $key, $index, $column) {
-                    return '<a target="_blank" href="http://192.168.74.5/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
+                    return '<a target="_blank" href="/index.php/article-rules/article?column_id=' . $model->column_id . '">点击获取文章</a>';
                 }
             ],
 
