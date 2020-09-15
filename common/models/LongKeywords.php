@@ -560,8 +560,8 @@ class LongKeywords extends Base
                     exit('<h1> 没有符合条件的词 可以组合文章 </h1>');
                 }
 
-                echo '<pre>';
-                print_r($longKeywords);
+//                echo '<pre>';
+//                print_r($longKeywords);
 
                 foreach ($longKeywords as $key => $longKeyword) {
                     //检验是否拉取过数据
