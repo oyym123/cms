@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\DomainColumn;
 use common\models\Fan;
+use common\models\MipFlag;
 use common\models\PushArticle;
 use Yii;
 use common\models\Domain;
@@ -118,7 +119,6 @@ class DomainController extends Controller
             }
 
 
-
             //创建一个新push_article表
             $_GET['from_id'] = $model->id;
             PushArticle::createTable($model->id);
@@ -185,5 +185,12 @@ class DomainController extends Controller
     public function actionRefresh()
     {
         Fan::refreshAll();
+    }
+
+    public function actionPushUrl()
+    {
+        $test = Yii::$app->request->get('test', 0);
+        $type = Yii::$app->request->get('type', 1);
+        MipFlag::pushUrl(Yii::$app->request->get('id'), $test, $type);
     }
 }

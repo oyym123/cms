@@ -29,21 +29,44 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
             'id',
             'name:url',
-            'ip',
+            'zh_name',
+//            'ip',
             'start_tags',
             'end_tags',
-            'zh_name',
-            'end_tags',
             [
-                'label' => '状态',
-                'attribute' => 'status',
+                'label' => '百度推送PC端',
+                'attribute' => 'created_at',
                 'filter' => \common\models\Base::getBaseStatus(),
                 'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
                 'content' => function ($model, $key, $index, $column) {
-                    return \common\models\Base::getBaseStatus($model->status);
+                    return '<a href="/index.php/domain/push-url?id=' . $model->id . '&test=1&type=1">  推送的PC端URL   </a>';
                 }
             ],
-
+            [
+                'label' => '百度推送M端',
+                'attribute' => 'created_at',
+                'filter' => \common\models\Base::getBaseStatus(),
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'content' => function ($model, $key, $index, $column) {
+                    return '<a href="/index.php/domain/push-url?id=' . $model->id . '&test=1&type=2">  推送的M端URL   </a>';
+                }
+            ],
+            [
+                'label' => '点击推送百度M',
+                'attribute' => 'user_id',
+                'filter' => \common\models\Base::getBaseStatus(),
+                'content' => function ($model, $key, $index, $column) {
+                    return '<a href="/index.php/domain/push-url?id=' . $model->id . '&type=2"> 点击推送 </a>';
+                }
+            ],
+            [
+                'label' => '点击推送百度PC',
+                'attribute' => 'user_id',
+                'filter' => \common\models\Base::getBaseStatus(),
+                'content' => function ($model, $key, $index, $column) {
+                    return '<a href="/index.php/domain/push-url?id=' . $model->id . '&type=1"> 点击推送 </a>';
+                }
+            ],
 //            'user_id',
 //            'created_at',
             'updated_at',

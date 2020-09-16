@@ -118,7 +118,7 @@ class ArticleRules extends Base
                         'content' => $item['content'],
                         'intro' => $item['intro'],
                         'title' => $item['title'],
-                        'push_time' => Tools::randomDate('20200501', ''),
+                        'push_time' => Tools::randomDate('20190601', '20200501'),
                         'created_at' => date('Y-m-d H:i:s'),
                     ];
 
