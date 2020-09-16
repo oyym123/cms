@@ -251,7 +251,7 @@ class AllBaiduKeywords extends Base
                 'catch_status' => 100,  //表示人工
                 'word_package' => '',
                 'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
-                'keywords' =>$item,
+                'keywords' => $item,
                 'from_keywords' => '',
                 'similar' => '',
                 'domain_id' => $postData['domain_id'] ?? 0,
@@ -300,5 +300,15 @@ class AllBaiduKeywords extends Base
     public function getCategory()
     {
         return $this->hasOne(Category::className(), ['id' => 'type_id']);
+    }
+
+    public static function cate()
+    {
+        $res = self::find()->select('type_id')->distinct('type_id')->all();
+        $arr =[];
+        foreach ($res as $re){
+            $arr[$re->type_id] =  $re->category->name;
+        }
+        return $arr;
     }
 }

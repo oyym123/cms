@@ -102,7 +102,7 @@ class CategoryController extends Controller
 
             $name = Category::find()->where(['name' => $model->name])->one();
             if (!empty($name)) {
-                Yii::$app->getSession()->setFlash('error', '该名称已存在！');
+                Yii::$app->getSession()->setFlash('error', $model->name . '  该名称已存在！');
                 return $this->redirect(['create', [
                     'model' => $model,
                 ]
@@ -173,7 +173,7 @@ class CategoryController extends Controller
 
             $name = Category::find()->where(['name' => $model->name])->one();
             if (!empty($name)) {
-                Yii::$app->getSession()->setFlash('error', '该名称已存在！');
+                Yii::$app->getSession()->setFlash('error', $model->name . '  该名称已存在！');
                 return $this->render('update', [
                     'model' => $model,
                 ]);
