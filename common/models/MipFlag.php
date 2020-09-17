@@ -306,4 +306,65 @@ class MipFlag extends Base
         ];
         return $useragent[rand(0, count($useragent) - 1)];
     }
+
+
+    /** 定时生成网站地图 */
+    public static function crontabSet()
+    {
+        set_time_limit(0);
+        //获取所有的域名
+        $doamins = Domain::find()->all();
+        $_GET['domain'] = 0;
+        foreach ($doamins as $da) {
+            if (!empty($da->baidu_token)) {
+
+                $domain = $da->name;
+
+                //生成网站地图
+                $num = 50000;
+
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
+
+                $articles = PushArticle::findx($da->id)->select('id,column_name')->limit($num)->orderBy('id desc')->all();
+                $data = [];
+                foreach ($articles as $article) {
+                    $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                }
+
+                foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
+                    $data[] = $item['url'];
+                }
+
+                $str = '';
+                foreach ($data as $datum) {
+                    $str .= $datum . PHP_EOL;
+                }
+
+                //存入缓存文件
+                file_put_contents($filePath, $str);
+
+                //生成PC端
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
+
+                $articles = PushArticle::find($da->id)->select('id,column_name')->limit($num)->orderBy('id desc')->all();
+                $data = [];
+                foreach ($articles as $article) {
+                    $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                }
+                foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
+                    $data[] = $item['url'];
+                }
+
+                $str = '';
+                foreach ($data as $datum) {
+                    $str .= $datum . PHP_EOL;
+                }
+
+                //存入缓存文件
+                file_put_contents($filePath, $str);
+                echo $da->name . '  已经生成' . PHP_EOL;
+            }
+        }
+        exit;
+    }
 }
