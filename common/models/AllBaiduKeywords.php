@@ -165,6 +165,7 @@ class AllBaiduKeywords extends Base
         if ($domain == 0) {
             $domain = Domain::getDomainInfo();
         }
+        
         $models = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
             ->select('id')
@@ -172,7 +173,7 @@ class AllBaiduKeywords extends Base
             ->all();
 
         foreach ($models as &$item) {
-            $item['url'] = 'http://' . $flag . Tools::getDoMain($_SERVER['HTTP_HOST']) . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            $item['url'] = 'http://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
         }
         return $models;
     }

@@ -351,7 +351,7 @@ class MipFlag extends Base
                 foreach ($articles as $article) {
                     $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
                 }
-                
+
                 foreach (AllBaiduKeywords::getKeywordsUrl('www.', $da) as $item) {
                     $data[] = $item['url'];
                 }
