@@ -134,4 +134,10 @@ class CmsController extends \yii\console\Controller
     {
         MipFlag::crontabSet();
     }
+
+    /** 推送Mip */
+    public function actionSetMip()
+    {
+        MipFlag::pushMip();
+    }
 }
