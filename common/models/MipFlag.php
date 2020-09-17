@@ -104,20 +104,15 @@ class MipFlag extends Base
 
     public static function getAllUrl($name)
     {
-
         $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
-        if (!file_exists($filePathM)) {
+        $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
+        if (!file_exists($filePathM) || !file_exists($filePathPC)) {
             Tools::curlGet($name . '/m_site.txt');
             sleep(10);
-        }
-
-        $resM = array_filter(explode(PHP_EOL, file_get_contents($filePathM)));
-
-        $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
-        if (!file_exists($filePathPC)) {
             Tools::curlGet($name . '/site.txt');
             sleep(10);
         }
+        $resM = array_filter(explode(PHP_EOL, file_get_contents($filePathM)));
         $resPc = array_filter(explode(PHP_EOL, file_get_contents($filePathPC)));
         return [$resM, $resPc];
     }
