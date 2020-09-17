@@ -611,7 +611,7 @@ class LongKeywords extends Base
                         'one_page_num_max' => 20,
                         'one_page_word_min' => 20,
                         'one_page_word_max' => $rules['one_page_word_max'],
-                        'num' => 3,
+                        'num' => 4,
                     ];
 
 //                        echo '<pre>';

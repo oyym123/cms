@@ -104,7 +104,7 @@ class MipFlag extends Base
 
     public static function getAllUrl($name)
     {
-        
+
         $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
         if (!file_exists($filePathM)) {
             Tools::curlGet($name . '/m_site.txt');
@@ -228,12 +228,10 @@ class MipFlag extends Base
     //mip推送
     public static function push($token, $domain, $urls, $type = 'm')
     {
-        $domain = '0ww9.com';
-
         if ($type == 'pc') {
-            $api = CmsAction::BAIDU_URL . '?site=http://m.' . $domain . '&token=' . $token;
+            $api = CmsAction::BAIDU_URL . '?site=m.' . $domain . '&token=' . $token;
         } elseif ($type == 'm') {
-            $api = CmsAction::BAIDU_URL . '?site=http://www.' . $domain . '&token=' . $token;
+            $api = CmsAction::BAIDU_URL . '?site=www.' . $domain . '&token=' . $token;
         }
 
         $userAgent = self::randUserAgent();
