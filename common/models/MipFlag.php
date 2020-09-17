@@ -198,7 +198,7 @@ class MipFlag extends Base
         }
 
         //按照剩余次数进行推送
-        $resData = self::push($domain->baidu_token, $domain, $info);
+        $resData = self::push($domain->baidu_token, $domain->name, $info);
         $jsonres = json_decode($resData);
 
         if ($jsonres->success >= 400) {
