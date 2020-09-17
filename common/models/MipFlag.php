@@ -168,7 +168,7 @@ class MipFlag extends Base
         Tools::writeLog($jsonres);
 
         if ($jsonres->success >= 400) {
-            Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
+            Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
             Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
@@ -197,7 +197,7 @@ class MipFlag extends Base
         $jsonres = json_decode($resData);
 
         if ($jsonres->success >= 400) {
-            Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
+            Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
             Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
