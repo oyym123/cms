@@ -152,9 +152,9 @@ class MipFlag extends Base
         }
         echo '<pre>';
         print_r($errorArr);
-        exit;
+        echo $domain->name . '  推送完成' . PHP_EOL;
+//        exit;
     }
-
 
     public static function pushData($domain, $info, $type)
     {
