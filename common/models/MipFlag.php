@@ -331,7 +331,7 @@ class MipFlag extends Base
                     $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
                 }
 
-                foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
+                foreach (AllBaiduKeywords::getKeywordsUrl('m.', $da) as $item) {
                     $data[] = $item['url'];
                 }
 
@@ -351,7 +351,8 @@ class MipFlag extends Base
                 foreach ($articles as $article) {
                     $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
                 }
-                foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
+                
+                foreach (AllBaiduKeywords::getKeywordsUrl('www.', $da) as $item) {
                     $data[] = $item['url'];
                 }
 

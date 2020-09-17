@@ -160,9 +160,11 @@ class AllBaiduKeywords extends Base
     }
 
 
-    public static function getKeywordsUrl($flag)
+    public static function getKeywordsUrl($flag, $domain = 0)
     {
-        $domain = Domain::getDomainInfo();
+        if ($domain == 0) {
+            $domain = Domain::getDomainInfo();
+        }
         $models = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
             ->select('id')
@@ -305,9 +307,9 @@ class AllBaiduKeywords extends Base
     public static function cate()
     {
         $res = self::find()->select('type_id')->distinct('type_id')->all();
-        $arr =[];
-        foreach ($res as $re){
-            $arr[$re->type_id] =  $re->category->name;
+        $arr = [];
+        foreach ($res as $re) {
+            $arr[$re->type_id] = $re->category->name;
         }
         return $arr;
     }
