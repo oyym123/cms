@@ -165,11 +165,12 @@ class MipFlag extends Base
         //推送
         $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], $flag);
         echo '<pre>';
-        print_r(json_decode($resData, true));
+        $resDa = json_decode($resData, true);
+        print_r($resDa);
         $jsonres = json_decode($resData);
         Tools::writeLog($jsonres);
 
-        if (strpos($jsonres, 'error') !== false) {
+        if (!isset($resDa['success'])) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
@@ -198,7 +199,7 @@ class MipFlag extends Base
         $resData = self::push($domain->baidu_token, $domain->name, $info);
         $jsonres = json_decode($resData);
         Tools::writeLog($jsonres);
-        if (strpos($jsonres, 'error') !== false) {
+        if (!isset($resDa['success'])) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
