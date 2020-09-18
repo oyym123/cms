@@ -121,8 +121,6 @@ class MipFlag extends Base
     public static function pushUrl($domainId = 0, $test = 0, $type = 1)
     {
         //推送
-        $resData = self::push('Z7nO9BfqjdZe1CtJ','ysjj.org.cn', ['http://www.ysjj.org.cn/chanyu/6.html','http://www.ysjj.org.cn/mnv510031tv']);
-        self::dd($resData);
         if ($domainId) {
             $where = [
                 'id' => $domainId
