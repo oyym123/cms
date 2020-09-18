@@ -120,6 +120,9 @@ class MipFlag extends Base
     /** 推送URL */
     public static function pushUrl($domainId = 0, $test = 0, $type = 1)
     {
+        //推送
+        $resData = self::push('Z7nO9BfqjdZe1CtJ','ysjj.org.cn', ['http://www.ysjj.org.cn/chanyu/6.html','http://www.ysjj.org.cn/mnv510031tv']);
+        self::dd($resData);
         if ($domainId) {
             $where = [
                 'id' => $domainId
@@ -142,6 +145,7 @@ class MipFlag extends Base
                     $info[] = $re;
                 }
             }
+
 
             if ($test == 1 && $type == 1) {
                 self::dd($info);
@@ -167,11 +171,11 @@ class MipFlag extends Base
         $jsonres = json_decode($resData);
         Tools::writeLog($jsonres);
 
-        if ($jsonres->success >= 400) {
+        if (strpos($jsonres, 'error') !== false) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
-            Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog($domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
             //更新插入 标记已经推送过了
             $saveData = [
                 'db_id' => $domain->id,
@@ -195,12 +199,12 @@ class MipFlag extends Base
         //按照剩余次数进行推送
         $resData = self::push($domain->baidu_token, $domain->name, $info);
         $jsonres = json_decode($resData);
-
-        if ($jsonres->success >= 400) {
+        Tools::writeLog($jsonres);
+        if (strpos($jsonres, 'error') !== false) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
-            Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
+            Tools::writeLog($domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
             foreach ($urls as $key => $url) {
                 if ($key > 0) {
                     //更新插入 标记已经推送过了
@@ -216,16 +220,14 @@ class MipFlag extends Base
                 }
             }
         }
-
-
     }
 
     //mip推送
     public static function push($token, $domain, $urls, $type = 'm')
     {
-        if ($type == 'pc') {
+        if ($type == 'm') {
             $api = CmsAction::BAIDU_URL . '?site=m.' . $domain . '&token=' . $token;
-        } elseif ($type == 'm') {
+        } elseif ($type == 'pc') {
             $api = CmsAction::BAIDU_URL . '?site=www.' . $domain . '&token=' . $token;
         }
 
