@@ -165,7 +165,7 @@ class AllBaiduKeywords extends Base
         if ($domain == 0) {
             $domain = Domain::getDomainInfo();
         }
-        
+
         $models = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
             ->select('id')
@@ -186,8 +186,8 @@ class AllBaiduKeywords extends Base
         set_time_limit(0);
         $keywords = Tools::cleanKeywords($postData['keywords']);
 
-        if (count($keywords) > 1000) {
-            return [-1, '最多一次只能导入1000个词'];
+        if (count($keywords) > 10000) {
+            return [-1, '最多一次只能导入10000个词'];
         }
 
         $error = [];

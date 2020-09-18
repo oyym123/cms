@@ -248,4 +248,21 @@ class PushArticle extends Modelx
             echo '该词已被' . $bd->domain_id . '使用!';
         }
     }
+
+    /** 有道翻译文章 */
+    public static function transArticle($str)
+    {
+        $str = '';
+        //有道翻译
+        $ret = (new YouDaoApi())->startRequest($str);
+        $ret = json_decode($ret, true);
+
+        $enRes = explode('{*}', $ret['translation'][0]);
+
+        echo '<pre>';
+        print_r($enRes);
+        exit;
+    }
+
+
 }

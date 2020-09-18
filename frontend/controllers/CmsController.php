@@ -242,4 +242,9 @@ class CmsController extends Controller
     {
         MipFlag::pushUrl(3);
     }
+
+    public function actionTrans()
+    {
+       PushArticle::transArticle();
+    }
 }
