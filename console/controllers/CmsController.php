@@ -140,4 +140,9 @@ class CmsController extends \yii\console\Controller
     {
         MipFlag::pushMip();
     }
+    /** 推送Mip */
+    public function actionSetMipM()
+    {
+        MipFlag::pushMipM();
+    }
 }
