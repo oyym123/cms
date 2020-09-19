@@ -192,14 +192,16 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
+            $remain = 1999;
             $urls = array_slice($info, 1, $remain);
         }
 
         //按照剩余次数进行推送
         $resData = self::push($domain->baidu_token, $domain->name, $info);
+        $resDaSecond = json_decode($resData, true);
         $jsonres = json_decode($resData);
         Tools::writeLog($jsonres);
-        if (!isset($resDa['success'])) {
+        if (!isset($resDaSecond['success'])) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
