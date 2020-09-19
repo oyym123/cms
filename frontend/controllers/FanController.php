@@ -542,7 +542,7 @@ class FanController extends Controller
                     $columnEnName = $columnObj->name;
                 }
             }
-
+            $oldTitle = $model['title'];
             $model['title'] = Tools::getKTitle($model['title']);
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
@@ -562,9 +562,9 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
-                'title' => $model['keywords'],
-                'keywords' => $model['keywords'],
-                'intro' => $model['keywords'],
+                'title' => $model['title'],
+                'keywords' => $oldTitle,
+                'intro' => $model['intro'],
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
