@@ -228,8 +228,8 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['user_tdk'] = [
-                'title' => $models[0]['nickname'] . '_' . $domain->zh_name,
-                'keywords' => $models[0]['nickname'] . '_' . $domain->zh_name,
+                'title' => $models[0]['nickname'] . '_会员' ,
+                'keywords' => $models[0]['nickname'] . '_会员',
                 'intro' => $column->intro . '_' . $domain->zh_name,
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
