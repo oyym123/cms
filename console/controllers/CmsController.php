@@ -124,10 +124,10 @@ class CmsController extends \yii\console\Controller
     }
 
 
-    public function actionPushPa()
-    {
-        BaiduKeywords::pushPa();
-    }
+//    public function actionPushPa()
+//    {
+//        BaiduKeywords::pushPa();
+//    }
 
     /** 设置链接 */
     public function actionSetUrl()

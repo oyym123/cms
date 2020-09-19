@@ -90,7 +90,6 @@ class FanController extends Controller
             }
 
 
-
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
 
@@ -126,7 +125,7 @@ class FanController extends Controller
 //            $model['content']= str_replace($downArr, $replaceArrDown, $model['content']);
 
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
-
+            $oldTitle = $model['title'];
             $model['title'] = Tools::getKTitle($model['title']);
 
             $res = [
@@ -149,13 +148,13 @@ class FanController extends Controller
 //            print_r($res);
 //            exit;
 
-            $desc = mb_substr($model['title'], 0, 28);
+            $desc = $model['intro'];
 
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
                 'title' => $model['title'],
-                'keywords' => $model['keywords'],
+                'keywords' => $oldTitle,
                 'description' => $desc,
                 'og_type' => 'news',
                 'og_title' => $model['title'],
