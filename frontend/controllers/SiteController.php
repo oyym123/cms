@@ -339,13 +339,11 @@ class SiteController extends Controller
             ],
         ];
 
-
         $view = Yii::$app->view;
-
         $view->params['list_tdk'] = [
             'title' => $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
-            'intro' => $domain->intro ?: $column->zh_name,
+            'intro' => $domain->intro ?: $column->intro,
             'canonical' => 'http://' . $_SERVER['HTTP_HOST'],
         ];
 
