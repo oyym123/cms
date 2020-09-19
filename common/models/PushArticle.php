@@ -250,12 +250,21 @@ class PushArticle extends Modelx
     }
 
     /** 有道翻译文章 */
-    public static function transArticle($str)
+    public static function transArticle($str = '')
     {
-        $str = '';
-        //有道翻译
+
+        //繁体
+        $chinese = new Chinaese();
+        $data = $chinese->cns('万事如意');
+
+        $str = '翻译';
+
+        //有道翻译 英文
         $ret = (new YouDaoApi())->startRequest($str);
         $ret = json_decode($ret, true);
+        
+        print_r($data);
+        exit;
 
         $enRes = explode('{*}', $ret['translation'][0]);
 
@@ -264,5 +273,9 @@ class PushArticle extends Modelx
         exit;
     }
 
+    public function fanti()
+    {
 
+
+    }
 }

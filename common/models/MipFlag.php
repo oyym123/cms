@@ -379,6 +379,18 @@ class MipFlag extends Base
         foreach ($doamins as $da) {
             if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 1); //PC推送
+            }
+        }
+    }
+
+    public static function pushMipM()
+    {
+        set_time_limit(0);
+        //获取所有的域名
+        $doamins = Domain::find()->all();
+        $_GET['domain'] = 0;
+        foreach ($doamins as $da) {
+            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 2); //移动推送
             }
         }
