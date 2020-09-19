@@ -345,7 +345,7 @@ class SiteController extends Controller
         $view->params['list_tdk'] = [
             'title' => $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
-            'intro' => $column->intro ?: $column->zh_name,
+            'intro' => $domain->intro ?: $column->zh_name,
             'canonical' => 'http://' . $_SERVER['HTTP_HOST'],
         ];
 

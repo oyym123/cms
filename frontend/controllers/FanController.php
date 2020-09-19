@@ -562,7 +562,7 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
-                'title' =>$model['keywords'],
+                'title' => $model['keywords'],
                 'keywords' => $model['keywords'],
                 'intro' => $model['intro'],
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
@@ -571,7 +571,6 @@ class FanController extends Controller
             if (empty($modelInfo)) {
                 return $this->render($render, ['models' => ['data' => ['title' => '没有内容了!']]]);
             }
-
             return $this->render($render, ['models' => $res]);
         }
     }
