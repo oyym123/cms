@@ -230,8 +230,10 @@ class CmsController extends Controller
     {
         //更新模板
         $template = Template::find()
+            ->where(['like', 'content', 'https://img.thszxxdyw.org.cn/wordImg/'])
             ->andWhere(['type' => 6])
             ->all();
+
         set_time_limit(0);
         foreach ($template as $item){
             sleep(2);
@@ -242,12 +244,13 @@ class CmsController extends Controller
     public function actionCleanData()
     {
         $template = Template::find()
-            ->where(['like', 'content', 'http://static.thszxxdyw.org.cn'])
+            ->where(['like', 'content', 'http://img.thszxxdyw.org.cn/wordImg/'])
             ->andWhere(['type' => 6])
             ->all();
 
+
         foreach ($template as $item) {
-            $item['content'] = str_replace('http://static.thszxxdyw.org.cn', 'https://static.thszxxdyw.org.cn', $item['content']);
+            $item['content'] = str_replace('https://img.thszxxdyw.org.cn/wordImg/', 'https://static.thszxxdyw.org.cn', $item['content']);
 //            echo '<pre>';
 //            print_r($item);
 //            exit;
