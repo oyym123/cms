@@ -820,13 +820,14 @@ class LongKeywords extends Base
 
                             //清理标签  $re['content']
                             $infoContent = strip_tags($re['content']);
+                            echo '<pre>';
+                            print_r($re['content']);
+                            exit;
+                            explode();
                             $infoContent = str_replace('　　', '&nbsp; &nbsp; &nbsp;', $infoContent);
                             $infoContent = str_replace('&nbsp; &nbsp;', '　　', $infoContent);
                             $txtArr = array_filter(explode('　　', $infoContent));
 
-                            echo '<pre>';
-                            print_r($txtArr);
-                            exit;
 
                             array_shift($txtArr);
                             $str = implode('{*}', $txtArr);

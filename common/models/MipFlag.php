@@ -144,7 +144,6 @@ class MipFlag extends Base
                 }
             }
 
-
             if ($test == 1 && $type == 1) {
                 self::dd($info);
             } elseif ($test == 1 && $type == 2) {
@@ -192,8 +191,9 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 500;
+            $remain = 1900;
             $urls = array_slice($info, 1, $remain);
+            $info = $urls;
         }
 
         //按照剩余次数进行推送
