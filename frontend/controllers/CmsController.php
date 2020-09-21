@@ -11,6 +11,7 @@ use common\models\DbName;
 use common\models\DirCatch;
 use common\models\Domain;
 use common\models\DomainColumn;
+use common\models\DomainTpl;
 use common\models\KeywordLongAll;
 use common\models\Keywords;
 use common\models\LongKeywords;
@@ -20,6 +21,7 @@ use common\models\NewsClassTags;
 use common\models\NewsData;
 use common\models\NewsTags;
 use common\models\PushArticle;
+use common\models\Template;
 use common\models\Tools;
 use common\models\ZuoWenWang;
 use frontend\models\ResendVerificationEmailForm;
@@ -224,8 +226,36 @@ class CmsController extends Controller
     }
 
 
+    public function  actionChangeTemp()
+    {
+        //更新模板
+        $template = Template::find()
+            ->andWhere(['type' => 6])
+            ->all();
+        set_time_limit(0);
+        foreach ($template as $item){
+            sleep(2);
+            DomainTpl::setTmp(0, $item->id);
+        }
+    }
+
     public function actionCleanData()
     {
+        $template = Template::find()
+            ->where(['like', 'content', 'http://static.thszxxdyw.org.cn'])
+            ->andWhere(['type' => 6])
+            ->all();
+
+        foreach ($template as $item) {
+            $item['content'] = str_replace('http://static.thszxxdyw.org.cn', 'https://static.thszxxdyw.org.cn', $item['content']);
+//            echo '<pre>';
+//            print_r($item);
+//            exit;
+            $item->content = $item['content'];
+            $item->save(false);
+
+        }
+         exit;
 //        $models = DomainColumn::find()->all();
 //        foreach ($models as $column) {
 //            if ($column->name == 'jaks') {
@@ -245,6 +275,6 @@ class CmsController extends Controller
 
     public function actionTrans()
     {
-       PushArticle::transArticle();
+        PushArticle::transArticle();
     }
 }

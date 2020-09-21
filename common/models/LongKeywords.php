@@ -540,7 +540,7 @@ class LongKeywords extends Base
         $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
 //            'id' => 90,
             'status' => self::STATUS_BASE_NORMAL,
-        ])
+        ])  
             ->andWhere($andWhere)
             ->asArray()->all();
 

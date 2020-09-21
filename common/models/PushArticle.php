@@ -262,7 +262,7 @@ class PushArticle extends Modelx
         //有道翻译 英文
         $ret = (new YouDaoApi())->startRequest($str);
         $ret = json_decode($ret, true);
-        
+
         print_r($data);
         exit;
 
@@ -275,7 +275,7 @@ class PushArticle extends Modelx
 
     public function fanti()
     {
-
+        
 
     }
 }
