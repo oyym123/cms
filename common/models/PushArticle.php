@@ -256,6 +256,7 @@ class PushArticle extends Modelx
         //繁体
         $chinese = new Chinaese();
         $data = $chinese->cns('万事如意');
+        
 
         $str = '翻译';
 
@@ -275,7 +276,7 @@ class PushArticle extends Modelx
 
     public function fanti()
     {
-        
+
 
     }
 }

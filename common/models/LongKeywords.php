@@ -540,7 +540,7 @@ class LongKeywords extends Base
         $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
 //            'id' => 90,
             'status' => self::STATUS_BASE_NORMAL,
-        ])  
+        ])
             ->andWhere($andWhere)
             ->asArray()->all();
 
@@ -727,6 +727,11 @@ class LongKeywords extends Base
         exit;
     }
 
+    public static function newRules()
+    {
+        
+
+    }
 
     /**
      * 设定规则 定时拉取文章 栏目深度
