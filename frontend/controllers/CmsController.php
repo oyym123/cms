@@ -226,7 +226,7 @@ class CmsController extends Controller
     }
 
 
-    public function  actionChangeTemp()
+    public function actionChangeTemp()
     {
         //更新模板
         $template = Template::find()
@@ -235,7 +235,7 @@ class CmsController extends Controller
             ->all();
 
         set_time_limit(0);
-        foreach ($template as $item){
+        foreach ($template as $item) {
             sleep(2);
             DomainTpl::setTmp(0, $item->id);
         }
@@ -258,7 +258,7 @@ class CmsController extends Controller
             $item->save(false);
 
         }
-         exit;
+        exit;
 //        $models = DomainColumn::find()->all();
 //        foreach ($models as $column) {
 //            if ($column->name == 'jaks') {
@@ -279,5 +279,11 @@ class CmsController extends Controller
     public function actionTrans()
     {
         PushArticle::transArticle();
+    }
+
+    public function actionTransA()
+    {
+        //翻译文章
+        LongKeywords::rulesTrans();
     }
 }

@@ -160,8 +160,8 @@ class MipFlag extends Base
 
     public static function pushData($domain, $info, $type)
     {
-
         $flag = $type == 1 ? 'pc' : 'm';
+
         //推送
         $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], $flag);
         echo '<pre>';
@@ -192,7 +192,7 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 1900;
+            $remain = 500;
             $urls = array_slice($info, 1, $remain);
         }
 

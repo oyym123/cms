@@ -252,11 +252,9 @@ class PushArticle extends Modelx
     /** 有道翻译文章 */
     public static function transArticle($str = '')
     {
-
         //繁体
         $chinese = new Chinaese();
         $data = $chinese->cns('万事如意');
-        
 
         $str = '翻译';
 
