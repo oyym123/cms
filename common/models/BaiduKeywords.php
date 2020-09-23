@@ -288,8 +288,8 @@ class BaiduKeywords extends Base
         $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
         $itemData = [];
 
-        $step = 5;
-        $limit = 70;
+        $step = 10;
+        $limit = 50;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()

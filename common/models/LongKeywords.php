@@ -544,157 +544,149 @@ class LongKeywords extends Base
         $url = Tools::reptileUrl() . '/cms/article';
 
         $_GET['domain'] = 0;
-        foreach ($domainColumn as $column) {
-            //查询分类规则
-            $rules = ArticleRules::find()->where([
-                'column_id' => $column['id']
-            ])->asArray()->one();
 
-            //只拉取有规则的
-            if (!empty($rules)) {
-//                echo '<pre>';
-//                print_r($column['type']);exit;
-//                $bdKeywords = BaiduKeywords::find()->select('id,keywords')
-//                    ->andWhere(['type' => $column['type']])      //只搜索某一大类的词
-//                    ->andWhere(['not like', 'keywords', '驾校'])
-//                    ->andWhere(['not like', 'keywords', '翻译'])
-//                    ->andWhere(['not like', 'keywords', '签证'])
-////                    ->limit(10)
-//                    ->orderBy('Rand()')
-//                    ->asArray()
-//                    ->all();
+        $step = 10;
+        for ($i = 1; $i < 10; $i++) {
+            foreach ($domainColumn as $column) {
+                //查询分类规则
+                $rules = ArticleRules::find()->where([
+                    'column_id' => $column['id']
+                ])->asArray()->one();
 
-//                foreach ($bdKeywords as $bdKeyword) {
-                //每个短尾词扩展  6个小指数长尾词 联表查询
-                $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id,type')
-//                    ->andWhere(['like', 'keywords', '风水'])
-//                    ->andWhere(['>=', 'm_pv', 0])
-//                    ->andWhere(['<=', 'm_pv', 20])
-                    ->andWhere(['catch_status' => 100])              //表示后台输入的词
-                    ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
-                    ->andWhere(['type_id' => $rules['category_id']])
-//                    ->orderBy('Rand()')
-                    ->andWhere(['column_id' => 0])                  //表示没有栏目使用过
-//                    ->limit(50)
-                    ->asArray()
-                    ->all();
+                //只拉取有规则的
+                if (!empty($rules)) {
+                    //每个短尾词扩展  6个小指数长尾词 联表查询
+                    $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id,type')
+                        ->andWhere(['catch_status' => 100])              //表示后台输入的词
+                        ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
+                        ->andWhere(['type_id' => $rules['category_id']])
+                        ->offset($i * $step)
+                        ->limit($step)
+                        ->andWhere(['column_id' => 0])                  //表示没有栏目使用过
+                        ->asArray()
+                        ->all();
 
-                if (empty($longKeywords)) {
-                    echo ' 没有符合条件的词 可以组合文章';
-                    continue;
+                    if (empty($longKeywords)) {
+                        echo ' 没有符合条件的词 可以组合文章';
+                        continue;
 //                    exit('<h1> 没有符合条件的词 可以组合文章 </h1>');
-                }
+                    }
 
 //                echo '<pre>';
 //                print_r($longKeywords);
 
-                foreach ($longKeywords as $key => $longKeyword) {
-                    $longKeyword['type'] = Category::findOne($rules['category_id'])->en_name;
-                    //检验是否拉取过数据
-                    $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
-                    if (!empty($oldArticleKey)) {
-                        Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
-                        continue;
-                    }
+                    foreach ($longKeywords as $key => $longKeyword) {
+                        $longKeyword['type'] = Category::findOne($rules['category_id'])->en_name;
+                        //检验是否拉取过数据
+                        $oldArticleKey = PushArticle::findx($column['domain_id'])->where(['key_id' => $longKeyword['id']])->one();
+                        if (!empty($oldArticleKey)) {
+                            Tools::writeLog($column['zh_name'] . ' ---  ' . $longKeyword['name'] . '  长尾词已经拉取过了', 'set_rules.log');
+                            continue;
+                        }
 
-                    echo $longKeyword['name'] . "<br/>";
+                        echo $longKeyword['name'] . "<br/>";
 
-                    //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
-                    $data = [
-                        'key_id' => $longKeyword['id'],
-                        'keywords' => $longKeyword['name'],
-                        'type' => strtoupper($longKeyword['type']),
-                        'one_page_num_min' => 10,
-                        'one_page_num_max' => 20,
-                        'one_page_word_min' => 20,
-                        'one_page_word_max' => $rules['one_page_word_max'],
-                        'num' => 4,
-                    ];
+                        //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
+                        $data = [
+                            'key_id' => $longKeyword['id'],
+                            'keywords' => $longKeyword['name'],
+                            'type' => strtoupper($longKeyword['type']),
+                            'one_page_num_min' => 10,
+                            'one_page_num_max' => 20,
+                            'one_page_word_min' => 20,
+                            'one_page_word_max' => $rules['one_page_word_max'],
+                            'num' => 4,
+                        ];
 
 //                        echo '<pre>';
 //                        print_r($longKeywords);
 //                        exit;
 
-                    //发送请求至爬虫库
-                    $res = Tools::curlPost($url, $data);
-                    if (strpos($res, '还未采集') !== false) {
-                        echo $res . '<br/>';
-                        continue;
-                    }
-
-                    $res = json_decode($res, true);
-
-                    $saveData = [];
-                    if (isset($res[0]['from_path'])) {
-                        foreach ($res as $re) {
-                            //存储入库
-                            $saveData[] = [
-                                'column_id' => $column['id'],
-                                'from_path' => $re['from_path'],
-                                'domain_id' => $column['domain_id'],
-                                'key_id' => $longKeyword['id'],
-                                'title_img' => $re['title_img'],
-                                'keywords' => $longKeyword['name'],
-                                'column_name' => $column['name'],
-//                              'fan_key_id' => $longKeyword['id'],
-                                'rules_id' => $rules['id'],
-                                'content' => $re['content'],
-                                'intro' => $re['intro'],
-                                'title' => $re['title'],
-                                'user_id' => rand(1, 3822),
-                                'push_time' => Tools::randomDate('20190601', '20200501'),
-                                'created_at' => date('Y-m-d H:i:s'),
-                                'updated_at' => date('Y-m-d H:i:s'),
-                            ];
+                        //发送请求至爬虫库
+                        $res = Tools::curlPost($url, $data);
+                        if (strpos($res, '还未采集') !== false) {
+                            echo $res . '<br/>';
+                            continue;
                         }
-                    }
 
-//                    echo '<pre>';
-//                    var_export($saveData);
-//                    exit;
+                        $res = json_decode($res, true);
 
-                    if (!empty($saveData)) {
-                        //表示没有双词 则匹配
-                        if (strpos($saveData[0]['title'], ',') === false) {
-                            sleep(1);
-                            list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
-
-                            if ($code < 0) {
-                                echo '<pre>';
-                                print_r($msg);
-                            } else {
-                                Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
-
-                                $arrTitle = [];
-                                foreach ($msg as $item) {
-                                    if ($item != $longKeyword['name'] && (strlen($item) > $longKeyword['name'])) {
-                                        $arrTitle[] = $item;
-                                    }
-                                }
-
-                                $saveData[0]['title'] = str_replace(',', '', $arrTitle[0]);
-                                $saveData[0]['title'] = $longKeyword['name'] . ',' . $arrTitle[0];
-
-                                PushArticle::setArticle($saveData[0]);
-                                Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'] . '  ' . $saveData[0]['title'], 'set_rules.log');
-//                                exit;
-                                //推送至远程线上
-//                              $res = Tools::curlPost($urlPush, $saveData[0]);
+                        $saveData = [];
+                        if (isset($res[0]['from_path'])) {
+                            foreach ($res as $re) {
+                                //存储入库
+                                $saveData[] = [
+                                    'column_id' => $column['id'],
+                                    'from_path' => $re['from_path'],
+                                    'domain_id' => $column['domain_id'],
+                                    'key_id' => $longKeyword['id'],
+                                    'title_img' => $re['title_img'],
+                                    'keywords' => $longKeyword['name'],
+                                    'column_name' => $column['name'],
+//                                  'fan_key_id' => $longKeyword['id'],
+                                    'rules_id' => $rules['id'],
+                                    'content' => $re['content'],
+                                    'intro' => $re['intro'],
+                                    'title' => $re['title'],
+                                    'user_id' => UserId::getId(),
+                                    'push_time' => Tools::randomDate('20190601', '20200501'),
+                                    'created_at' => date('Y-m-d H:i:s'),
+                                    'updated_at' => date('Y-m-d H:i:s'),
+                                ];
                             }
-                        } else {
+                        }
+
+//                        echo '<pre>';
+//                        var_export($saveData);
+//                        exit;
+
+                        if (!empty($saveData)) {
+                            //表示没有双词 则匹配
+                            if (strpos($saveData[0]['title'], ',') === false) {
+                                sleep(1);
+                                list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
+
+                                if ($code < 0) {
+                                    echo '<pre>';
+                                    print_r($msg);
+                                } else {
+                                    Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
+
+                                    $arrTitle = [];
+                                    foreach ($msg as $item) {
+                                        if ($item != $longKeyword['name'] && (strlen($item) > $longKeyword['name'])) {
+                                            $arrTitle[] = $item;
+                                        }
+                                    }
+
+                                    $saveData[0]['title'] = str_replace(',', '', $arrTitle[0]);
+                                    $saveData[0]['title'] = $longKeyword['name'] . ',' . $arrTitle[0];
+
+                                    //保存下拉词
+                                    $allKeywords = AllBaiduKeywords::findOne($longKeyword['id']);
+                                    $allKeywords->m_down_name = str_replace(',', '', $arrTitle[0]);
+                                    $allKeywords->save(false);
+
+                                    PushArticle::setArticle($saveData[0]);
+                                    Tools::writeLog('保存组合双词' . $saveData[0]['domain_id'] . '  ' . $saveData[0]['title'], 'set_rules.log');
+//                                   exit;
+                                    //推送至远程线上
+//                              $res = Tools::curlPost($urlPush, $saveData[0]);
+                                }
+                            } else {
 //                            echo '<pre>';
 //                            print_r($saveData);
 //                            exit;
-                            Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
+                                Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
 
 //                                echo ' < pre>';
 //                                print_r($saveData);
 //                                exit;
 
-                            //推送至远程线上
+                                //推送至远程线上
 //                            $res = Tools::curlPost($urlPush, $saveData[0]);
 
-                            PushArticle::setArticle($saveData[0]);
+                                PushArticle::setArticle($saveData[0]);
 
 //                            $bd = AllBaiduKeywords::findOne($longKeyword['id']);
 //                            $bd->domain_id = $column['domain_id'];
@@ -702,21 +694,22 @@ class LongKeywords extends Base
 //                            $bd->save();
 
 //                            PushArticle::batchInsertOnDuplicatex($column['domain_id'], $saveData);
-                        }
+                            }
 //                            exit;
 //                            sleep(1);
-                    } else {
-                        Tools::writeLog('保存失败!' . $longKeyword['name'], 'set_rules.log');
-                        echo '保存失败!';
-                        $doubleK = [];
+                        } else {
+                            Tools::writeLog('保存失败!' . $longKeyword['name'], 'set_rules.log');
+                            echo '保存失败!';
+                            $doubleK = [];
 //                            echo ' < pre>';
 //                            var_export($data);
-                    }
+                        }
 
 //                        echo ' < pre>';
 //                        print_r($saveData);
 
 //                    }
+                    }
                 }
 //                        sleep(5);
             }
@@ -892,7 +885,7 @@ class LongKeywords extends Base
                                     'en_part_content' => $enPart,
                                     'fan_part_content' => $fanPart,
                                     'all_part_content' => $contentRes,
-                                    'user_id' => rand(1, 3822),
+                                    'user_id' => UserId::getId(),
                                     'push_time' => Tools::randomDate('20190601', '20200501'),
                                     'created_at' => date('Y-m-d H:i:s'),
                                     'updated_at' => date('Y-m-d H:i:s'),

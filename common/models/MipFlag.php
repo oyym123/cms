@@ -104,6 +104,7 @@ class MipFlag extends Base
 
     public static function getAllUrl($name)
     {
+        $limit = 3000; //取网站地图后最新的url
         $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
         $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
         if (!file_exists($filePathM) || !file_exists($filePathPC)) {
@@ -112,8 +113,8 @@ class MipFlag extends Base
             Tools::curlGet($name . '/site.txt');
             sleep(10);
         }
-        $resM = array_filter(explode(PHP_EOL, file_get_contents($filePathM)));
-        $resPc = array_filter(explode(PHP_EOL, file_get_contents($filePathPC)));
+        $resM = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathM))), 0, $limit);
+        $resPc = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathPC))), 0, $limit);
         return [$resM, $resPc];
     }
 
@@ -143,7 +144,10 @@ class MipFlag extends Base
                     $info[] = $re;
                 }
             }
-
+//
+//            echo '<pre>';
+//            print_r($info);
+//            exit;
             if ($test == 1 && $type == 1) {
                 self::dd($info);
             } elseif ($test == 1 && $type == 2) {
@@ -165,7 +169,7 @@ class MipFlag extends Base
         $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], $flag);
         echo '<pre>';
         $resDa = json_decode($resData, true);
-        print_r($resDa);
+//        print_r($resDa);
         $jsonres = json_decode($resData);
         Tools::writeLog($jsonres);
 
@@ -191,15 +195,16 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 1900;
+            $remain = 1000;
             $urls = array_slice($info, 1, $remain);
             $info = $urls;
         }
 
         //按照剩余次数进行推送
-        $resData = self::push($domain->baidu_token, $domain->name, $info);
+        $resData = self::push($domain->baidu_token, $domain->name, $info, $flag);
         $resDaSecond = json_decode($resData, true);
         $jsonres = json_decode($resData);
+
         Tools::writeLog($jsonres);
         if (!isset($resDaSecond['success'])) {
             Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
@@ -310,63 +315,69 @@ class MipFlag extends Base
         return $useragent[rand(0, count($useragent) - 1)];
     }
 
+    /** 获取新的url */
+    public static function getCrontabData($filePath, $da, $flag, $num = 50000)
+    {
+        $_GET['domain'] = 0;
+        $domain = $da->name;
+        $urls = [];
+        //当文件不存在时，全部搜索
+        if (file_exists($filePath)) {
+            $articles = PushArticle::findx($da->id)->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
+        } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
+            $urls = explode(PHP_EOL, file_get_contents($filePath));
+            $arr = explode('/', $urls[0]);
+            $resUrl = $arr[count($arr) - 1];
+            if (preg_match('/\d+/', $resUrl, $lastArr)) {
+                $lastId = $lastArr[0];
+            }
+
+            $articles = PushArticle::findx($da->id)
+                ->select('id,column_name,key_id')
+                ->where(['>', 'id', $lastId])
+                ->limit($num)
+                ->orderBy('id desc')
+                ->asArray()
+                ->all();
+        }
+
+        $data = [];
+        foreach ($articles as $article) {
+            $data[] = 'https://' . $flag . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $data[] = 'https://' . $flag . $domain . '/' . $da->start_tags . $article['key_id'] . $da->end_tags;
+        }
+
+
+        $data = array_unique(array_merge($data, $urls));
+        $str = '';
+
+        foreach ($data as $datum) {
+            $str .= $datum . PHP_EOL;
+        }
+
+        //存入缓存文件
+        file_put_contents($filePath, $str);
+    }
 
     /** 定时生成网站地图 */
     public static function crontabSet()
     {
         set_time_limit(0);
-        //获取所有的域名
+        //获取所有的域名    生成网站地图
         $doamins = Domain::find()->all();
         $_GET['domain'] = 0;
         foreach ($doamins as $da) {
             if (!empty($da->baidu_token)) {
-
                 $domain = $da->name;
-
-                //生成网站地图
                 $num = 50000;
 
-                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
-
-                $articles = PushArticle::findx($da->id)->select('id,column_name')->limit($num)->orderBy('id desc')->all();
-                $data = [];
-                foreach ($articles as $article) {
-                    $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                }
-
-                foreach (AllBaiduKeywords::getKeywordsUrl('m.', $da) as $item) {
-                    $data[] = $item['url'];
-                }
-
-                $str = '';
-                foreach ($data as $datum) {
-                    $str .= $datum . PHP_EOL;
-                }
-
-                //存入缓存文件
-                file_put_contents($filePath, $str);
-
                 //生成PC端
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
+                self::getCrontabData($filePath, $da, 'www.', $num);
+
+                //生成移动端
                 $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
-
-                $articles = PushArticle::find($da->id)->select('id,column_name')->limit($num)->orderBy('id desc')->all();
-                $data = [];
-                foreach ($articles as $article) {
-                    $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                }
-
-                foreach (AllBaiduKeywords::getKeywordsUrl('www.', $da) as $item) {
-                    $data[] = $item['url'];
-                }
-
-                $str = '';
-                foreach ($data as $datum) {
-                    $str .= $datum . PHP_EOL;
-                }
-
-                //存入缓存文件
-                file_put_contents($filePath, $str);
-                echo $da->name . '  已经生成' . PHP_EOL;
+                self::getCrontabData($filePath, $da, 'm.', $num);
             }
         }
         exit;

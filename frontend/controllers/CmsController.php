@@ -248,9 +248,8 @@ class CmsController extends Controller
             ->andWhere(['type' => 6])
             ->all();
 
-
         foreach ($template as $item) {
-            $item['content'] = str_replace('https://img.thszxxdyw.org.cn/wordImg/', 'https://static.thszxxdyw.org.cn', $item['content']);
+            $item['content'] = str_replace('http://img.thszxxdyw.org.cn/wordImg/', 'https://img.thszxxdyw.org.cn/wordImg/', $item['content']);
 //            echo '<pre>';
 //            print_r($item);
 //            exit;
