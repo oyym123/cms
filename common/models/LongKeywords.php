@@ -534,35 +534,27 @@ class LongKeywords extends Base
         }
 
         //查询指定20个站 的规则
-        $domainIds = self::getDomainIds();
-
-
-        //查询所有栏目
-        $domainColumn = DomainColumn::find()
-            ->select('id,type,domain_id,zh_name,name')
-            ->where(['in', 'id', $domainIds])
-            ->andWhere([
-//            'id' => 90,
-            'status' => self::STATUS_BASE_NORMAL,
-        ])
-            ->andWhere($andWhere)
-            ->asArray()->all();
+        $domainIds = BaiduKeywords::getDomainIds();
 
         $url = Tools::reptileUrl() . '/cms/article';
 
         $_GET['domain'] = 0;
 
+        //查询指定20个站 的规则
+        $domainIds = BaiduKeywords::getDomainIds();
+
+        //查询出所有的规则分类
+        $articleRules = ArticleRules::find()->select('category_id,domain_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+
+        $itemData = [];
 
         $step = 10;
-        for ($i = 1; $i < 20; $i++) {
-            foreach ($domainColumn as $column) {
-                //查询分类规则
-                $rules = ArticleRules::find()->where([
-                    'column_id' => $column['id']
-                ])->asArray()->one();
-
-                //只拉取有规则的
-                if (!empty($rules)) {
+        $limit = 50;
+        for ($i = 0; $i <= $limit; $i++) {
+            foreach ($articleRules as $key => $rules) {
+                $column = DomainColumn::find()
+                    ->select('id,type,domain_id,zh_name,name')
+                    ->where(['id'=>$rules['column_id']])->asArray()->one();
                     //每个短尾词扩展  6个小指数长尾词 联表查询
                     $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id,type')
                         ->andWhere(['catch_status' => 100])              //表示后台输入的词
@@ -579,11 +571,12 @@ class LongKeywords extends Base
                     if (empty($longKeywords)) {
                         echo ' 没有符合条件的词 可以组合文章';
                         continue;
-//                    exit('<h1> 没有符合条件的词 可以组合文章 </h1>');
+//                      exit('<h1> 没有符合条件的词 可以组合文章 </h1>');
                     }
 
 //                echo '<pre>';
-//                print_r($longKeywords);
+//                print_r($column);
+//                exit;
 
                     foreach ($longKeywords as $key => $longKeyword) {
                         $longKeyword['type'] = Category::findOne($rules['category_id'])->en_name;
@@ -687,6 +680,7 @@ class LongKeywords extends Base
 //                            echo '<pre>';
 //                            print_r($saveData);
 //                            exit;
+
                                 Tools::writeLog('保存爬取双词' . $saveData[0]['domain_id'], 'set_rules.log');
 
 //                                echo ' < pre>';
@@ -719,7 +713,7 @@ class LongKeywords extends Base
 //                        print_r($saveData);
 
 //                    }
-                    }
+
                 }
 //                        sleep(5);
             }

@@ -371,10 +371,11 @@ class MipFlag extends Base
                 $domain = $da->name;
                 $num = 50000;
                 //生成PC端
-                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
                 self::getCrontabData($filePath, $da, 'www.', $num);
                 //生成移动端
-                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
+
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
                 self::getCrontabData($filePath, $da, 'm.', $num);
             }
         }
