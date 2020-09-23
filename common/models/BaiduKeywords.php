@@ -55,6 +55,34 @@ class BaiduKeywords extends Base
     const CATCH_STATUS_START = 20;  //可抓取
     const CATCH_STATUS_OVER = 30;  //搜狗抓取挖完毕
 
+    public static function getDomainIds()
+    {
+        //查询指定20个站 的规则
+        $domainIds = [
+            25,    //arcf.org.cn
+            48,    //jlsds.org.cn
+            72,    //hbrl22.com
+            16,    //0ww9.com
+            35,    //hsmengxiao.org.cn
+            38,    //ysjj.org.cn
+            63,    //xjscpt.org
+            60,    //thszxxdyw.org.cn
+            30,    //dglanglun.com
+            39,    //xljd0571.com
+            45,    //whsgtzydzhjjcy.org.cn
+            50,    //sclxfl.org.cn
+            47,    //hncf.org.cn
+            34,    //hebjj.org.cn
+            32,    //jsflxh.org.cn
+            20,    //qdmjsw.org.cn
+            53,    //fs120yy.com
+            41,    //cmru.org.cn
+            46,    //cxch.org.cn
+            76,    //xunke.org.cn
+        ];
+        return $domainIds;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -261,29 +289,7 @@ class BaiduKeywords extends Base
     public static function changeSort()
     {
         //查询指定20个站 的规则
-        $domainIds = [
-            25,    //arcf.org.cn
-            48,    //jlsds.org.cn
-            72,    //hbrl22.com
-            16,    //0ww9.com
-            35,    //hsmengxiao.org.cn
-            38,    //ysjj.org.cn
-            63,    //xjscpt.org
-            60,    //thszxxdyw.org.cn
-            30,    //dglanglun.com
-            39,    //xljd0571.com
-            45,    //whsgtzydzhjjcy.org.cn
-            50,    //sclxfl.org.cn
-            47,    //hncf.org.cn
-            34,    //hebjj.org.cn
-            32,    //jsflxh.org.cn
-            20,    //qdmjsw.org.cn
-            53,    //fs120yy.com
-            41,    //cmru.org.cn
-            46,    //cxch.org.cn
-            76,    //xunke.org.cn
-        ];
-
+        $domainIds = self::getDomainIds();
         //查询出所有的规则分类
         $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
         $itemData = [];

@@ -533,8 +533,15 @@ class LongKeywords extends Base
             $andWhere = [];
         }
 
+        //查询指定20个站 的规则
+        $domainIds = self::getDomainIds();
+
+
         //查询所有栏目
-        $domainColumn = DomainColumn::find()->select('id,type,domain_id,zh_name,name')->where([
+        $domainColumn = DomainColumn::find()
+            ->select('id,type,domain_id,zh_name,name')
+            ->where(['in', 'id', $domainIds])
+            ->andWhere([
 //            'id' => 90,
             'status' => self::STATUS_BASE_NORMAL,
         ])
@@ -545,8 +552,9 @@ class LongKeywords extends Base
 
         $_GET['domain'] = 0;
 
+
         $step = 10;
-        for ($i = 1; $i < 10; $i++) {
+        for ($i = 1; $i < 20; $i++) {
             foreach ($domainColumn as $column) {
                 //查询分类规则
                 $rules = ArticleRules::find()->where([

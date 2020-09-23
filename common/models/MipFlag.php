@@ -322,7 +322,7 @@ class MipFlag extends Base
         $domain = $da->name;
         $urls = [];
         //当文件不存在时，全部搜索
-        if (file_exists($filePath)) {
+        if (!file_exists($filePath)) {
             $articles = PushArticle::findx($da->id)->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
         } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
             $urls = explode(PHP_EOL, file_get_contents($filePath));
@@ -370,11 +370,9 @@ class MipFlag extends Base
             if (!empty($da->baidu_token)) {
                 $domain = $da->name;
                 $num = 50000;
-
                 //生成PC端
                 $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
                 self::getCrontabData($filePath, $da, 'www.', $num);
-
                 //生成移动端
                 $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
                 self::getCrontabData($filePath, $da, 'm.', $num);
