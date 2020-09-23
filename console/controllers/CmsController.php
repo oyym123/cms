@@ -145,4 +145,10 @@ class CmsController extends \yii\console\Controller
     {
         MipFlag::pushMipM();
     }
+
+    public function actionTransA()
+    {
+        //翻译文章
+        LongKeywords::rulesTrans();
+    }
 }

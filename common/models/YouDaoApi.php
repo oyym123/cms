@@ -22,7 +22,7 @@ class YouDaoApi extends \yii\db\ActiveRecord
         $args['from'] = 'zh-CHS';
         $args['to'] = 'en';
         $args['signType'] = 'v3';
-        $args['ext'] = 'mp3';
+//        $args['ext'] = 'mp3';
         $curtime = strtotime("now");
 
         $args['curtime'] = $curtime;

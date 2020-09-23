@@ -257,81 +257,109 @@ class BaiduKeywords extends Base
         }
     }
 
+    /** 将数据打乱重组 推入爬虫库 */
+    public static function changeSort()
+    {
+        //查询指定20个站 的规则
+        $domainIds = [
+            25,    //arcf.org.cn
+            48,    //jlsds.org.cn
+            72,    //hbrl22.com
+            16,    //0ww9.com
+            35,    //hsmengxiao.org.cn
+            38,    //ysjj.org.cn
+            63,    //xjscpt.org
+            60,    //thszxxdyw.org.cn
+            30,    //dglanglun.com
+            39,    //xljd0571.com
+            45,    //whsgtzydzhjjcy.org.cn
+            50,    //sclxfl.org.cn
+            47,    //hncf.org.cn
+            34,    //hebjj.org.cn
+            32,    //jsflxh.org.cn
+            20,    //qdmjsw.org.cn
+            53,    //fs120yy.com
+            41,    //cmru.org.cn
+            46,    //cxch.org.cn
+            76,    //xunke.org.cn
+        ];
+
+        //查询出所有的规则分类
+        $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+        $itemData = [];
+
+        $step = 5;
+        $limit = 70;
+        for ($i = 0; $i <= $limit; $i++) {
+            foreach ($articleRules as $key => $rules) {
+                $keywordData = AllBaiduKeywords::find()
+                    ->select('id,keywords as name, type as type_name,from_keywords as keywords,pid,m_pv')
+                    ->where([
+                        'status' => 1,
+                        'type_id' => $rules['category_id']
+                    ])
+                    ->andWhere([
+                        'catch_status' => 100
+                    ])
+                    ->orderBy('id desc')
+                    ->offset($i * $step)
+                    ->limit($step)
+                    ->asArray()
+                    ->all();
+
+                foreach ($keywordData as $keywordDatum) {
+                    $itemData[] = $keywordDatum;
+                }
+            }
+        }
+
+        return $itemData;
+
+//        echo '<pre>';
+//        print_r($itemData);
+//        exit;
+    }
+
     /** 推送关键词 */
     public static function pushKeywords()
     {
         set_time_limit(0);
         ignore_user_abort();
-        //233061
-        //231954
-//        for ($i = 231954; $i <= 233061; $i++) {
-//       echo $i . PHP_EOL;
-
-        //搜索 下拉词栏目
-//        $bd = BaiduKeywords::find()->select('id,keywords')
-////            ->where(['type' => 'LEA'])
-//            ->andWhere(['not like', 'keywords', '驾校'])
-//            ->andWhere(['not like', 'keywords', '翻译'])
-//            ->andWhere(['not like', 'keywords', '签证'])
-//            ->orderBy('Rand()')
-////            ->limit(100)
-//            ->asArray()
-//            ->all();
-
-//        foreach ($bd as $item) {
-
-        $long = AllBaiduKeywords::find()
-            ->select('id,keywords as name, type as type_name,from_keywords as keywords,pid,m_pv')
-//            ->where([
-//                '>', 'm_pv', 0
-//            ])
-//            ->andWhere([
-//                '<=', 'm_pv', 20
-//            ])
-            ->where([
-                'status' => 1
-            ])
-            ->andWhere([
-                'catch_status' => 100
-            ])
-            ->andWhere([
-                '>', 'type_id', 0
-            ])
-            ->orderBy('id desc')
-            ->limit(10000)
-            ->asArray()
-            ->all();
-
+        $long = self::changeSort();
         //标记长尾词
         foreach ($long as $l) {
-            sleep(1);
+//            sleep(1);
             //匹配下拉词
-            list($code, $msg) = LongKeywords::getBaiduKey(['keywords' => $l['name']], 1);
+//            list($code, $msg) = LongKeywords::getBaiduKey(['keywords' => $l['name']], 1);
+//
+//            if ($code < 0) {
+//                echo '<pre>';
+//                print_r($msg);
 
-            if ($code < 0) {
-                echo '<pre>';
-                print_r($msg);
-                $all = AllBaiduKeywords::findOne($l['id']);
-                $all->status = 10;
-                $all->save(false);
-                LongKeywords::bdPushReptileNew($l, $l['pid']);
-                continue;
-            } else {
-                $arrTitle = [];
-                foreach ($msg as $item) {
-                    if ($item != $l['name'] && (strlen($item) > strlen($l['name']))) {
-                        $arrTitle[] = $item;
-                    }
-                }
+            $l['name'] = trim($l['name']);
+            $all = AllBaiduKeywords::findOne($l['id']);
+            $all->status = 10;
+            $all->save(false);
+            LongKeywords::bdPushReptileNew($l, $l['pid']);
 
-                $downKeywords = str_replace(',', '', $arrTitle[0]);
-                echo '下拉词:  ' . $downKeywords . '<br/>';
-                $all = AllBaiduKeywords::findOne($l['id']);
-                $all->status = 10;
-                $all->save(false);
-                LongKeywords::bdPushReptileNew($l, $l['pid'], $downKeywords);
-//                    print_r($l);exit;
-            }
+
+//                continue;
+//            } else {
+//                $arrTitle = [];
+//                foreach ($msg as $item) {
+//                    if ($item != $l['name'] && (strlen($item) > strlen($l['name']))) {
+//                        $arrTitle[] = $item;
+//                    }
+//                }
+//
+//                $downKeywords = str_replace(',', '', $arrTitle[0]);
+//                echo '下拉词:  ' . $downKeywords . '<br/>';
+//                $all = AllBaiduKeywords::findOne($l['id']);
+//                $all->status = 10;
+//                $all->save(false);
+//                LongKeywords::bdPushReptileNew($l, $l['pid'], $downKeywords);
+////                    print_r($l);exit;
+//            }
         }
 //                echo '<pre>';
 //                print_r($l['name']);

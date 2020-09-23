@@ -75,7 +75,7 @@ class AllBaiduKeywords extends Base
             [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
-            [['keywords', 'json_info', 'type'], 'string'],
+            [['keywords', 'json_info', 'type','m_down_name'], 'string'],
             [['m_cpc'], 'string', 'max' => 11],
         ];
     }

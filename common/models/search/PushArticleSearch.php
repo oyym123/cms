@@ -40,7 +40,7 @@ class PushArticleSearch extends PushArticle
      */
     public function search($params)
     {
-        $query = PushArticle::find();
+        $query = PushArticle::findx(\Yii::$app->request->get('domain_id'));
 
         // add conditions that should always apply here
 
