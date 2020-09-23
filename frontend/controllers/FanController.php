@@ -117,7 +117,7 @@ class FanController extends Controller
 
             $model['content'] = str_replace($upArr, '', $model['content']);
 
-            $model['content']  = str_replace(['<p>.</p>', '. .</p>'], ['', '.</p>'], $model['content'] );
+            $model['content']  = str_replace(['<p>.</p>', '. .</p>','</p>.</p>'], ['', '.</p>',''], $model['content'] );
 //
 //            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
 //
