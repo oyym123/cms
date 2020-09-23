@@ -322,7 +322,7 @@ class MipFlag extends Base
         $domain = $da->name;
         $urls = [];
         //当文件不存在时，全部搜索
-        if (!file_exists($filePath)) {
+        if (file_exists($filePath)) {
             $articles = PushArticle::findx($da->id)->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
         } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
             $urls = explode(PHP_EOL, file_get_contents($filePath));
