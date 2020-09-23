@@ -215,8 +215,8 @@ class SiteController extends Controller
             $data = [];
             $domainModel = Domain::getDomainInfo();
             foreach ($articles as $article) {
-                $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                $data[] = 'http://m.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
+                $data[] = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'https://m.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
             }
 
             $data = array_merge($data, $urls);
@@ -268,8 +268,8 @@ class SiteController extends Controller
             $data = [];
             $domainModel = Domain::getDomainInfo();
             foreach ($articles as $article) {
-                $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                $data[] = 'http://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
+                $data[] = 'https://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
             }
 
             $data = array_merge($data, $urls);
