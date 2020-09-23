@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use Cassandra\Date;
+use common\models\AllBaiduKeywords;
 use common\models\ArticleRules;
 use common\models\BaiduKeywords;
 use common\models\BaiDuSdk;
@@ -284,5 +286,42 @@ class CmsController extends Controller
     {
         //翻译文章
         LongKeywords::rulesTrans();
+    }
+
+    public function actionCountArticle()
+    {
+        $domainIds = BaiduKeywords::getDomainIds();
+        $articleRules = ArticleRules::find()->select('category_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+
+        $itemData = [];
+        $timeStart = Yii::$app->request->get('start', Date('Y-m-d') . ' 00:00:00');
+        $timeEnd = Yii::$app->request->get('end', date("Y-m-d", strtotime("+1 day")) . ' 00:00:00');
+
+        $total = 0;
+        foreach ($articleRules as $key => $rules) {
+            $column = DomainColumn::find()
+                ->where(['id' => $rules['column_id']])->one();
+            $res = AllBaiduKeywords::find()
+                ->where(['type_id' => $rules['category_id']])
+                ->andWhere(['>', 'updated_at', $timeStart])
+                ->andWhere(['<', 'updated_at', $timeEnd])
+                ->andWhere(['>', 'column_id', 0])
+                ->count();
+            $total += $res;
+            $itemData[] = [
+                '文章数量' => '<strong style="color: red">' . $res . '</strong>',
+                '域名' => $column->domain->name,
+                '域名ID' => $column->domain_id,
+                '栏目名称' => $column->name,
+                '栏目中文名称' => $column->zh_name,
+                '开始时间' => $timeStart,
+                '结束时间' => $timeEnd,
+            ];
+
+        }
+        echo '<pre>';
+        echo '<h1> 总量：' . $total . '</h1>';
+        print_r($itemData);
+        exit;
     }
 }

@@ -195,7 +195,7 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 1000;
+            $remain = 200;
             $urls = array_slice($info, 1, $remain);
             $info = $urls;
         }
@@ -346,7 +346,6 @@ class MipFlag extends Base
             $data[] = 'https://' . $flag . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             $data[] = 'https://' . $flag . $domain . '/' . $da->start_tags . $article['key_id'] . $da->end_tags;
         }
-
 
         $data = array_unique(array_merge($data, $urls));
         $str = '';
