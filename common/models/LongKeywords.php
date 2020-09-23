@@ -227,11 +227,15 @@ class LongKeywords extends Base
         $url2 = 'http://m.baidu.com/sugrec?pre=1&p=20&ie=utf-8&json=1&prod=wise&from=wise_web&net=&os=&sp=&callback=jsonp&wd=' . $data['keywords'];
 
         $resDown = Tools::curlGet($url);
-        $resDown = str_replace('jsonp(', '', $resDown);
+       
+ echo '<pre>';
+print_r($resDown);exit;
+ $resDown = str_replace('jsonp(', '', $resDown);
         $resDown = substr($resDown, 0, -1);
 
         $resDown = json_decode($resDown, true)['g'];
 
+        
         if (!empty($resDown)) {
             $resDown = array_column($resDown, 'q');
         } else {
