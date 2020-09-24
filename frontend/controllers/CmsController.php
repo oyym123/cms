@@ -311,14 +311,14 @@ class CmsController extends Controller
 
             $lastArticle = PushArticle::findx($column->domain_id)->orderBy('id desc')->one();
             $total += $res;
-            $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
+//            $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
             $itemData[] = [
                 '文章数量' => '<strong style="color: red">' . $res . '</strong>',
                 '域名' => $column->domain->name,
                 '域名ID' => $column->domain_id,
                 '栏目名称' => $column->name,
                 '栏目中文名称' => $column->zh_name,
-                '最后一条连接' => '<a href="' . $lastUrl . '" target="_blank">' . $lastUrl . '</a>',
+//                '最后一条连接' => '<a href="' . $lastUrl . '" target="_blank">' . $lastUrl . '</a>',
                 '开始时间' => $timeStart,
                 '结束时间' => $timeEnd,
             ];
