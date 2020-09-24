@@ -120,7 +120,7 @@ class KeywordsController extends BaseController
         $data = json_decode($post, true);
         //关键词爬取回调
         foreach ($data as $item) {
-            $keywords = AllBaiduKeywords::findOne($item('key_id'));
+            $keywords = AllBaiduKeywords::findOne($item['key_id']);
             if (!empty($keywords)) {
                 $keywords->back_time = date('Y-m-d H:i:s');
                 $keywords->save(false);
