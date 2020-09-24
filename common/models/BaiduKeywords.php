@@ -294,8 +294,8 @@ class BaiduKeywords extends Base
         $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
         $itemData = [];
 
-        $step = 10;
-        $limit = 200;
+        $step = 1;
+        $limit = 2;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()
@@ -318,12 +318,14 @@ class BaiduKeywords extends Base
                 }
             }
         }
-
-        return $itemData;
-
 //        echo '<pre>';
 //        print_r($itemData);
 //        exit;
+        return $itemData;
+
+        echo '<pre>';
+        print_r($itemData);
+        exit;
     }
 
     /** 推送关键词 */

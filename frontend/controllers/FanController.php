@@ -117,7 +117,7 @@ class FanController extends Controller
 
             $model['content'] = str_replace($upArr, '', $model['content']);
 
-            $model['content']  = str_replace(['<p>.</p>', '. .</p>','</p>.</p>'], ['', '.</p>',''], $model['content'] );
+            $model['content'] = str_replace(['<p>.</p>', '. .</p>', '</p>.</p>'], ['', '.</p>', ''], $model['content']);
 //
 //            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
 //
@@ -230,7 +230,7 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['user_tdk'] = [
-                'title' => $models[0]['nickname'] . '_会员' ,
+                'title' => $models[0]['nickname'] . '_会员',
                 'keywords' => $models[0]['nickname'] . '_会员',
                 'intro' => $column->intro . '_' . $domain->zh_name,
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
@@ -293,7 +293,9 @@ class FanController extends Controller
                 'url' => Tools::getLocalUrl(1) . '/' . $columnName
             ];
         }
+
 //        print_r( $this->layout );exit;
+
         $res = [
             'home_list' => $models,
             'column_info' => [
@@ -317,7 +319,6 @@ class FanController extends Controller
             'pages' => $pages,
         ]);
     }
-
 
     /**
      * @OA\Get(
@@ -501,7 +502,6 @@ class FanController extends Controller
         }
     }
 
-
     /**
      * @OA\Get(
      *     path="/fan/tags-detail",
@@ -573,6 +573,7 @@ class FanController extends Controller
             if (empty($modelInfo)) {
                 return $this->render($render, ['models' => ['data' => ['title' => '没有内容了!']]]);
             }
+
             return $this->render($render, ['models' => $res]);
         }
     }
