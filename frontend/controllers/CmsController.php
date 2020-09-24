@@ -290,13 +290,14 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
+
         $domainIds = BaiduKeywords::getDomainIds();
         $articleRules = ArticleRules::find()->select('category_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
 
         $itemData = [];
         $timeStart = Yii::$app->request->get('start', Date('Y-m-d') . ' 00:00:00');
         $timeEnd = Yii::$app->request->get('end', date("Y-m-d", strtotime("+1 day")) . ' 00:00:00');
-
+        $_GET['domain'] = 0;
         $total = 0;
         foreach ($articleRules as $key => $rules) {
             $column = DomainColumn::find()
@@ -307,17 +308,20 @@ class CmsController extends Controller
                 ->andWhere(['<', 'updated_at', $timeEnd])
                 ->andWhere(['>', 'column_id', 0])
                 ->count();
+
+            $lastArticle = PushArticle::findx($column->domain_id)->orderBy('id desc')->one();
             $total += $res;
+            $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
             $itemData[] = [
                 '文章数量' => '<strong style="color: red">' . $res . '</strong>',
                 '域名' => $column->domain->name,
                 '域名ID' => $column->domain_id,
                 '栏目名称' => $column->name,
                 '栏目中文名称' => $column->zh_name,
+                '最后一条连接' => '<a href="' . $lastUrl . '" target="_blank">' . $lastUrl . '</a>',
                 '开始时间' => $timeStart,
                 '结束时间' => $timeEnd,
             ];
-
         }
         echo '<pre>';
         echo '<h1> 总量：' . $total . '</h1>';
