@@ -173,7 +173,7 @@ class AllBaiduKeywords extends Base
             ->all();
 
         foreach ($models as &$item) {
-            $item['url'] = 'http://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            $item['url'] = 'https://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
         }
         return $models;
     }

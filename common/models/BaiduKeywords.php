@@ -295,7 +295,7 @@ class BaiduKeywords extends Base
         $itemData = [];
 
         $step = 10;
-        $limit = 50;
+        $limit = 200;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()

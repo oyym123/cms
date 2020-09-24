@@ -226,8 +226,7 @@ class CmsController extends Controller
     {
         return BaiduKeywords::pushKeywords();
     }
-
-
+    
     public function actionChangeTemp()
     {
         //更新模板
@@ -290,6 +289,9 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
+        $listRes = Tools::curlGet('http://8.129.37.130/index.php/distribute/list-length');
+        $listArr = json_decode($listRes, true);
+
 
         $domainIds = BaiduKeywords::getDomainIds();
         $articleRules = ArticleRules::find()->select('category_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
@@ -311,20 +313,23 @@ class CmsController extends Controller
 
             $lastArticle = PushArticle::findx($column->domain_id)->orderBy('id desc')->one();
             $total += $res;
-//            $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
+            $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
             $itemData[] = [
                 '文章数量' => '<strong style="color: red">' . $res . '</strong>',
                 '域名' => $column->domain->name,
                 '域名ID' => $column->domain_id,
                 '栏目名称' => $column->name,
                 '栏目中文名称' => $column->zh_name,
-//                '最后一条连接' => '<a href="' . $lastUrl . '" target="_blank">' . $lastUrl . '</a>',
+                '最后一条连接' => '<a href="' . $lastUrl . '" target="_blank">' . $lastUrl . '</a>',
                 '开始时间' => $timeStart,
                 '结束时间' => $timeEnd,
             ];
         }
+
         echo '<pre>';
-        echo '<h1> 总量：' . $total . '</h1>';
+        echo '<h1> 文章总量：' . $total . '</h1>';
+        echo '<h2> 爬虫分发器中剩余：' . $listArr['data'][0] . '</h2>';
+
         print_r($itemData);
         exit;
     }

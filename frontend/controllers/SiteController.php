@@ -99,7 +99,7 @@ class SiteController extends Controller
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
 
         foreach ($articles as $article) {
-            $urlPc = 'http://www.' . $domain . '/' . $article['column_id'] . '/' . $article['id'] . '.html';
+            $urlPc = 'https://www.' . $domain . '/' . $article['column_id'] . '/' . $article['id'] . '.html';
             $data .= '
                     <url>
                     <loc>' . $urlPc . '</loc>
@@ -150,7 +150,7 @@ class SiteController extends Controller
         $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
         foreach ($articles as $article) {
-            $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $urlM = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
 
             $data .= '
                     <url>
