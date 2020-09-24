@@ -45,3 +45,5 @@ phpunit.phar
 /backend/web/robots.txt
 /backend/web/img_tmp
 
+backend/web/nginx.htaccess
+frontend/web/nginx.htaccess

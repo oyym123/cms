@@ -128,8 +128,9 @@ class MipFlag extends Base
             ];
         }
 
+        $domainIds = BaiduKeywords::getDomainIds();
         $errorArr = [];
-        $domains = Domain::find()->where($where)->all();
+        $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
         foreach ($domains as $domain) {
             list($resM, $resPc) = self::getAllUrl($domain->name);
             $res = $type == 1 ? $resPc : $resM;
@@ -408,5 +409,5 @@ class MipFlag extends Base
     }
 
 
-    
+
 }

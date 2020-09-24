@@ -9,7 +9,7 @@ use common\models\AllBaiduKeywords;
 class KeywordsController extends BaseController
 {
 
-
+    public $enableCsrfValidation = false;
     /**
      * @OA\Post(
      *     path="/keywords/pull",
@@ -116,6 +116,7 @@ class KeywordsController extends BaseController
 
     public function actionCallBack()
     {
+
         $post = \Yii::$app->request->post('res');
         $data = json_decode($post, true);
         //关键词爬取回调
