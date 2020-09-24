@@ -117,7 +117,7 @@ class KeywordsController extends BaseController
     public function actionCallBack()
     {
         $post = \Yii::$app->request->post('res');
-        $data = json_ddecode($post, true);
+        $data = json_decode($post, true);
         //关键词爬取回调
         foreach ($data as $item) {
             $keywords = AllBaiduKeywords::findOne($item('key_id'));
