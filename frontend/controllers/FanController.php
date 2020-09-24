@@ -78,13 +78,13 @@ class FanController extends Controller
             $nextTitle = PushArticle::findOne($arr[0] + 1);
 
             if ($preTitle) {
-                $preTitle = $preTitle->title;
+                $preTitle =  Tools::getKTitle($preTitle->title);
             } else {
                 $preTitle = '没有更多内容啦！';
             }
 
             if ($nextTitle) {
-                $nextTitle = $nextTitle->title;
+                $nextTitle =  Tools::getKTitle($nextTitle->title);
             } else {
                 $nextTitle = '没有更多内容啦！';
             }
