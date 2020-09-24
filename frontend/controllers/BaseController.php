@@ -67,7 +67,7 @@ class BaseController extends Controller
             echo json_encode($item);
         } else {
             //编码
-            $item = json_encode($item);
+            $item = json_encode($item,JSON_UNESCAPED_UNICODE);
             // 送出信息
             echo "{$item}";
         }

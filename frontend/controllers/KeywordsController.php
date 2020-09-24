@@ -121,9 +121,9 @@ class KeywordsController extends BaseController
         if (!empty($keywords)) {
             $keywords->back_time = date('Y-m-d H:i:s');
             $keywords->save(false);
-            slef::showMsg([]);
+            self::showMsg([]);
         } else {
-
+            self::showMsg([],-1,'没有该关键词');
         }
     }
 }
