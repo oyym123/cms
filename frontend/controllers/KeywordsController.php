@@ -116,14 +116,15 @@ class KeywordsController extends BaseController
 
     public function actionCallBack()
     {
+        $post = \Yii::$app->request->post('res');
+        $data = json_ddecode($post, true);
         //关键词爬取回调
-        $keywords = AllBaiduKeywords::findOne(\Yii::$app->request->get('key_id'));
-        if (!empty($keywords)) {
-            $keywords->back_time = date('Y-m-d H:i:s');
-            $keywords->save(false);
-            self::showMsg([]);
-        } else {
-            self::showMsg([],-1,'没有该关键词');
+        foreach ($data as $item) {
+            $keywords = AllBaiduKeywords::findOne($item('key_id'));
+            if (!empty($keywords)) {
+                $keywords->back_time = date('Y-m-d H:i:s');
+                $keywords->save(false);
+            }
         }
     }
 }
