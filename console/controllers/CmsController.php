@@ -2,6 +2,7 @@
 
 namespace console\controllers;
 
+use common\models\AllBaiduKeywords;
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
 use common\models\DbName;
@@ -9,7 +10,7 @@ use common\models\FanUser;
 use common\models\LongKeywords;
 use common\models\MipFlag;
 use common\models\Tools;
-
+use common\models\ArticleRules;
 class CmsController extends \yii\console\Controller
 {
     /**
@@ -150,5 +151,75 @@ class CmsController extends \yii\console\Controller
     {
         //翻译文章
         LongKeywords::rulesTrans();
+    }
+
+    public function actionSetList()
+    {
+
+
+
+
+        //查询指定20个站 的规则
+        $domainIds = BaiduKeywords::getDomainIds();
+        //查询出所有的规则分类
+        $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+        $itemData = [];
+
+        $step = 50;
+        $limit = 60;
+
+        for ($i = 41; $i <= $limit; $i++) {
+            foreach ($articleRules as $key => $rules) {
+                $keywords = AllBaiduKeywords::find()
+                    ->select('id,keywords,type')
+                    ->where([
+                        'column_id' => 0,
+                        'status' => 10,
+                        'type_id' => $rules['category_id']
+                    ])
+                    ->andWhere(['>', 'updated_at', '2020-09-24 08:00:00'])
+                    ->andWhere([
+                        'catch_status' => 100
+                    ])
+                    ->andWhere(['back_time' => null])
+                    ->orderBy('id desc')
+                    ->offset($i * $step)
+                    ->limit($step)
+                    ->asArray()
+                    ->all();
+
+                foreach ($keywords as $keyword) {
+                    $data[] = [
+                        'keyword' => $keyword['keywords'],
+                        'key_id' => $keyword['id'],
+                        'id' => 0,
+                        'type' => $keyword['type'],
+                    ];
+                }
+            }
+
+        }
+
+        $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
+        Tools::curlPost($url, ['res' => json_encode($data)]);
+        exit;
+
+
+
+//        echo '<pre>';
+//        print_r($data);
+//        exit;
+//
+//        $data = [];
+
+//        $urlGet = 'http://8.129.37.130/index.php/distribute/set-keyword';
+//
+//        Tools::curlNewGet()
+//        echo '<pre>';
+//        print_r($data);exit;
+
+        $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
+        $res = Tools::curlPost($url, ['res' => json_encode($data)]);
+        print_r($res);
     }
 }

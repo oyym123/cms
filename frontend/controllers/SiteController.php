@@ -96,7 +96,7 @@ class SiteController extends Controller
 
 
         $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
 
 
         //当文件不存在时，全部搜索
@@ -170,7 +170,7 @@ class SiteController extends Controller
 
         $articles = PushArticle::find()->select('id,column_name,column_id,push_time')->limit($num)->orderBy('id desc')->all();
         $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
         foreach ($articles as $article) {
             $urlM = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
 

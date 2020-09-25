@@ -289,7 +289,8 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
-        $listRes = Tools::curlGet('http://8.129.37.130/index.php/distribute/list-length');
+
+        $listRes = Tools::curlGet('http://8.129.37.130/distribute/list-length');
         $listArr = json_decode($listRes, true);
 
         $domainIds = BaiduKeywords::getDomainIds();
@@ -347,22 +348,22 @@ class CmsController extends Controller
             }
         }
 
-        $pushNum = AllBaiduKeywords::find()
+        $catchNum = AllBaiduKeywords::find()
             ->where([
                 'status' => 10,
-                'column_id' => 0
             ])
-            ->andWhere(['>', 'updated_at', $timeStart])
-            ->andWhere(['<', 'updated_at', $timeEnd])
+            ->andWhere(['>', 'back_time', $timeStart])
+            ->andWhere(['<', 'back_time', $timeEnd])
             ->count();
 
         echo '<pre>';
         echo '<div style="background: black;color: white">';
         echo $timeStart . '  至 ' . $timeEnd . '<h1>期间的文章总量：' . $total . ' 篇</h1>';
-        echo '<h2> 关键词推入总量：' . $pushNum . ' 个</h2>';
+//        echo '<h2> 关键词推入总量：' . $pushNum . ' 个</h2>';
         echo '<h2> 爬虫分发器中剩余：' . $listArr['data'][0] . ' 条</h2>';
-        echo '<h2> 爬虫爬取关键词量：' . ($pushNum - $listArr['data'][0]) . ' 个</h2>';
+        echo '<h2> 爬虫爬取关键词量：' . $catchNum . ' 个</h2>';
         echo '<h2> 百度推送总量：' . $tuiTotal . ' 个</h2>';
+        echo '<h2> <a href="/cms/check-computer" target="_blank"><button>查看爬虫电脑运行状态：</button></a> </h2>';
 
         echo '<hr/>';
         echo '<hr/>';
@@ -383,16 +384,45 @@ class CmsController extends Controller
         exit;
     }
 
+
+    public function actionCheckComputer()
+    {
+        $checkComputer = Tools::curlGet(\Yii::$app->params['local_reptile_url'] . '/cms/check-computer');
+        echo '<pre>';
+        echo '<div style="background: black;color: white;">';
+        echo '<h1>时间大于10分钟的标记为红色!</h1>';
+
+        $data = json_decode($checkComputer, true);
+        $num = 0;
+        $noArr = $yesArr = [];
+        foreach ($data as $datum) {
+            if ($datum['time'] > (10 * 60)) {
+                $num += 1;
+                $noArr[] = $datum['电脑号'];
+            }else{
+                $yesArr[]= $datum['电脑号'];
+            }
+        }
+
+        echo '<h1>异常机器 <strong style="color: red;font-size: larger">' . $num . '台 ---  ' .implode(',',$noArr).'</strong></h1>';
+        echo '<h1>正常机器<strong style="color: green;font-size: larger">' . (count($data) - $num) . '台 --- '.implode(',',$yesArr).'</strong></h1>';
+        print_r(json_decode($checkComputer, true));
+        echo '<pre>';
+        echo '</div>';
+        exit;
+    }
+
     public function actionSetList()
     {
+        exit('暂停使用！');
         //查询指定20个站 的规则
         $domainIds = BaiduKeywords::getDomainIds();
         //查询出所有的规则分类
         $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
         $itemData = [];
 
-        $step = 10;
-        $limit = 5;
+        $step = 50;
+        $limit = 50;
 
         for ($i = 1; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
@@ -407,6 +437,7 @@ class CmsController extends Controller
                     ->andWhere([
                         'catch_status' => 100
                     ])
+                    ->andWhere(['back_time' => null])
                     ->orderBy('id desc')
                     ->offset($i * $step)
                     ->limit($step)
@@ -422,12 +453,18 @@ class CmsController extends Controller
                     ];
                 }
             }
+            $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
+            Tools::curlPost($url, ['res' => json_encode($data)]);
         }
+        exit;
 
-//        echo '<pre>';
-//        print_r($data);
-//        exit;
-//
+        $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
+        $res = Tools::curlPost($url, ['res' => json_encode($data)]);
+
+        echo '<pre>';
+        print_r($data);
+        exit;
+
 //        $data = [];
 
 //        $urlGet = 'http://8.129.37.130/index.php/distribute/set-keyword';
