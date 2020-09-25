@@ -121,15 +121,16 @@ class MipFlag extends Base
     /** 推送URL */
     public static function pushUrl($domainId = 0, $test = 0, $type = 1)
     {
+        $where =[];
         //推送
         if ($domainId) {
             $where = [
                 'id' => $domainId
             ];
         }
-
         $errorArr = [];
         $domains = Domain::find()->where($where)->all();
+
         foreach ($domains as $domain) {
             list($resM, $resPc) = self::getAllUrl($domain->name);
             $res = $type == 1 ? $resPc : $resM;
@@ -384,10 +385,11 @@ class MipFlag extends Base
     public static function pushMip()
     {
         set_time_limit(0);
-        //获取所有的域名
-        $doamins = Domain::find()->all();
+
         $_GET['domain'] = 0;
-        foreach ($doamins as $da) {
+        $domainIds = BaiduKeywords::getDomainIds();
+        $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
+        foreach ($domains as $da) {
             if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 1); //PC推送
             }
@@ -398,12 +400,16 @@ class MipFlag extends Base
     {
         set_time_limit(0);
         //获取所有的域名
-        $doamins = Domain::find()->all();
         $_GET['domain'] = 0;
-        foreach ($doamins as $da) {
+        $domainIds = BaiduKeywords::getDomainIds();
+        $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
+        foreach ($domains as $da) {
             if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 2); //移动推送
             }
         }
     }
+
+
+
 }

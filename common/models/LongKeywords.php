@@ -560,6 +560,7 @@ class LongKeywords extends Base
                     ->andWhere(['catch_status' => 100])              //表示后台输入的词
                     ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
                     ->andWhere(['type_id' => $rules['category_id']])
+//                    ->andWhere(['>','back_time','2020-08-01 00:00:00'])  有回调参数的关键词
                     //表示没有栏目使用过
                     ->orderBy('id desc')
                     ->offset($i * $step)

@@ -73,9 +73,9 @@ class AllBaiduKeywords extends Base
             [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status', 'catch_status'], 'integer'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
             [['word_package', 'json_info', 'type'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'back_time'], 'safe'],
             [['from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
-            [['keywords', 'json_info', 'type','m_down_name'], 'string'],
+            [['keywords', 'json_info', 'type', 'm_down_name'], 'string'],
             [['m_cpc'], 'string', 'max' => 11],
         ];
     }
@@ -173,7 +173,7 @@ class AllBaiduKeywords extends Base
             ->all();
 
         foreach ($models as &$item) {
-            $item['url'] = 'http://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            $item['url'] = 'https://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
         }
         return $models;
     }

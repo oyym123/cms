@@ -94,12 +94,39 @@ class SiteController extends Controller
             exit($data);
         }
 
-        $articles = PushArticle::find()->select('id,column_name,column_id,push_time')->limit($num)->orderBy('id desc')->all();
+
         $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
 
+
+        //当文件不存在时，全部搜索
+        if (file_exists($filePath)) {
+            $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
+        } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
+            $urls = explode('<loc>', file_get_contents($filePath));
+            $urls = explode('</loc>', $urls[1]);
+            $arr = explode('/', $urls[0]);
+            $resUrl = $arr[count($arr) - 1];
+
+            if (preg_match('/\d+/', $resUrl, $lastArr)) {
+                $lastId = $lastArr[0];
+            }
+
+            $articles = PushArticle::find()
+                ->select('id,column_name,key_id')
+                ->where(['>', 'id', $lastId])
+                ->limit($num)
+                ->orderBy('id desc')
+                ->asArray()
+                ->all();
+        }
+
+        $domainModel = Domain::getDomainInfo();
+
         foreach ($articles as $article) {
-            $urlPc = 'http://www.' . $domain . '/' . $article['column_id'] . '/' . $article['id'] . '.html';
+            $urlPc = 'https://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $tagPc = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
+
             $data .= '
                     <url>
                     <loc>' . $urlPc . '</loc>
@@ -109,13 +136,9 @@ class SiteController extends Controller
                     </url>
                     ';
 
-        }
-
-        foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
-            $urlPc = $item['url'];
             $data .= '
                     <url>
-                    <loc>' . $urlPc . '</loc>
+                    <loc>' . $tagPc . '</loc>
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
@@ -125,16 +148,15 @@ class SiteController extends Controller
 
         $data .= '
                     </urlset>';
+
+//        $data = $data . file_get_contents($filePath);
+
         //存入缓存文件
         file_put_contents($filePath, $data);
         exit($data);
-
     }
 
 
-    /**
-     *
-     */
     public function actionSiteMxml()
     {
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
@@ -148,9 +170,9 @@ class SiteController extends Controller
 
         $articles = PushArticle::find()->select('id,column_name,column_id,push_time')->limit($num)->orderBy('id desc')->all();
         $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
         foreach ($articles as $article) {
-            $urlM = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $urlM = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
 
             $data .= '
                     <url>
@@ -219,7 +241,7 @@ class SiteController extends Controller
                 $data[] = 'https://m.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
             }
 
-            $data = array_merge($data, $urls);
+            $data = array_unique(array_merge($data, $urls));
             $str = '';
             foreach ($data as $datum) {
                 $str .= $datum . PHP_EOL;
@@ -272,7 +294,7 @@ class SiteController extends Controller
                 $data[] = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
             }
 
-            $data = array_merge($data, $urls);
+            $data = array_unique(array_merge($data, $urls));
             $str = '';
             foreach ($data as $datum) {
                 $str .= $datum . PHP_EOL;
