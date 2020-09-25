@@ -184,6 +184,7 @@ class SiteController extends Controller
 
     public function actionSiteMtxt()
     {
+        $urls = [];
         $num = Yii::$app->request->get('num', 50000);
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
         $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
@@ -191,16 +192,34 @@ class SiteController extends Controller
             $data = file_get_contents($filePath);
             exit($data);
         } else {
-            $articles = PushArticle::find()->select('id,column_name')->limit($num)->orderBy('id desc')->all();
+            //当文件不存在时，全部搜索
+            if (!file_exists($filePath)) {
+                $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
+            } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
+                $urls = explode(PHP_EOL, file_get_contents($filePath));
+                $arr = explode('/', $urls[0]);
+                $resUrl = $arr[count($arr) - 1];
+                if (preg_match('/\d+/', $resUrl, $lastArr)) {
+                    $lastId = $lastArr[0];
+                }
+
+                $articles = PushArticle::find()
+                    ->select('id,column_name,key_id')
+                    ->where(['>', 'id', $lastId])
+                    ->limit($num)
+                    ->orderBy('id desc')
+                    ->asArray()
+                    ->all();
+            }
+
             $data = [];
+            $domainModel = Domain::getDomainInfo();
             foreach ($articles as $article) {
-                $data[] = 'http://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'https://m.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
             }
 
-            foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
-                $data[] = $item['url'];
-            }
-
+            $data = array_merge($data, $urls);
             $str = '';
             foreach ($data as $datum) {
                 $str .= $datum . PHP_EOL;
@@ -212,35 +231,48 @@ class SiteController extends Controller
             foreach ($data as $datum) {
                 $str2 .= $datum . '<br/>';
             }
-
             echo $str2;
-
         }
     }
 
-
-    /**
-     *
-     */
     public function actionSiteTxt()
     {
         $num = Yii::$app->request->get('num', 50000);
         $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-
+        $urls = [];
         $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
         if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
             $data = file_get_contents($filePath);
             exit($data);
         } else {
-            $articles = PushArticle::find()->select('id,column_name')->limit($num)->orderBy('id desc')->all();
-            $data = [];
-            foreach ($articles as $article) {
-                $data[] = 'http://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-            }
-            foreach (AllBaiduKeywords::getKeywordsUrl('www.') as $item) {
-                $data[] = $item['url'];
+            //当文件不存在时，全部搜索
+            if (!file_exists($filePath)) {
+                $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
+            } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
+                $urls = explode(PHP_EOL, file_get_contents($filePath));
+                $arr = explode('/', $urls[0]);
+                $resUrl = $arr[count($arr) - 1];
+                if (preg_match('/\d+/', $resUrl, $lastArr)) {
+                    $lastId = $lastArr[0];
+                }
+
+                $articles = PushArticle::find()
+                    ->select('id,column_name,key_id')
+                    ->where(['>', 'id', $lastId])
+                    ->limit($num)
+                    ->orderBy('id desc')
+                    ->asArray()
+                    ->all();
             }
 
+            $data = [];
+            $domainModel = Domain::getDomainInfo();
+            foreach ($articles as $article) {
+                $data[] = 'https://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+                $data[] = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
+            }
+
+            $data = array_merge($data, $urls);
             $str = '';
             foreach ($data as $datum) {
                 $str .= $datum . PHP_EOL;
@@ -339,11 +371,9 @@ class SiteController extends Controller
             ],
         ];
 
-
         $view = Yii::$app->view;
-
         $view->params['list_tdk'] = [
-            'title' => $domain->zh_name,
+            'title' => $column->title,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
             'canonical' => 'http://' . $_SERVER['HTTP_HOST'],

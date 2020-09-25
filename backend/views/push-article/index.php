@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <?php Pjax::begin(); ?>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -27,15 +27,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'b_id',
+//            'b_id',
             'column_id',
             'column_name',
             'rules_id',
-            //'domain_id',
-            //'domain',
-            //'from_path',
-            //'keywords',
-            //'title_img',
+            'domain_id',
+            'domain',
+//            'from_path',
+            'keywords',
+//            'title_img',
+
             [
                 'label' => '状态',
                 'attribute' => 'status',
@@ -46,11 +47,11 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             //'content:ntext',
-            //'intro',
-            //'title',
-            //'push_time',
-            //'created_at',
-            //'updated_at',
+//            'intro',
+            'title',
+            'push_time',
+            'created_at',
+            'updated_at',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

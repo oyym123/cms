@@ -75,7 +75,7 @@ class AllBaiduKeywords extends Base
             [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at'], 'safe'],
             [['from_keywords', 'pc_cpc', 'charge', 'all_charge', 'm_charge', 'm_show', 'm_ctr', 'show_reasons', 'businessPoints', 'similar'], 'string', 'max' => 255],
-            [['keywords', 'json_info', 'type'], 'string'],
+            [['keywords', 'json_info', 'type','m_down_name'], 'string'],
             [['m_cpc'], 'string', 'max' => 11],
         ];
     }
@@ -160,9 +160,12 @@ class AllBaiduKeywords extends Base
     }
 
 
-    public static function getKeywordsUrl($flag)
+    public static function getKeywordsUrl($flag, $domain = 0)
     {
-        $domain = Domain::getDomainInfo();
+        if ($domain == 0) {
+            $domain = Domain::getDomainInfo();
+        }
+
         $models = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
             ->select('id')
@@ -170,7 +173,7 @@ class AllBaiduKeywords extends Base
             ->all();
 
         foreach ($models as &$item) {
-            $item['url'] = 'http://' . $flag . Tools::getDoMain($_SERVER['HTTP_HOST']) . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+            $item['url'] = 'http://' . $flag . $domain->name . '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
         }
         return $models;
     }
@@ -183,8 +186,8 @@ class AllBaiduKeywords extends Base
         set_time_limit(0);
         $keywords = Tools::cleanKeywords($postData['keywords']);
 
-        if (count($keywords) > 1000) {
-            return [-1, '最多一次只能导入1000个词'];
+        if (count($keywords) > 10000) {
+            return [-1, '最多一次只能导入10000个词'];
         }
 
         $error = [];
@@ -251,7 +254,7 @@ class AllBaiduKeywords extends Base
                 'catch_status' => 100,  //表示人工
                 'word_package' => '',
                 'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
-                'keywords' =>$item,
+                'keywords' => $item,
                 'from_keywords' => '',
                 'similar' => '',
                 'domain_id' => $postData['domain_id'] ?? 0,
@@ -300,5 +303,15 @@ class AllBaiduKeywords extends Base
     public function getCategory()
     {
         return $this->hasOne(Category::className(), ['id' => 'type_id']);
+    }
+
+    public static function cate()
+    {
+        $res = self::find()->select('type_id')->distinct('type_id')->all();
+        $arr = [];
+        foreach ($res as $re) {
+            $arr[$re->type_id] = $re->category->name;
+        }
+        return $arr;
     }
 }

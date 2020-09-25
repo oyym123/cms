@@ -58,7 +58,7 @@
                             ['label' => '类型    羁绊', 'icon' => 'file-code-o', 'url' => ['/category/index']],
                             ['label' => '手法    技能', 'icon' => 'file-code-o', 'url' => ['/article-way/index']],
                             ['label' => '规则    经验', 'icon' => 'file-code-o', 'url' => ['/article-rules/index']],
-                            ['label' => '文章    金币', 'icon' => 'file-code-o', 'url' => ['/push-article/index']],
+                            ['label' => '文章    金币', 'icon' => 'file-code-o', 'url' => ['/push-article/index?domain_id=16']],
 //                        ]
 //                    ],
                     ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],

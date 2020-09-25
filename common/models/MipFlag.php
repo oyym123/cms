@@ -78,10 +78,9 @@ class MipFlag extends Base
     }
 
     //查询是否已经推送过了
-    public static function checkIsMip($dbId, $url)
+    public static function checkIsMip($url)
     {
         $res = self::find()->where([
-            'db_id' => $dbId,
             'url' => $url,
         ])->one();
         return $res;
@@ -105,18 +104,24 @@ class MipFlag extends Base
 
     public static function getAllUrl($name)
     {
+        $limit = 3000; //取网站地图后最新的url
         $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
-        $resM = array_filter(explode(PHP_EOL, file_get_contents($filePathM)));
-
         $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
-
-        $resPc = array_filter(explode(PHP_EOL, file_get_contents($filePathPC)));
+        if (!file_exists($filePathM) || !file_exists($filePathPC)) {
+            Tools::curlGet($name . '/m_site.txt');
+            sleep(10);
+            Tools::curlGet($name . '/site.txt');
+            sleep(10);
+        }
+        $resM = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathM))), 0, $limit);
+        $resPc = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathPC))), 0, $limit);
         return [$resM, $resPc];
     }
 
     /** 推送URL */
-    public static function pushUrl($domainId = 0)
+    public static function pushUrl($domainId = 0, $test = 0, $type = 1)
     {
+        //推送
         if ($domainId) {
             $where = [
                 'id' => $domainId
@@ -127,101 +132,143 @@ class MipFlag extends Base
         $domains = Domain::find()->where($where)->all();
         foreach ($domains as $domain) {
             list($resM, $resPc) = self::getAllUrl($domain->name);
+            $res = $type == 1 ? $resPc : $resM;
+
             //获取所有的文章进行
-            foreach ($resPc as $re) {
+            foreach ($res as $re) {
                 //判断是否已经提交过了
-                $flag = MipFlag::checkIsMip($domain->id, MipFlag::TYPE_ARTICLE, $re);
+                $flag = MipFlag::checkIsMip($re);
                 if (!empty($flag)) {          //表示已经提交过了
                     $errorArr[] = $re;
                 } else {
                     $info[] = $re;
                 }
             }
-
-            //推送
-            $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], 'pc');
-            $jsonres = json_decode($resData);
-            Tools::writeLog($jsonres);
-            if ($jsonres->success >= 400) {
-                Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
-                return 1;
-            } else {
-                Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
-                //更新插入 标记已经推送过了
-                $saveData = [
-                    'db_id' => $domain->id,
-                    'db_name' => $domain->name,
-                    'type' => MipFlag::TYPE_TAG,
-                    'type_id' => 0,
-                    'url' => $info[0],
-                    'remain' => $jsonres->remain,
-                ];
-                MipFlag::createOne($saveData);
-                $remain = $jsonres->remain;
+//
+//            echo '<pre>';
+//            print_r($info);
+//            exit;
+            if ($test == 1 && $type == 1) {
+                self::dd($info);
+            } elseif ($test == 1 && $type == 2) {
+                self::dd($info);
             }
+            self::pushData($domain, $info, $type);
+        }
+        echo '<pre>';
+        print_r($errorArr);
+        echo $domain->name . '  推送完成' . PHP_EOL;
+//        exit;
+    }
 
-            if ($remain == 0) {
-                Tools::writeLog($domain->name . "Tag推送次数用完");
-                return 1;
-            } else {
-                $urls = array_slice($info, 1, $remain);
-            }
+    public static function pushData($domain, $info, $type)
+    {
+        $flag = $type == 1 ? 'pc' : 'm';
 
-            exit;
+        //推送
+        $resData = self::push($domain->baidu_token, $domain->name, [$info[0]], $flag);
+        echo '<pre>';
+        $resDa = json_decode($resData, true);
+//        print_r($resDa);
+        $jsonres = json_decode($resData);
+        Tools::writeLog($jsonres);
 
-            //按照剩余次数进行推送
-            $resData = self::push($domain->baidu_token, $domain, $info);
-            $jsonres = json_decode($resData);
+        if (!isset($resDa['success'])) {
+            Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
+            return 1;
+        } else {
+            Tools::writeLog($domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            //更新插入 标记已经推送过了
+            $saveData = [
+                'db_id' => $domain->id,
+                'db_name' => $domain->name,
+                'type' => MipFlag::TYPE_TAG,
+                'type_id' => 0,
+                'url' => $info[0],
+                'remain' => $jsonres->remain,
+            ];
+            MipFlag::createOne($saveData);
+            $remain = $jsonres->remain;
+        }
 
-            if ($jsonres->success >= 400) {
-                Tools::writeLog($domain->name . "百度站长Tag推送失败:" . $jsonres);
-                return 1;
-            } else {
-                Tools::writeLog($domain->name . "百度站长Tag成功推送第一条" . $jsonres->success . "，今日还可推送:" . $jsonres->remain . "条");
-                foreach ($urls as $key => $url) {
-                    if ($key > 0) {
-                        //更新插入 标记已经推送过了
-                        $saveData = [
-                            'db_id' => $domain->id,
-                            'db_name' => $domain->name,
-                            'type' => MipFlag::TYPE_TAG,
-                            'type_id' => 0,
-                            'url' => $url,
-                        ];
-                        MipFlag::createOne($saveData);
-                        $remain = $jsonres->remain;
-                    }
+        if ($remain == 0) {
+            Tools::writeLog($domain->name . "Tag推送次数用完");
+            return 1;
+        } else {
+            $remain = 200;
+            $urls = array_slice($info, 1, $remain);
+            $info = $urls;
+        }
+
+        //按照剩余次数进行推送
+        $resData = self::push($domain->baidu_token, $domain->name, $info, $flag);
+        $resDaSecond = json_decode($resData, true);
+        $jsonres = json_decode($resData);
+
+        Tools::writeLog($jsonres);
+        if (!isset($resDaSecond['success'])) {
+            Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
+            return 1;
+        } else {
+            Tools::writeLog($domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            foreach ($urls as $key => $url) {
+                if ($key > 0) {
+                    //更新插入 标记已经推送过了
+                    $saveData = [
+                        'db_id' => $domain->id,
+                        'db_name' => $domain->name,
+                        'type' => MipFlag::TYPE_TAG,
+                        'type_id' => 0,
+                        'url' => $url,
+                    ];
+                    MipFlag::createOne($saveData);
+                    $remain = $jsonres->remain;
                 }
             }
         }
-
-        echo '<pre>';
-        print_r($errorArr);
-        exit;
     }
-
 
     //mip推送
     public static function push($token, $domain, $urls, $type = 'm')
     {
-        $domain = '0ww9.com';
-        if ($type == 'pc') {
-            $api = CmsAction::BAIDU_URL . '?site=http://m.' . $domain . '&token=' . $token;
-        } elseif ($type == 'm') {
-            $api = CmsAction::BAIDU_URL . '?site=http://www.' . $domain . '&token=' . $token;
+        if ($type == 'm') {
+            $api = CmsAction::BAIDU_URL . '?site=m.' . $domain . '&token=' . $token;
+        } elseif ($type == 'pc') {
+            $api = CmsAction::BAIDU_URL . '?site=www.' . $domain . '&token=' . $token;
         }
 
-        $ch = curl_init();
-        $options = array(
-            CURLOPT_URL => $api,
-            CURLOPT_POST => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POSTFIELDS => implode("\n", $urls),
-            CURLOPT_HTTPHEADER => array('Content-Type: text/plain'),
-        );
-        curl_setopt_array($ch, $options);
-        $result = curl_exec($ch);
-        return $result;
+        $userAgent = self::randUserAgent();
+
+        $ipUrl = 'https://api.xiaoxiangdaili.com/ip/get?appKey=623460644494397440&appSecret=1zblJiRJ&cnt=1&wt=json%20';
+
+//        $ipUrl = 'https://api.xiaoxiangdaili.com/ip/get?appKey=623452295174443008&appSecret=8evtFPzt&cnt=1&wt=json%20';
+
+        $ipInfo = json_decode(Tools::curlGet($ipUrl), true);
+
+        if ($ipInfo['code'] == 200) {
+            $ip = $ipInfo['data']['ip'];
+            $port = $ipInfo['data']['port'];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC); //代理认证模式
+            curl_setopt($ch, CURLOPT_PROXY, $ip); //代理服务器地址
+            curl_setopt($ch, CURLOPT_PROXYPORT, $port); //代理服务器端口
+
+            $options = array(
+                CURLOPT_URL => $api,
+                CURLOPT_POST => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POSTFIELDS => implode("\n", $urls),
+                curl_setopt($ch, CURLOPT_USERAGENT, $userAgent),
+                CURLOPT_HTTPHEADER => array('Content-Type: text/plain'),
+            );
+            curl_setopt_array($ch, $options);
+            $result = curl_exec($ch);
+
+//            self::dd($result);
+
+            return $result;
+        }
     }
 
     //mip推送
@@ -239,5 +286,124 @@ class MipFlag extends Base
         curl_setopt_array($ch, $options);
         $result = curl_exec($ch);
         return $result;
+    }
+
+
+    /** 随机user-agent */
+    public static function randUserAgent()
+    {
+        $useragent = [
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
+            "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
+            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5",
+            "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
+            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
+        ];
+        return $useragent[rand(0, count($useragent) - 1)];
+    }
+
+    /** 获取新的url */
+    public static function getCrontabData($filePath, $da, $flag, $num = 50000)
+    {
+        $_GET['domain'] = 0;
+        $domain = $da->name;
+        $urls = [];
+        //当文件不存在时，全部搜索
+        if (file_exists($filePath)) {
+            $articles = PushArticle::findx($da->id)->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
+        } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
+            $urls = explode(PHP_EOL, file_get_contents($filePath));
+            $arr = explode('/', $urls[0]);
+            $resUrl = $arr[count($arr) - 1];
+            if (preg_match('/\d+/', $resUrl, $lastArr)) {
+                $lastId = $lastArr[0];
+            }
+
+            $articles = PushArticle::findx($da->id)
+                ->select('id,column_name,key_id')
+                ->where(['>', 'id', $lastId])
+                ->limit($num)
+                ->orderBy('id desc')
+                ->asArray()
+                ->all();
+        }
+
+        $data = [];
+        foreach ($articles as $article) {
+            $data[] = 'https://' . $flag . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $data[] = 'https://' . $flag . $domain . '/' . $da->start_tags . $article['key_id'] . $da->end_tags;
+        }
+
+        $data = array_unique(array_merge($data, $urls));
+        $str = '';
+
+        foreach ($data as $datum) {
+            $str .= $datum . PHP_EOL;
+        }
+
+        //存入缓存文件
+        file_put_contents($filePath, $str);
+    }
+
+    /** 定时生成网站地图 */
+    public static function crontabSet()
+    {
+        set_time_limit(0);
+        //获取所有的域名    生成网站地图
+        $doamins = Domain::find()->all();
+        $_GET['domain'] = 0;
+        foreach ($doamins as $da) {
+            if (!empty($da->baidu_token)) {
+                $domain = $da->name;
+                $num = 50000;
+                //生成PC端
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
+                self::getCrontabData($filePath, $da, 'www.', $num);
+                //生成移动端
+
+                $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
+                self::getCrontabData($filePath, $da, 'm.', $num);
+            }
+        }
+        exit;
+    }
+
+    public static function pushMip()
+    {
+        set_time_limit(0);
+        //获取所有的域名
+        $doamins = Domain::find()->all();
+        $_GET['domain'] = 0;
+        foreach ($doamins as $da) {
+            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
+                MipFlag::pushUrl($da->id, 0, 1); //PC推送
+            }
+        }
+    }
+
+    public static function pushMipM()
+    {
+        set_time_limit(0);
+        //获取所有的域名
+        $doamins = Domain::find()->all();
+        $_GET['domain'] = 0;
+        foreach ($doamins as $da) {
+            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
+                MipFlag::pushUrl($da->id, 0, 2); //移动推送
+            }
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use Cassandra\Date;
+use common\models\AllBaiduKeywords;
 use common\models\ArticleRules;
 use common\models\BaiduKeywords;
 use common\models\BaiDuSdk;
@@ -11,6 +13,7 @@ use common\models\DbName;
 use common\models\DirCatch;
 use common\models\Domain;
 use common\models\DomainColumn;
+use common\models\DomainTpl;
 use common\models\KeywordLongAll;
 use common\models\Keywords;
 use common\models\LongKeywords;
@@ -20,6 +23,7 @@ use common\models\NewsClassTags;
 use common\models\NewsData;
 use common\models\NewsTags;
 use common\models\PushArticle;
+use common\models\Template;
 use common\models\Tools;
 use common\models\ZuoWenWang;
 use frontend\models\ResendVerificationEmailForm;
@@ -224,8 +228,38 @@ class CmsController extends Controller
     }
 
 
+    public function actionChangeTemp()
+    {
+        //更新模板
+        $template = Template::find()
+            ->where(['like', 'content', 'https://img.thszxxdyw.org.cn/wordImg/'])
+            ->andWhere(['type' => 6])
+            ->all();
+
+        set_time_limit(0);
+        foreach ($template as $item) {
+            sleep(2);
+            DomainTpl::setTmp(0, $item->id);
+        }
+    }
+
     public function actionCleanData()
     {
+        $template = Template::find()
+            ->where(['like', 'content', 'http://img.thszxxdyw.org.cn/wordImg/'])
+            ->andWhere(['type' => 6])
+            ->all();
+
+        foreach ($template as $item) {
+            $item['content'] = str_replace('http://img.thszxxdyw.org.cn/wordImg/', 'https://img.thszxxdyw.org.cn/wordImg/', $item['content']);
+//            echo '<pre>';
+//            print_r($item);
+//            exit;
+            $item->content = $item['content'];
+            $item->save(false);
+
+        }
+        exit;
 //        $models = DomainColumn::find()->all();
 //        foreach ($models as $column) {
 //            if ($column->name == 'jaks') {
@@ -241,5 +275,87 @@ class CmsController extends Controller
     public function actionPushMip()
     {
         MipFlag::pushUrl(3);
+    }
+
+    public function actionTrans()
+    {
+        PushArticle::transArticle();
+    }
+
+    public function actionTransA()
+    {
+        //翻译文章
+        LongKeywords::rulesTrans();
+    }
+
+    public function actionCountArticle()
+    {
+        $domainIds = BaiduKeywords::getDomainIds();
+        $articleRules = ArticleRules::find()->select('category_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+
+        $itemData = [];
+        $timeStart = Yii::$app->request->get('start', Date('Y-m-d') . ' 00:00:00');
+        $timeEnd = Yii::$app->request->get('end', date("Y-m-d", strtotime("+1 day")) . ' 00:00:00');
+
+        $total = 0;
+        foreach ($articleRules as $key => $rules) {
+            $column = DomainColumn::find()
+                ->where(['id' => $rules['column_id']])->one();
+            $res = AllBaiduKeywords::find()
+                ->where(['type_id' => $rules['category_id']])
+                ->andWhere(['>', 'updated_at', $timeStart])
+                ->andWhere(['<', 'updated_at', $timeEnd])
+                ->andWhere(['>', 'column_id', 0])
+                ->count();
+            $total += $res;
+            $itemData[] = [
+                '文章数量' => '<strong style="color: red">' . $res . '</strong>',
+                '域名' => $column->domain->name,
+                '域名ID' => $column->domain_id,
+                '栏目名称' => $column->name,
+                '栏目中文名称' => $column->zh_name,
+                '开始时间' => $timeStart,
+                '结束时间' => $timeEnd,
+            ];
+
+        }
+        echo '<pre>';
+        echo '<h1> 总量：' . $total . '</h1>';
+        print_r($itemData);
+        exit;
+    }
+
+    public function actionSetList()
+    {
+        $keywords = AllBaiduKeywords::find()
+            ->select('id,keywords,type')
+            ->where([
+                'column_id' => 0,
+                'status' => 10,
+            ])
+            ->andWhere(['>', 'updated_at', '2020-09-23 15:00:00'])
+            ->all();
+
+//        $res = count($keywords);
+//        print_r($res);exit;
+
+        $data = [];
+        foreach ($keywords as $keyword) {
+            $data[] = [
+                'keyword' => $keyword['keywords'],
+                'key_id' => $keyword['id'],
+                'id' => 0,
+                'type' => strtolower($keyword['type']),
+            ];
+        }
+//        $urlGet = 'http://8.129.37.130/index.php/distribute/set-keyword';
+//
+//        Tools::curlNewGet()
+//        echo '<pre>';
+//        print_r($data);exit;
+
+        $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
+        $res = Tools::curlPost($url, ['res' => json_encode($data)]);
+        print_r($res);
     }
 }

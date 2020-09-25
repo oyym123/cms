@@ -99,6 +99,16 @@ class CategoryController extends Controller
             $model->en_name = $tname;
             $model->status = Base::STATUS_BASE_NORMAL;
 
+
+            $name = Category::find()->where(['name' => $model->name])->one();
+            if (!empty($name)) {
+                Yii::$app->getSession()->setFlash('error', $model->name . '  该名称已存在！');
+                return $this->redirect(['create', [
+                    'model' => $model,
+                ]
+                ]);
+            }
+
             if ($model->save(false)) {
 
             }
@@ -159,6 +169,17 @@ class CategoryController extends Controller
             }
             $model->status = Base::STATUS_BASE_NORMAL;
             $model->en_name = $tname;
+
+
+            $name = Category::find()->where(['name' => $model->name])->one();
+            if (!empty($name)) {
+                Yii::$app->getSession()->setFlash('error', $model->name . '  该名称已存在！');
+                return $this->render('update', [
+                    'model' => $model,
+                ]);
+            }
+
+
             $model->save(false);
             return $this->redirect(['view', 'id' => $model->id]);
         }

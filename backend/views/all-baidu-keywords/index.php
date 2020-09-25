@@ -46,6 +46,8 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => '分类　　　   　　　   ',
                 'attribute' => 'type_id',
+                'filter' => \common\models\AllBaiduKeywords::cate(),
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
                 'content' => function ($model, $key, $index, $column) {
                     return $model->category->name . ' 【' . $model->type_id . '】';
                 }

@@ -193,6 +193,9 @@ class PushArticle extends Modelx
             'rules_id' => $migrate->integer(11)->defaultValue(0)->comment('规则id'),
             'content' => $migrate->text()->comment('内容'),
             'title_img' => $migrate->string(255)->defaultValue('')->comment('图片'),
+            'all_part_content' => $migrate->text()->comment('中文内容'),
+            'en_part_content' => $migrate->text()->comment('英文内容'),
+            'fan_part_content' => $migrate->text()->comment('繁体内容'),
             'status' => $migrate->smallInteger()->defaultValue(10)->comment('10=状态有效 20=无效'),
             'intro' => $migrate->string(255)->defaultValue('')->comment('文章简介'),
             'title' => $migrate->string(255)->defaultValue('')->comment('标题'),
@@ -247,5 +250,34 @@ class PushArticle extends Modelx
         } else {
             echo '该词已被' . $bd->domain_id . '使用!';
         }
+    }
+
+    /** 有道翻译文章 */
+    public static function transArticle($str = '')
+    {
+        //繁体
+        $chinese = new Chinaese();
+        $data = $chinese->cns('万事如意');
+
+        $str = '翻译';
+
+        //有道翻译 英文
+        $ret = (new YouDaoApi())->startRequest($str);
+        $ret = json_decode($ret, true);
+
+        print_r($data);
+        exit;
+
+        $enRes = explode('{*}', $ret['translation'][0]);
+
+        echo '<pre>';
+        print_r($enRes);
+        exit;
+    }
+
+    public function fanti()
+    {
+
+
     }
 }

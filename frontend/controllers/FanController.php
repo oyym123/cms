@@ -90,7 +90,6 @@ class FanController extends Controller
             }
 
 
-
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
 
@@ -117,6 +116,8 @@ class FanController extends Controller
             $upArr = ['知乎', '百度知道', '360', '头条'];
 
             $model['content'] = str_replace($upArr, '', $model['content']);
+
+            $model['content']  = str_replace(['<p>.</p>', '. .</p>','</p>.</p>'], ['', '.</p>',''], $model['content'] );
 //
 //            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
 //
@@ -126,7 +127,7 @@ class FanController extends Controller
 //            $model['content']= str_replace($downArr, $replaceArrDown, $model['content']);
 
             $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
-
+            $oldTitle = $model['title'];
             $model['title'] = Tools::getKTitle($model['title']);
 
             $res = [
@@ -149,13 +150,13 @@ class FanController extends Controller
 //            print_r($res);
 //            exit;
 
-            $desc = mb_substr($model['title'], 0, 28);
+            $desc = $model['intro'];
 
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
                 'title' => $model['title'],
-                'keywords' => $model['keywords'],
+                'keywords' => $oldTitle,
                 'description' => $desc,
                 'og_type' => 'news',
                 'og_title' => $model['title'],
@@ -229,8 +230,8 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['user_tdk'] = [
-                'title' => $models[0]['nickname'] . '_' . $domain->zh_name,
-                'keywords' => $models[0]['nickname'] . '_' . $domain->zh_name,
+                'title' => $models[0]['nickname'] . '_会员' ,
+                'keywords' => $models[0]['nickname'] . '_会员',
                 'intro' => $column->intro . '_' . $domain->zh_name,
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
@@ -543,7 +544,7 @@ class FanController extends Controller
                     $columnEnName = $columnObj->name;
                 }
             }
-
+            $oldTitle = $model['title'];
             $model['title'] = Tools::getKTitle($model['title']);
             list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
             $this->layout = $layout;
@@ -565,14 +566,13 @@ class FanController extends Controller
             $view->params['tags_tdk'] = [
                 'title' => $model['keywords'],
                 'keywords' => $model['keywords'],
-                'intro' => $model['keywords'],
+                'intro' => $model['intro'],
                 'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
             if (empty($modelInfo)) {
                 return $this->render($render, ['models' => ['data' => ['title' => '没有内容了!']]]);
             }
-
             return $this->render($render, ['models' => $res]);
         }
     }

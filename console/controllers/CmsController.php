@@ -7,6 +7,7 @@ use common\models\BlackArticle;
 use common\models\DbName;
 use common\models\FanUser;
 use common\models\LongKeywords;
+use common\models\MipFlag;
 use common\models\Tools;
 
 class CmsController extends \yii\console\Controller
@@ -123,9 +124,31 @@ class CmsController extends \yii\console\Controller
     }
 
 
-    public function actionPushPa()
+//    public function actionPushPa()
+//    {
+//        BaiduKeywords::pushPa();
+//    }
+
+    /** 设置链接 */
+    public function actionSetUrl()
     {
-        BaiduKeywords::pushPa();
+        MipFlag::crontabSet();
     }
 
+    /** 推送Mip */
+    public function actionSetMip()
+    {
+        MipFlag::pushMip();
+    }
+    /** 推送Mip */
+    public function actionSetMipM()
+    {
+        MipFlag::pushMipM();
+    }
+
+    public function actionTransA()
+    {
+        //翻译文章
+        LongKeywords::rulesTrans();
+    }
 }
