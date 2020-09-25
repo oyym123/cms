@@ -96,7 +96,7 @@ class SiteController extends Controller
 
 
         $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
 
 
         //当文件不存在时，全部搜索
