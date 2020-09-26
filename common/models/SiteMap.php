@@ -6,7 +6,6 @@ use common\models\Domain;
 
 use Yii;
 
-
 /**
  * This is the model class for table "site_map".
  *
@@ -97,14 +96,24 @@ class SiteMap extends Base
     {
         return [
             'id' => 'ID',
-            'domain_id' => 'Domain ID',
-            'type' => 'Type',
-            'file_name' => 'File Name',
-            'last_id' => 'Last ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'domain_id' => '域名',
+            'type' => '类型',
+            'file_name' => '文件名称',
+            'last_id' => '文件最后的id',
+            'update_start_id' => '上次更新的最后一个文章id',
+            'start_url_id' => '地图第一条文章id',
+            'number' => '此地图总url数量',
+            'created_at' => '创建时间',
+            'updated_at' => '修改时间',
         ];
     }
+
+    /** 获取域名 */
+    public function getDomain()
+    {
+        return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
+    }
+
 
     /** 获取所有更新的网址 */
     public static function getAllUrl($domain)
@@ -166,11 +175,11 @@ class SiteMap extends Base
             return [$domain->id . '_site_1' . self::getExt($type), 0, 0];
         } else {
             if ($add == 1) {
-                $lastUrlId = $siteMap->last_id + 1;
+                $lastId = $siteMap->last_id + 1;
             } else {
-                $lastUrlId = $siteMap->last_id;
+                $lastId = $siteMap->last_id;
             }
-            return [$domain->id . '_site_' . $lastUrlId . self::getExt($type), $siteMap->last_url_id, $siteMap];
+            return [$domain->id . '_site_' . $lastId . self::getExt($type), $siteMap->last_url_id, $siteMap];
         }
     }
 
@@ -259,7 +268,6 @@ class SiteMap extends Base
                     list($data, $urlNum) = self::setTxt($articlesTotal, $domainModel, $type);
                 }
 
-                list($fileName, $lastId) = self::getFileName($domainModel, $type);
                 file_put_contents($siteMap->file_name, $data);
 
                 //更新
@@ -286,7 +294,7 @@ class SiteMap extends Base
                     'update_start_id' => $articles[$articlesNum - 1]['id'],
                     'number' => $urlNum,
                     'last_url_id' => $articles[0]['id'],
-                    'last_id' => $lastId,
+                    'last_id' => $siteMap->last_id + 1,
                 ];
                 self::createOne($dataSave);
                 if ($jump) {
@@ -309,7 +317,7 @@ class SiteMap extends Base
                 'update_start_id' => $articles[$articlesNum - 1]['id'],
                 'number' => $urlNum,
                 'last_url_id' => $articles[0]['id'],
-                'last_id' => $lastId,
+                'last_id' => 1,
             ];
             self::createOne($dataSave);
             if ($jump) {
