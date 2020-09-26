@@ -289,7 +289,7 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
-
+        ini_set ("memory_limit","-1");
         $listRes = Tools::curlGet('http://8.129.37.130/distribute/list-length');
         $listArr = json_decode($listRes, true);
 
@@ -485,4 +485,6 @@ setTimeout('myrefresh()',5000); //5秒刷新一次
         $res = Tools::curlPost($url, ['res' => json_encode($data)]);
         print_r($res);
     }
+
+
 }

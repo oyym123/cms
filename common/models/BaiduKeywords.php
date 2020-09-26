@@ -318,6 +318,11 @@ class BaiduKeywords extends Base
                 }
             }
         }
+
+
+        return $itemData;
+
+
 //        echo '<pre>';
 //        print_r($itemData);
 //        exit;

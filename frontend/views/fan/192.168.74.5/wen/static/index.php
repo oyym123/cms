@@ -4,7 +4,7 @@
             ?>
             <li>
                 <div class="user-msg">
-                    <a class="user-box" rel="nofollow">
+                    <a class="user-box" rel="nofollow" href="user/<?=  $item['user_id']?>.html">
                         <img class="js_user_image" src="<?= $item['avatar'] ?>"/><span class="user-name"><?= $item['nickname'] ?></span>
                     </a>
                 </div>

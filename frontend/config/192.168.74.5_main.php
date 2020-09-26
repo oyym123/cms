@@ -50,7 +50,12 @@ return [
                 'wen/index_<id:\d+>.html' => '/fan',
                 
                 'index_<id:\d+>.html' => '/site/index',
-                //end 正则注释识别 勿删
+                'site.xml' => '/site/site-xml',
+                'site.txt' => '/site/site-txt',
+                'm_site.xml' => '/site/site-mxml',
+                'm_site.txt' => '/site/site-mtxt',
+                'favicon.ico' => '/site/favicon',
+                //end 正则注释识别 勿删{"is_jump":0,"jump_url":"http:\/\/www.baidu.com"}  &end_url
             ],
         ],
 

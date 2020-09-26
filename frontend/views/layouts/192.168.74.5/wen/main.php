@@ -24,8 +24,7 @@ $domain = \common\models\Domain::getDomainInfo();
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="description" content="<?= $domain->intro ?>"/>
-    <meta name="keywords" content="<?= $domain->zh_name ?>"/>
+
     <meta name="applicable-device" content="pc">
     <?php
     if (isset($this->params['list_tdk'])) {  //栏目列表页TDK
@@ -34,14 +33,14 @@ $domain = \common\models\Domain::getDomainInfo();
 
         <title><?= $tdk['title'] ?></title>
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
-
+        <meta name="description" content="<?= $tdk['intro'] ?>">
         <?php
     } elseif (isset($this->params['detail_tdk'])) { //详情页TDK
         $tdk = $this->params['detail_tdk'];
         ?>
-
+        <title><?= $tdk['title'] ?></title>
         <meta name="keywords" content="<?= $tdk['keywords'] ?>">
-        <meta name="description" content="<?= $tdk['description'] ?>">
+        <meta name="description" content="<?= $tdk['intro'] ?>">
         <meta property="og:type" content="<?= $tdk['og_type'] ?>"/>
         <meta property="og:title" content="<?= $tdk['og_title'] ?>"/>
         <meta property="og:description" content="<?= $tdk['og_description'] ?>"/>
@@ -53,6 +52,8 @@ $domain = \common\models\Domain::getDomainInfo();
         ?>
 
         <title><?= $tdk['title'] ?></title>
+        <meta name="description" content="<?= $tdk['intro'] ?>">
+        <meta name="keywords" content="<?= $tdk['keywords'] ?>">
 
         <?php
     } elseif (isset($this->params['home_tdk'])) {   //首页TDK
@@ -60,6 +61,8 @@ $domain = \common\models\Domain::getDomainInfo();
         ?>
 
         <title><?= $tdk['title'] ?></title>
+        <meta name="description" content="<?= $tdk['intro'] ?>">
+        <meta name="keywords" content="<?= $tdk['keywords'] ?>">
 
         <?php
     } elseif (isset($this->params['tags_tdk'])) {   //标签内页TDK
@@ -67,7 +70,9 @@ $domain = \common\models\Domain::getDomainInfo();
         ?>
 
         <title><?= $tdk['title'] ?></title>
-    <?php
+        <meta name="description" content="<?= $tdk['intro'] ?>">
+        <meta name="keywords" content="<?= $tdk['keywords'] ?>">
+        <?php
     }
     ?>
 
@@ -148,7 +153,7 @@ $domain = \common\models\Domain::getDomainInfo();
                     <li class="label-box">
                         <div class="label-list">
                             <?php
-                            foreach (\common\models\BaiduKeywords::hotKeywords(10) as $item) {
+                            foreach (\common\models\BaiduKeywords::hotKeywords(100) as $item) {
                                 ?>
                                 <a href="<?= $item['url'] ?>" title="<?= $item['keywords'] ?>">
                                     <?= $item['keywords'] ?>
