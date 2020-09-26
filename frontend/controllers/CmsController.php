@@ -390,23 +390,31 @@ class CmsController extends Controller
         $checkComputer = Tools::curlGet(\Yii::$app->params['local_reptile_url'] . '/cms/check-computer');
         echo '<pre>';
         echo '<div style="background: black;color: white;">';
-        echo '<h1>时间大于10分钟的标记为红色!</h1>';
+        echo '<h1>时间大于15分钟的标记为红色!</h1>';
 
         $data = json_decode($checkComputer, true);
         $num = 0;
         $noArr = $yesArr = [];
         foreach ($data as $datum) {
-            if ($datum['time'] > (10 * 60)) {
+            if ($datum['time'] > (15 * 60)) {
                 $num += 1;
                 $noArr[] = $datum['电脑号'];
-            }else{
-                $yesArr[]= $datum['电脑号'];
+            } else {
+                $yesArr[] = $datum['电脑号'];
             }
         }
 
-        echo '<h1>异常机器 <strong style="color: red;font-size: larger">' . $num . '台 ---  ' .implode(',',$noArr).'</strong></h1>';
-        echo '<h1>正常机器<strong style="color: green;font-size: larger">' . (count($data) - $num) . '台 --- '.implode(',',$yesArr).'</strong></h1>';
+        echo '<h1>异常机器 <strong style="color: red;font-size: larger">' . $num . '台 ---  ' . implode(',', $noArr) . '</strong></h1>';
+        echo '<h1>正常机器<strong style="color: green;font-size: larger">' . (count($data) - $num) . '台 --- ' . implode(',', $yesArr) . '</strong></h1>';
         print_r(json_decode($checkComputer, true));
+
+        echo "<script language=\"JavaScript\"> 
+function myrefresh() 
+{ 
+window.location.reload(); 
+} 
+setTimeout('myrefresh()',5000); //5秒刷新一次 
+</script> ";
         echo '<pre>';
         echo '</div>';
         exit;

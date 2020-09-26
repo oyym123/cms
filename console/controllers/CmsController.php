@@ -9,8 +9,10 @@ use common\models\DbName;
 use common\models\FanUser;
 use common\models\LongKeywords;
 use common\models\MipFlag;
+use common\models\SiteMap;
 use common\models\Tools;
 use common\models\ArticleRules;
+
 class CmsController extends \yii\console\Controller
 {
     /**
@@ -141,6 +143,7 @@ class CmsController extends \yii\console\Controller
     {
         MipFlag::pushMip();
     }
+
     /** 推送Mip */
     public function actionSetMipM()
     {
@@ -157,7 +160,7 @@ class CmsController extends \yii\console\Controller
     {
 
 
-
+        exit;
 
         //查询指定20个站 的规则
         $domainIds = BaiduKeywords::getDomainIds();
@@ -205,7 +208,6 @@ class CmsController extends \yii\console\Controller
         exit;
 
 
-
 //        echo '<pre>';
 //        print_r($data);
 //        exit;
@@ -221,5 +223,10 @@ class CmsController extends \yii\console\Controller
         $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
         $res = Tools::curlPost($url, ['res' => json_encode($data)]);
         print_r($res);
+    }
+
+    public function actionStartMap()
+    {
+        SiteMap::setAllSiteMap();
     }
 }

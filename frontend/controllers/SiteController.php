@@ -11,6 +11,7 @@ use common\models\Fan;
 use common\models\FanUser;
 use common\models\LoginForm;
 use common\models\PushArticle;
+use common\models\SiteMap;
 use common\models\Template;
 use common\models\Tools;
 use frontend\models\ContactForm;
@@ -80,235 +81,24 @@ class SiteController extends Controller
         ];
     }
 
-    /**
-     *
-     */
     public function actionSiteXml()
     {
-        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-        $num = Yii::$app->request->get('num', 50000);
-
-        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.xml';
-        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
-            $data = file_get_contents($filePath);
-            exit($data);
-        }
-
-
-        $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
-
-
-        //当文件不存在时，全部搜索
-        if (file_exists($filePath)) {
-            $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
-        } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
-            $urls = explode('<loc>', file_get_contents($filePath));
-            $urls = explode('</loc>', $urls[1]);
-            $arr = explode('/', $urls[0]);
-            $resUrl = $arr[count($arr) - 1];
-
-            if (preg_match('/\d+/', $resUrl, $lastArr)) {
-                $lastId = $lastArr[0];
-            }
-
-            $articles = PushArticle::find()
-                ->select('id,column_name,key_id')
-                ->where(['>', 'id', $lastId])
-                ->limit($num)
-                ->orderBy('id desc')
-                ->asArray()
-                ->all();
-        }
-
-        $domainModel = Domain::getDomainInfo();
-
-        foreach ($articles as $article) {
-            $urlPc = 'https://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-            $tagPc = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
-
-            $data .= '
-                    <url>
-                    <loc>' . $urlPc . '</loc>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    ';
-
-            $data .= '
-                    <url>
-                    <loc>' . $tagPc . '</loc>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    ';
-        }
-
-        $data .= '
-                    </urlset>';
-
-//        $data = $data . file_get_contents($filePath);
-
-        //存入缓存文件
-        file_put_contents($filePath, $data);
-        exit($data);
+        SiteMap::setMap(0, SiteMap::TYPE_PC_XML);
     }
-
 
     public function actionSiteMxml()
     {
-        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-        $num = Yii::$app->request->get('num', 50000);
-
-        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.xml';
-        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
-            $data = file_get_contents($filePath);
-            exit($data);
-        }
-
-        $articles = PushArticle::find()->select('id,column_name,column_id,push_time')->limit($num)->orderBy('id desc')->all();
-        $data = '<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
-        foreach ($articles as $article) {
-            $urlM = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-
-            $data .= '
-                    <url>
-                    <loc>' . $urlM . '</loc>
-                    <mobile:mobile type="mobile"/>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    ';
-        }
-
-        foreach (AllBaiduKeywords::getKeywordsUrl('m.') as $item) {
-            $urlPc = $item['url'];
-            $data .= '
-                    <url>
-                    <loc>' . $urlPc . '</loc>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    ';
-        }
-
-        $data .= '
-                    </urlset>';
-        //存入缓存文件
-        file_put_contents($filePath, $data);
-        exit($data);
+        SiteMap::setMap(0, SiteMap::TYPE_M_XML);
     }
 
     public function actionSiteMtxt()
     {
-        $urls = [];
-        $num = Yii::$app->request->get('num', 50000);
-        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/m_site.txt';
-        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
-            $data = file_get_contents($filePath);
-            exit($data);
-        } else {
-            //当文件不存在时，全部搜索
-            if (!file_exists($filePath)) {
-                $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
-            } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
-                $urls = explode(PHP_EOL, file_get_contents($filePath));
-                $arr = explode('/', $urls[0]);
-                $resUrl = $arr[count($arr) - 1];
-                if (preg_match('/\d+/', $resUrl, $lastArr)) {
-                    $lastId = $lastArr[0];
-                }
-
-                $articles = PushArticle::find()
-                    ->select('id,column_name,key_id')
-                    ->where(['>', 'id', $lastId])
-                    ->limit($num)
-                    ->orderBy('id desc')
-                    ->asArray()
-                    ->all();
-            }
-
-            $data = [];
-            $domainModel = Domain::getDomainInfo();
-            foreach ($articles as $article) {
-                $data[] = 'https://m.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                $data[] = 'https://m.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
-            }
-
-            $data = array_unique(array_merge($data, $urls));
-            $str = '';
-            foreach ($data as $datum) {
-                $str .= $datum . PHP_EOL;
-            }
-
-            //存入缓存文件
-            file_put_contents($filePath, $str);
-            $str2 = '';
-            foreach ($data as $datum) {
-                $str2 .= $datum . '<br/>';
-            }
-            echo $str2;
-        }
+        SiteMap::setMap(0, SiteMap::TYPE_M_TXT);
     }
 
     public function actionSiteTxt()
     {
-        $num = Yii::$app->request->get('num', 50000);
-        $domain = Tools::getDoMain($_SERVER['HTTP_HOST']);
-        $urls = [];
-        $filePath = __DIR__ . '/../../frontend/views/site/' . $domain . '/home/static/site.txt';
-        if (file_exists($filePath) && Yii::$app->request->get('update', 0) != 1) {
-            $data = file_get_contents($filePath);
-            exit($data);
-        } else {
-            //当文件不存在时，全部搜索
-            if (!file_exists($filePath)) {
-                $articles = PushArticle::find()->select('id,column_name,key_id')->limit($num)->asArray()->orderBy('id desc')->all();
-            } else {   //否则取文件的第一行数据 获得其尾号id 然后将两个数组合并
-                $urls = explode(PHP_EOL, file_get_contents($filePath));
-                $arr = explode('/', $urls[0]);
-                $resUrl = $arr[count($arr) - 1];
-                if (preg_match('/\d+/', $resUrl, $lastArr)) {
-                    $lastId = $lastArr[0];
-                }
-
-                $articles = PushArticle::find()
-                    ->select('id,column_name,key_id')
-                    ->where(['>', 'id', $lastId])
-                    ->limit($num)
-                    ->orderBy('id desc')
-                    ->asArray()
-                    ->all();
-            }
-
-            $data = [];
-            $domainModel = Domain::getDomainInfo();
-            foreach ($articles as $article) {
-                $data[] = 'https://www.' . $domain . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
-                $data[] = 'https://www.' . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
-            }
-
-            $data = array_unique(array_merge($data, $urls));
-            $str = '';
-            foreach ($data as $datum) {
-                $str .= $datum . PHP_EOL;
-            }
-
-            //存入缓存文件
-            file_put_contents($filePath, $str);
-            $str2 = '';
-            foreach ($data as $datum) {
-                $str2 .= $datum . '<br/>';
-            }
-            echo $str2;
-            exit;
-        }
+        SiteMap::setMap(0, SiteMap::TYPE_PC_TXT);
     }
 
     /**
