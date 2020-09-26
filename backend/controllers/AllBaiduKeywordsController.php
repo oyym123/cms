@@ -4,7 +4,9 @@ namespace backend\controllers;
 
 use common\models\AllBaiduKeywords;
 use common\models\Keywords;
+use common\models\RedisTools;
 use common\models\search\AllBaiduKeywordsSearch;
+use common\models\Tools;
 use Yii;
 use common\models\BaiduKeywords;
 use common\models\search\BaiduKeywordsSearch;
@@ -75,13 +77,25 @@ class AllBaiduKeywordsController extends Controller
                 Yii::$app->getSession()->setFlash('error', '请填写分类');
                 return $this->redirect(['create']);
             }
+            $post = $data['AllBaiduKeywords'];
 
-            list($code, $msg) = AllBaiduKeywords::setKeywords($data['AllBaiduKeywords']);
-            if ($code < 0) {
-                Yii::$app->getSession()->setFlash('error', json_encode($msg, JSON_UNESCAPED_UNICODE));
+            $keywords = Tools::cleanKeywords($data['AllBaiduKeywords']['keywords']);
+
+            $dataKey = [
+                'prefix' => 'list_keywords_',
+                'list_name' => 'list_long_keywords',
+                'key_id' => $keywords,
+                'type_id' => $post['type_id'],
+            ];
+
+            list($yesNum, $error) = (new RedisTools())->setList($dataKey);
+
+            if (!empty($error)) {
+                Yii::$app->getSession()->setFlash('success', '成功保存' . $yesNum . '个!');
+                Yii::$app->getSession()->setFlash('error', '重复的关键词' . count($error) . '个!');
                 return $this->redirect(['create']);
             } else {
-                Yii::$app->getSession()->setFlash('success', '全部保存成功!');
+                Yii::$app->getSession()->setFlash('success', '成功保存' . $yesNum . '个!');
                 return $this->redirect(['create']);
             }
         }

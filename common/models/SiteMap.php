@@ -379,6 +379,7 @@ class SiteMap extends Base
             $data .= '
                     <url>
                     <loc>' . $urlPc . '</loc>
+                    <mobile:mobile type="mobile"/>
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>

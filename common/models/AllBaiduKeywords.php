@@ -179,6 +179,25 @@ class AllBaiduKeywords extends Base
     }
 
     /**
+     * 检测关键词
+     */
+    public static function checkKeywords($keywords)
+    {
+        $keys = self::find()->select('keywords')->where(['in', 'keywords', $keywords])->all();
+        $usedUrls = array_column($keys, 'url');
+        $error = $arr = [];
+        //过滤已经存在的keywords
+        foreach ($keywords as $value) {
+            if (!in_array($value, $usedUrls)) {
+                $arr[] = $value;
+            } else {
+                $error[] = $value . '  已经重复了！';
+            }
+        }
+        return [$arr, $error];
+    }
+
+    /**
      * 新增关键词 并且调用百度营销词接口获取相应的参数
      */
     public static function setKeywords($postData)
@@ -186,33 +205,14 @@ class AllBaiduKeywords extends Base
         set_time_limit(0);
         $keywords = Tools::cleanKeywords($postData['keywords']);
 
-        if (count($keywords) > 10000) {
-            return [-1, '最多一次只能导入10000个词'];
+        if (count($keywords) > 100000) {
+            return [-1, '最多一次只能导入100000个词'];
         }
 
-        $error = [];
+        list($keyData, $error) = self::checkKeywords($keywords);
 
-        foreach ($keywords as $item) {
-            //判重 不可有所有重复的关键词 减少接口请求次数
-            $oldInfo = self::find()->where([
-                'keywords' => $item,
-//                'column_id' => $postData['column_id']
-            ])->one();
-
-            if (!empty($oldInfo)) {
-                $oldInfo->catch_status = 100;
-                $oldInfo->save(false);
-                $error[] = $item . '  已经重复了！';
-                continue;
-            }
-
+        foreach ($keyData as $item) {
             $data = [[]];
-//            $data = (new BaiDuSdk())->getRank($item);
-            if ($data === false) {
-//                $error[] = $item . '  没有请求请成功！';
-//                continue;
-            }
-
             $info = $data[0];
             $tname = '';
 
@@ -267,11 +267,11 @@ class AllBaiduKeywords extends Base
             list($code, $msg) = self::createOne($saveData);
 
             //只保存主词
-            if ($code < 0) {
-                $error[] = $msg;
-                print_r($msg);
-                exit;
-            } else {
+//            if ($code < 0) {
+//                $error[] = $msg;
+//                print_r($msg);
+//                exit;
+//            } else {
 
                 //保存主词
 //                $dataSave = [
@@ -290,7 +290,7 @@ class AllBaiduKeywords extends Base
 
                 //保存扩展词
 //                self::getSdkWords($msg->id);
-            }
+//            }
         }
 
         if (!empty($error)) {
