@@ -230,7 +230,7 @@ class SiteMap extends Base
         $path = __DIR__ . '/../../frontend/web/map/';
 
         //网站距离上一次的 更新量
-        $articles = $query->select('id,column_name,key_id,user_id')
+        $articles = $query->select('id,column_name,key_id,user_id,push_time')
             ->where(['>=', 'id', $lastUrlId])
             ->limit(40000)
             ->orderBy('id desc')
@@ -254,7 +254,7 @@ class SiteMap extends Base
             $remain = $max - $siteMap->number;
             if ($remain >= $articleCount) { //当剩余容量大于 更新量时 则重新写入该文件
                 //网站距离上一次的 更新量
-                $articlesTotal = $query->select('id,column_name,key_id,user_id')
+                $articlesTotal = $query->select('id,column_name,key_id,user_id,push_time')
                     ->where(['>=', 'id', $siteMap->start_url_id])
                     ->where(['<=', 'id', $articles[0]['id']])
                     ->limit(40000)
@@ -343,11 +343,11 @@ class SiteMap extends Base
 
     public static function setXml($articles, $domainModel, $type)
     {
-        $strM ='';
+
         if ($type == self::TYPE_PC_XML) {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
-
+            $strM = '';
         } else {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
@@ -374,15 +374,15 @@ class SiteMap extends Base
             $number += 2;
 
             //文章网址
-            $urlPc = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
+            $url = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             //标签网址
-            $tagPc = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
+            $tag = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
 
 
             $data .= '
                     <url>
-                    <loc>' . $urlPc . '</loc>
-                    '.$strM.'
+                    <loc>' . $url . '</loc>
+                    ' . $strM . '
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
@@ -391,8 +391,8 @@ class SiteMap extends Base
 
             $data .= '
                     <url>
-                    <loc>' . $tagPc . '</loc>
-                    '.$strM.'
+                    <loc>' . $tag . '</loc>
+                    ' . $strM . '
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
