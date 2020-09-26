@@ -385,8 +385,7 @@ class MipFlag extends Base
         $domainIds = BaiduKeywords::getDomainIds();
         $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
         foreach ($domains as $da) {
-//            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
-            if (!empty($da->baidu_token)) {
+            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 1); //PC推送
             }
         }
