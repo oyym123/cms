@@ -201,7 +201,7 @@ class SiteMap extends Base
     }
 
     /** 设置最新的网站地图 */
-    public static function setMap($domain = 0, $type = 40)
+    public static function setMap($domain, $type, $update = 0)
     {
         $max = self::MAX_NUM;      //单个文件最大的承载量
 
@@ -236,7 +236,7 @@ class SiteMap extends Base
         $articleCount = $articlesNum * 3;
 
         //当不是更新时 直接跳转到最新一个地图
-        if ($siteMap && empty(\Yii::$app->request->get('update', 0)) && $jump) {
+        if ($siteMap && empty($update) && $jump) {
             self::jumpUrl($domainModel->name, $siteMap->file_name);
         }
 

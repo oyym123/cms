@@ -83,22 +83,26 @@ class SiteController extends Controller
 
     public function actionSiteXml()
     {
-        SiteMap::setMap(0, SiteMap::TYPE_PC_XML);
+        $update = Yii::$app->request->get('update', 0);
+        SiteMap::setMap(0, SiteMap::TYPE_PC_XML, $update);
     }
 
     public function actionSiteMxml()
     {
-        SiteMap::setMap(0, SiteMap::TYPE_M_XML);
+        $update = Yii::$app->request->get('update', 0);
+        SiteMap::setMap(0, SiteMap::TYPE_M_XML, $update);
     }
 
     public function actionSiteMtxt()
     {
-        SiteMap::setMap(0, SiteMap::TYPE_M_TXT);
+        $update = Yii::$app->request->get('update', 0);
+        SiteMap::setMap(0, SiteMap::TYPE_M_TXT, $update);
     }
 
     public function actionSiteTxt()
     {
-        SiteMap::setMap(0, SiteMap::TYPE_PC_TXT);
+        $update = Yii::$app->request->get('update', 0);
+        SiteMap::setMap(0, SiteMap::TYPE_PC_TXT, $update);
     }
 
     /**
