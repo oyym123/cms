@@ -123,7 +123,7 @@ class SiteMap extends Base
             'domain_id' => $domain->id,
             'type' => SiteMap::TYPE_PC_TXT
         ])->andWhere([
-            '>', 'created_at', $timeStart
+            '>', 'updated_at', $timeStart
         ])->orderBy('id desc')->one();
 
         if ($siteMap) {
@@ -133,10 +133,9 @@ class SiteMap extends Base
                     '>', 'id', $siteMap->update_start_id
                 ])->andWhere([
                     '<', 'id', $siteMap->last_url_id
-                ])->all();
+                ])->orderBy('id desc')->all();
 
             list($dataPc, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_PC_TXT);
-
             list($dataM, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_M_TXT);
             return [explode(PHP_EOL, $dataM), explode(PHP_EOL, $dataPc)];
         }
@@ -157,6 +156,7 @@ class SiteMap extends Base
         $model->number = $data['number'];
         $model->last_id = $data['last_id'];
         $model->created_at = date('Y-m-d H:i:s');
+        $model->updated_at = date('Y-m-d H:i:s');
 
         if (!$model->save(false)) {
             return [-1, $model->getErrors()];
