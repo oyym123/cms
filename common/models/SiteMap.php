@@ -241,8 +241,8 @@ class SiteMap extends Base
 
         $articlesNum = count($articles);
 
-        //考虑到标签以及用户含量 所以文章 url数量 x 3 取近似值
-        $articleCount = $articlesNum * 3;
+        //考虑到标签 所以文章 url数量 x 3 取近似值
+        $articleCount = $articlesNum * 2;
 
         //当不是更新时 直接跳转到最新一个地图
         if ($siteMap && empty($update) && $jump) {
@@ -331,7 +331,7 @@ class SiteMap extends Base
         $data = [];
         foreach ($articles as $article) {
             //会员网址
-            $data[] = 'https://' . self::domainExt($type) . $domainModel->name . '/user/index_' . $article['user_id'] . '.html';
+//            $data[] = 'https://' . self::domainExt($type) . $domainModel->name . '/user/index_' . $article['user_id'] . '.html';
             //文章网址
             $data[] = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $article['column_name'] . '/' . $article['id'] . '.html';
             //标签网址
@@ -343,31 +343,33 @@ class SiteMap extends Base
 
     public static function setXml($articles, $domainModel, $type)
     {
-
+        $strM ='';
         if ($type == self::TYPE_PC_XML) {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
+
         } else {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
+            $strM = '<mobile:mobile type="mobile"/>';
         }
 
         $users = [];
         $number = 0;
         foreach ($articles as $key => $article) {
-            if (!in_array($article['user_id'], $users)) {  //判重
-                //用户网址
-                $urlUser = $urlPc = 'https://' . self::domainExt($type) . $domainModel->name . '/user/index_' . $article['user_id'] . '.html';
-                $data .= '
-                    <url>
-                    <loc>' . $urlUser . '</loc>
-                    <lastmod>' . $article['push_time'] . '</lastmod>
-                    <changefreq>daily</changefreq>
-                    <priority>1.0</priority>
-                    </url>
-                    ';
-                $number += 1;
-            }
+//            if (!in_array($article['user_id'], $users)) {  //判重
+//                //用户网址
+//                $urlUser = $urlPc = 'https://' . self::domainExt($type) . $domainModel->name . '/user/index_' . $article['user_id'] . '.html';
+//                $data .= '
+//                    <url>
+//                    <loc>' . $urlUser . '</loc>
+//                    <lastmod>' . $article['push_time'] . '</lastmod>
+//                    <changefreq>daily</changefreq>
+//                    <priority>1.0</priority>
+//                    </url>
+//                    ';
+//                $number += 1;
+//            }
             $users[] = $article['user_id'];
             $number += 2;
 
@@ -376,10 +378,11 @@ class SiteMap extends Base
             //标签网址
             $tagPc = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
 
+
             $data .= '
                     <url>
                     <loc>' . $urlPc . '</loc>
-                    <mobile:mobile type="mobile"/>
+                    '.$strM.'
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
@@ -389,6 +392,7 @@ class SiteMap extends Base
             $data .= '
                     <url>
                     <loc>' . $tagPc . '</loc>
+                    '.$strM.'
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
