@@ -59,6 +59,7 @@ class BaiduKeywords extends Base
     {
         //查询指定20个站 的规则
         $domainIds = [
+            3,
             25,    //arcf.org.cn
             48,    //jlsds.org.cn
             72,    //hbrl22.com

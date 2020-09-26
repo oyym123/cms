@@ -86,6 +86,23 @@ class MipFlag extends Base
         return $res;
     }
 
+    /** 批量检测是否提交过 */
+    public static function checkUrls($urls)
+    {
+        $res = self::find()->select('url')->where([
+            'in', 'url', $urls
+        ])->all();
+
+        $usedUrls = array_column($res, 'url');
+        $arr = [];
+        foreach ($urls as $url) {
+            if (!in_array($url, $usedUrls)) { //已经使用过的url
+                $arr[] = $url;
+            }
+        }
+        return $arr;
+    }
+
     /** 插入一条记录 */
     public static function createOne($data)
     {
@@ -102,53 +119,33 @@ class MipFlag extends Base
         }
     }
 
-    public static function getAllUrl($name)
-    {
-        $limit = 3000; //取网站地图后最新的url
-        $filePathM = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/m_site.txt';
-        $filePathPC = __DIR__ . '/../../frontend/views/site/' . $name . '/home/static/site.txt';
-        if (!file_exists($filePathM) || !file_exists($filePathPC)) {
-            Tools::curlGet($name . '/m_site.txt');
-            sleep(10);
-            Tools::curlGet($name . '/site.txt');
-            sleep(10);
-        }
-        $resM = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathM))), 0, $limit);
-        $resPc = array_slice(array_filter(explode(PHP_EOL, file_get_contents($filePathPC))), 0, $limit);
-        return [$resM, $resPc];
-    }
-
     /** 推送URL */
     public static function pushUrl($domainId = 0, $test = 0, $type = 1)
     {
-        $where =[];
+        $where = [];
         //推送
         if ($domainId) {
             $where = [
                 'id' => $domainId
             ];
         }
-        $errorArr = [];
+
+        $flag = $type == 1 ? 'pc' : 'm';
         $domains = Domain::find()->where($where)->all();
 
         foreach ($domains as $domain) {
-            list($resM, $resPc) = self::getAllUrl($domain->name);
-            $res = $type == 1 ? $resPc : $resM;
-
-            //获取所有的文章进行
-            foreach ($res as $re) {
-                //判断是否已经提交过了
-                $flag = MipFlag::checkIsMip($re);
-                if (!empty($flag)) {          //表示已经提交过了
-                    $errorArr[] = $re;
-                } else {
-                    $info[] = $re;
-                }
+            list($resM, $resPc) = SiteMap::getAllUrl($domain);
+            if (empty($resM)) {
+                echo $domain->name . ' 网站没有可以更新的链接！';
+                continue;
             }
-//
+
+            $res = $type == 1 ? $resPc : $resM;
+            $info = MipFlag::checkUrls($res);
 //            echo '<pre>';
 //            print_r($info);
 //            exit;
+
             if ($test == 1 && $type == 1) {
                 self::dd($info);
             } elseif ($test == 1 && $type == 2) {
@@ -156,10 +153,8 @@ class MipFlag extends Base
             }
             self::pushData($domain, $info, $type);
         }
-        echo '<pre>';
-        print_r($errorArr);
-        echo $domain->name . '  推送完成' . PHP_EOL;
-//        exit;
+
+        echo $flag . '   ' . $domain->name . '  推送完成' . PHP_EOL;
     }
 
     public static function pushData($domain, $info, $type)
@@ -196,7 +191,7 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 200;
+            $remain = 200;    //分5个时间推送
             $urls = array_slice($info, 1, $remain);
             $info = $urls;
         }
@@ -390,7 +385,8 @@ class MipFlag extends Base
         $domainIds = BaiduKeywords::getDomainIds();
         $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
         foreach ($domains as $da) {
-            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
+//            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
+            if (!empty($da->baidu_token)) {
                 MipFlag::pushUrl($da->id, 0, 1); //PC推送
             }
         }
@@ -409,7 +405,6 @@ class MipFlag extends Base
             }
         }
     }
-
 
 
 }

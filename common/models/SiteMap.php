@@ -106,6 +106,35 @@ class SiteMap extends Base
         ];
     }
 
+    /** 获取所有更新的网址 */
+    public static function getAllUrl($domain)
+    {
+        $timeStart = Date('Y-m-d') . ' 00:00:00';  //当天凌晨
+        $siteMap = SiteMap::find()->where([
+            'domain_id' => $domain->id,
+            'type' => SiteMap::TYPE_PC_TXT
+        ])->andWhere([
+            '>', 'created_at', $timeStart
+        ])->orderBy('id desc')->one();
+
+        if ($siteMap) {
+            $articles = PushArticle::findx($domain->id)
+                ->select('id,column_name,key_id,user_id')
+                ->where([
+                    '>', 'id', $siteMap->update_start_id
+                ])->andWhere([
+                    '<', 'id', $siteMap->last_url_id
+                ])->all();
+
+            list($dataPc, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_PC_TXT);
+
+            list($dataM, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_M_TXT);
+            return [explode(PHP_EOL, $dataM), explode(PHP_EOL, $dataPc)];
+        }
+        return [[], []];
+    }
+
+
     /** 创建一个网址地图 */
     public static function createOne($data)
     {
@@ -166,7 +195,7 @@ class SiteMap extends Base
     public static function jumpUrl($domain, $name)
     {
         //查询最后的 文件数
-        $str = "http://{$domain}/{$name}";
+        $str = "http://{$domain}/map/{$name}";
         header("location:{$str}");
         exit();
     }
@@ -189,7 +218,7 @@ class SiteMap extends Base
         }
 
         list($fileName, $lastUrlId, $siteMap) = self::getFileName($domainModel, $type);
-        $path = __DIR__ . '/../../frontend/web/';
+        $path = __DIR__ . '/../../frontend/web/map/';
 
         //网站距离上一次的 更新量
         $articles = $query->select('id,column_name,key_id,user_id')
@@ -284,11 +313,10 @@ class SiteMap extends Base
             ];
             self::createOne($dataSave);
             if ($jump) {
-                self::jumpUrl($domainModel->name, $siteMap->file_name);
+                self::jumpUrl($domainModel->name, $fileName);
             }
         }
     }
-
 
     public static function setTxt($articles, $domainModel, $type)
     {
