@@ -191,7 +191,7 @@ class MipFlag extends Base
             Tools::writeLog($domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 200;    //分5个时间推送
+            $remain = 1500;    //分5个时间推送
             $urls = array_slice($info, 1, $remain);
             $info = $urls;
         }
