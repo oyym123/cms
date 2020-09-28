@@ -196,7 +196,7 @@ class SiteController extends Controller
             'title' => $column->title,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
-            'canonical' => 'http://' . $_SERVER['HTTP_HOST'],
+            'canonical' => 'https://' . $_SERVER['HTTP_HOST'],
         ];
 
         return $this->render($render, [

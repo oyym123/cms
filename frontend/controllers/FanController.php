@@ -154,7 +154,7 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
+                'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
                 'title' => $model['title'],
                 'keywords' => $oldTitle,
                 'description' => $desc,
@@ -233,7 +233,7 @@ class FanController extends Controller
                 'title' => $models[0]['nickname'] . '_会员',
                 'keywords' => $models[0]['nickname'] . '_会员',
                 'intro' => $column->intro . '_' . $domain->zh_name,
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
+                'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
             return $this->render($render, [
@@ -315,7 +315,7 @@ class FanController extends Controller
             'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
             'keywords' => $column->keywords ?: $column->zh_name,
             'intro' => $column->intro ?: $column->zh_name,
-            'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
+            'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
         ];
 
         return $this->render($render, [
@@ -495,7 +495,7 @@ class FanController extends Controller
                 'title' => $column->title ?: $column->zh_name . '_' . $domain->zh_name,
                 'keywords' => $column->keywords ?: $column->zh_name,
                 'intro' => $column->intro ?: $column->zh_name,
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
+                'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . '/' . $columnName,
             ];
 
             return $this->render($render, [
@@ -571,7 +571,7 @@ class FanController extends Controller
                 'title' => $model['keywords'],
                 'keywords' => $model['keywords'],
                 'intro' => $model['intro'],
-                'canonical' => 'http://' . $_SERVER['HTTP_HOST'] . $url,
+                'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
             ];
 
             if (empty($modelInfo)) {
