@@ -245,11 +245,15 @@ class FanController extends Controller
         $andWhere = [];
 
         if ($column->is_change) {
-            $maxRand = rand($lastId - 200, $lastId);
-            $minRand = rand($lastId - 280, $lastId - 201);
-            $andWhere = ['between', 'id', $minRand, $maxRand];
+            if ($lastId < 280) {
+                $andWhere = [];
+            } else {
+                $maxRand = rand($lastId - 30, $lastId);
+                $minRand = rand($lastId - 280, $lastId - 101);
+                $andWhere = ['between', 'id', $minRand, $maxRand];
+            }
         }
-        $andWhere = [];
+
         $query = PushArticle::find()->select('id,column_id,column_name,user_id,key_id,keywords,title_img,title,intro,push_time')
             ->andWhere($andWhere)
             ->orderBy('Rand()')

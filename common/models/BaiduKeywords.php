@@ -81,6 +81,7 @@ class BaiduKeywords extends Base
             46,    //cxch.org.cn
             76,    //xunke.org.cn
         ];
+
         return $domainIds;
     }
 
@@ -295,8 +296,8 @@ class BaiduKeywords extends Base
         $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
         $itemData = [];
 
-        $step = 1;
-        $limit = 2;
+        $step = 20;
+        $limit = 100;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()

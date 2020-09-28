@@ -160,7 +160,7 @@ class CmsController extends \yii\console\Controller
     {
 
 
-        exit;
+//        exit;
 
         //查询指定20个站 的规则
         $domainIds = BaiduKeywords::getDomainIds();
@@ -169,9 +169,7 @@ class CmsController extends \yii\console\Controller
         $itemData = [];
 
         $step = 50;
-        $limit = 60;
-
-        for ($i = 41; $i <= $limit; $i++) {
+        for ($i = 0; $i <= 100; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywords = AllBaiduKeywords::find()
                     ->select('id,keywords,type')
@@ -180,7 +178,7 @@ class CmsController extends \yii\console\Controller
                         'status' => 10,
                         'type_id' => $rules['category_id']
                     ])
-                    ->andWhere(['>', 'updated_at', '2020-09-24 08:00:00'])
+                    ->andWhere(['>', 'updated_at', '2020-09-26 10:00:00'])
                     ->andWhere([
                         'catch_status' => 100
                     ])
@@ -200,13 +198,15 @@ class CmsController extends \yii\console\Controller
                     ];
                 }
             }
-
         }
+
+//        echo '<pre>';
+//        print_r($data);
+//        exit;
 
         $url = 'http://8.129.37.130/index.php/distribute/set-keyword';
         Tools::curlPost($url, ['res' => json_encode($data)]);
         exit;
-
 
 //        echo '<pre>';
 //        print_r($data);
