@@ -17,8 +17,8 @@ class DomainColumnSearch extends DomainColumn
     public function rules()
     {
         return [
-            [['id', 'domain_id', 'user_id', 'status'], 'integer'],
-            [['name', 'tags', 'domain_name', 'created_at', 'updated_at', 'zh_name', 'type'], 'safe'],
+            [['id',  'user_id', 'status'], 'integer'],
+            [['name', 'tags', 'domain_name', 'created_at', 'updated_at', 'zh_name', 'type','domain_id'], 'safe'],
         ];
     }
 
@@ -65,6 +65,12 @@ class DomainColumnSearch extends DomainColumn
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
+
+        $query->andFilterWhere([
+            'domain.id' => $this->domain_id[0],
+        ])
+            ->innerJoinWith('domain', 'domain.id = domain_column.domain_id');
+
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'type', $this->type])

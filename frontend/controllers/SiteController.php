@@ -153,6 +153,7 @@ class SiteController extends Controller
         $url = Tools::getLocalUrl(1);
 
         $columnZhName = '';
+
         if (!empty($models)) {
             $columnObj = DomainColumn::findOne($models[0]['column_id']);
             if (!empty($columnObj)) {

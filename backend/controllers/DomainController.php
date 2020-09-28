@@ -193,4 +193,30 @@ class DomainController extends Controller
         $type = Yii::$app->request->get('type', 1);
         MipFlag::pushUrl(Yii::$app->request->get('id'), $test, $type);
     }
+
+    /** 获取模板 */
+    public function actionGetDomain()
+    {
+        $q = Yii::$app->request->get('q', '');
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!$q) {
+            return $out;
+        }
+
+        $data = Domain::find()
+
+            ->select('id,name as text')
+            ->andFilterWhere(['like', 'name', $q])
+            ->limit(30)
+            ->asArray()
+            ->all();
+
+        foreach ($data as &$item) {
+            $item['text'] = '<strong>' . $item['text'] . '</strong>' ;
+        }
+
+        $out['results'] = array_values($data);
+        return $out;
+    }
 }

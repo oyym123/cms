@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Domain;
 use common\models\DomainTpl;
 use common\models\Fan;
 use common\models\PushArticle;
@@ -114,7 +115,7 @@ class DomainColumnController extends Controller
             if ($model->save()) {
                 //规则配置
                 Fan::getRules($model->domain_id);
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index', 'DomainColumnSearch[domain_id][]' => $model->domain_id]);
             }
         }
 
@@ -151,5 +152,30 @@ class DomainColumnController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+
+    /** 获取标签 */
+    public function actionGetTags()
+    {
+        $q = Yii::$app->request->get('q', '');
+
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!$q) {
+            return $out;
+        }
+
+        $data = Domain::find()
+            ->select('id,name as text')
+            ->andFilterWhere(['like', 'keywords', $q])
+            ->limit(50)
+            ->asArray()
+            ->all();
+        foreach ($data as &$item) {
+            $item['text'] = '<strong>' . $item['text'] .'</strong>';
+        }
+        $out['results'] = array_values($data);
+        return $out;
     }
 }
