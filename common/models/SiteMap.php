@@ -268,7 +268,7 @@ class SiteMap extends Base
                     list($data, $urlNum) = self::setTxt($articlesTotal, $domainModel, $type);
                 }
 
-                file_put_contents($siteMap->file_name, $data);
+                file_put_contents($path . $siteMap->file_name, $data);
 
                 //更新
                 $siteMap->number = $urlNum;
