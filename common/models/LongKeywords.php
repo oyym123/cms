@@ -549,8 +549,8 @@ class LongKeywords extends Base
         $itemData = [];
 
         $step = 20;
-        $limit = 90;
-        for ($i = 51; $i <= $limit; $i++) {
+        $limit = 30;
+        for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $column = DomainColumn::find()
                     ->select('id,type,domain_id,zh_name,name')
@@ -560,7 +560,7 @@ class LongKeywords extends Base
                     ->andWhere(['catch_status' => 100])              //表示后台输入的词
                     ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
                     ->andWhere(['type_id' => $rules['category_id']])
-//                    ->andWhere(['>','back_time','2020-08-01 00:00:00'])  有回调参数的关键词
+                    ->andWhere(['>','back_time','2020-08-01 00:00:00'])  //有回调参数的关键词
                     //表示没有栏目使用过
                     ->orderBy('id desc')
                     ->offset($i * $step)
@@ -636,7 +636,7 @@ class LongKeywords extends Base
                                 'intro' => $re['intro'],
                                 'title' => $re['title'],
                                 'user_id' => UserId::getId(),
-                                'push_time' => Tools::randomDate('20190601', '20200501'),
+                                'push_time' => Tools::randomDate('20190301', '20200301'),
                                 'created_at' => date('Y-m-d H:i:s'),
                                 'updated_at' => date('Y-m-d H:i:s'),
                             ];
