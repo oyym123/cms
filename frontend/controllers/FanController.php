@@ -78,13 +78,13 @@ class FanController extends Controller
             $nextTitle = PushArticle::findOne($arr[0] + 1);
 
             if ($preTitle) {
-                $preTitle =  Tools::getKTitle($preTitle->title);
+                $preTitle = Tools::getKTitle($preTitle->title);
             } else {
                 $preTitle = '没有更多内容啦！';
             }
 
             if ($nextTitle) {
-                $nextTitle =  Tools::getKTitle($nextTitle->title);
+                $nextTitle = Tools::getKTitle($nextTitle->title);
             } else {
                 $nextTitle = '没有更多内容啦！';
             }
@@ -230,8 +230,8 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['user_tdk'] = [
-                'title' => $models[0]['nickname'] . '_'.$domain->name,
-                'keywords' => $models[0]['nickname'] . '_会员',
+                'title' => $models[0]['nickname'] . '_' . $domain->zh_name,
+                'keywords' => $models[0]['nickname'] . '_' . $domain->zh_name,
                 'intro' => $column->intro . '_' . $domain->zh_name,
                 'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
             ];
