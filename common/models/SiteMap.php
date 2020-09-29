@@ -276,7 +276,7 @@ class SiteMap extends Base
                 $siteMap->last_url_id = $articles[0]['id'];
                 $siteMap->save(false);
                 if ($jump) {
-                    self::jumpUrl($domainModel->name, $siteMap->file_name);
+                    self::jumpUrl($domainModel->name, $path . $siteMap->file_name);
                 }
             } else {  //剩余容量小于时，则写入新的文件
                 if ($type == self::TYPE_PC_XML || $type == self::TYPE_M_XML) {
@@ -396,7 +396,7 @@ class SiteMap extends Base
                     <priority>1.0</priority>
                     </url>
                     ';
-            }else{
+            } else {
 
                 $data .= '
                     <url>
