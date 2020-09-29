@@ -34,7 +34,7 @@ class Domain extends Base
         return [
             [['name', 'end_tags', 'start_tags', 'jump_url', 'zh_name', 'intro'], 'required'],
             [['status', 'user_id', 'is_jump'], 'integer'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'links'], 'safe'],
             [['name', 'ip', 'baidu_token', 'mip_time', 'baidu_password', 'baidu_account'], 'string', 'max' => 255],
         ];
     }
@@ -59,6 +59,7 @@ class Domain extends Base
             'baidu_token' => '推送token',
             'baidu_password' => '百度账号密码',
             'baidu_account' => '百度账号',
+            'links' => '友情链接',
             'mip_time' => '推送时间',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
@@ -89,12 +90,19 @@ class Domain extends Base
     /** 获取友情链接 */
     public static function getLinks()
     {
-        return [
-            [
-                'url' => '1.html',
-                'name' => '百度',
-            ]
-        ];
+        $arr = [];
+        $domain = self::getDomainInfo();
+        if (!empty($domain)) {
+            $links = trim($domain->links);
+            foreach (explode(',', $links) as $item) {
+                $strArr = explode('|', $item);
+                $arr[] = [
+                    'name' => $strArr[0],
+                    'url' => $strArr[1]
+                ];
+            }
+        }
+        return $arr;
     }
 
 }

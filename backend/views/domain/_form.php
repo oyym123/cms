@@ -31,8 +31,11 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'baidu_password')->passwordInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'baidu_account')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'mip_time')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'links')->textarea(['rows' => 5])
+        ->hint('实例： 百度|https://www.baodu.com/,头条|https://www.toutiao.com/ 【名称在网址前面，名称用|分割 新增的用，分割。 排序默认按照从左到右】') ?>
     <?= $form->field($model, 'is_jump')->radioList(\common\models\Base::getBaseS(), ['maxlength' => true])->hint('请确保有流量时才开启') ?>
     <?= $form->field($model, 'jump_url')->textInput(['maxlength' => true]) ?>
+
 
     <!--    --><? //= $form->field($model, 'status')->textInput() ?>
     <!---->
