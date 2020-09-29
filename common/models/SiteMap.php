@@ -347,11 +347,9 @@ class SiteMap extends Base
         if ($type == self::TYPE_PC_XML) {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.google.com/schemas/sitemap/0.84">';
-            $strM = '';
         } else {
             $data = '<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.baidu.com/schemas/sitemap-mobile/1/">';
-            $strM = '<mobile:mobile type="mobile"/>';
         }
 
         $users = [];
@@ -378,33 +376,55 @@ class SiteMap extends Base
             //标签网址
             $tag = 'https://' . self::domainExt($type) . $domainModel->name . '/' . $domainModel->start_tags . $article['key_id'] . $domainModel->end_tags;
 
+            if ($type == self::TYPE_PC_XML) {
 
-            $data .= '
+                $data .= '
                     <url>
                     <loc>' . $url . '</loc>
-                    ' . $strM . '
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
                     </url>
                     ';
 
-            $data .= '
+
+                $data .= '
                     <url>
                     <loc>' . $tag . '</loc>
-                    ' . $strM . '
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    ';
+            }else{
+
+                $data .= '
+                    <url>
+                    <loc>' . $url . '</loc>
+                    <mobile:mobile type="mobile"/>
                     <lastmod>' . $article['push_time'] . '</lastmod>
                     <changefreq>daily</changefreq>
                     <priority>1.0</priority>
                     </url>
                     ';
 
+
+                $data .= '
+                    <url>
+                    <loc>' . $tag . '</loc>
+                    <mobile:mobile type="mobile"/>
+                    <lastmod>' . $article['push_time'] . '</lastmod>
+                    <changefreq>daily</changefreq>
+                    <priority>1.0</priority>
+                    </url>
+                    ';
+
+            }
         }
 
         $data .= '
                     </urlset>';
 
         return [$data, $number];
-
     }
 }
