@@ -230,7 +230,7 @@ class FanController extends Controller
 
             $view = Yii::$app->view;
             $view->params['user_tdk'] = [
-                'title' => $models[0]['nickname'] . '_会员',
+                'title' => $models[0]['nickname'] . '_'.$domain->name,
                 'keywords' => $models[0]['nickname'] . '_会员',
                 'intro' => $column->intro . '_' . $domain->zh_name,
                 'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
@@ -407,6 +407,7 @@ class FanController extends Controller
      *     description="返回码",
      *     @OA\JsonContent( type="json", example=
      *     {
+     *       "Domain::getLinks()":          " 【友情链接】   用于循环  $item['url']         $item['name']",
      *       "BaiduKeywords::hotKeywords()": "【热门标签】   用于循环  $item['url']         $item['keywords']",
      *       "PushArticle::newArticle()": "   【最新文章】   用于循环  $item['url']         $item['title']",
      *       "PushArticle::hotArticle()": "   【热门文章】   用于循环  $item['title_img']   $item['url']    $item['title']   $item['push_time'] $item['nickname']   $item['avatar']  $item['user_url']",
@@ -420,6 +421,7 @@ class FanController extends Controller
     {
 
     }
+
 
     /**
      * @OA\Get(

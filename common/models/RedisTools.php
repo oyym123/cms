@@ -72,6 +72,8 @@ class RedisTools
 //                    $redis->setex($data['prefix'] . $res['key_id'], 60 * 60 * 24, $record);
                     //处理业务逻辑
                     $arr[] = $res;
+                }else{
+                    exit('没有数据了！');
                 }
             } catch (\Throwable $e) {
                 continue;

@@ -86,4 +86,15 @@ class Domain extends Base
         return $domainInfo;
     }
 
+    /** 获取友情链接 */
+    public static function getLinks()
+    {
+        return [
+            [
+                'url' => '1.html',
+                'name' => '百度',
+            ]
+        ];
+    }
+
 }
