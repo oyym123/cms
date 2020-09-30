@@ -19,6 +19,8 @@ use yii\filters\VerbFilter;
  */
 class TemplateController extends Controller
 {
+    public $enableCsrfValidation = false;
+
     /**
      * {@inheritdoc}
      */
@@ -122,6 +124,9 @@ class TemplateController extends Controller
         $model = $this->findModel($id);
         $post = Yii::$app->request->post()['Template'];
         $old = $model;
+        if (Yii::$app->request->get('update', 0) == 1) {
+            Yii::$app->getSession()->setFlash('success', '内容保存成功!');
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             if (isset($post['php_func']) && !empty($post['php_func'])) {
@@ -164,6 +169,44 @@ class TemplateController extends Controller
         return $this->render('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionSaveContent()
+    {
+        $id = Yii::$app->request->post('id');
+        $content = Yii::$app->request->post('content');
+        $template = Template::findOne($id);
+        if (!Tools::contentCheck($content)) {
+            exit('有敏感词！请重新提交');
+            Yii::$app->getSession()->setFlash('error', '有敏感词！请重新提交');
+            return $this->redirect(['update', 'id' => $id]);
+        } else {
+            $template->content = $content;
+            $template->save(false);
+            exit('成功');
+            Yii::$app->getSession()->setFlash('success', '内容修改保存成功！');
+            return $this->redirect(['update', 'id' => $id]);
+        }
+    }
+
+    public function actionContent()
+    {
+        $id = Yii::$app->request->get('id');
+        $template = Template::findOne($id);
+
+        exit($template->content);
+    }
+
+    public function actionEdit()
+    {
+        $id = Yii::$app->request->get('id');
+        $template = Template::findOne($id);
+        $this->layout = 'blank';
+
+        return $this->render('edit', [
+            'id' => $id
+        ]);
+
     }
 
     /**

@@ -59,7 +59,7 @@ class BaiduKeywords extends Base
     {
         //查询指定20个站 的规则
         $domainIds = [
-            3,
+//            3,
             25,    //arcf.org.cn
             48,    //jlsds.org.cn
             72,    //hbrl22.com
@@ -80,6 +80,11 @@ class BaiduKeywords extends Base
             41,    //cmru.org.cn
             46,    //cxch.org.cn
             76,    //xunke.org.cn
+            //-------------------------------
+
+
+
+
         ];
 
         return $domainIds;
@@ -293,11 +298,13 @@ class BaiduKeywords extends Base
         //查询指定20个站 的规则
         $domainIds = self::getDomainIds();
         //查询出所有的规则分类
-        $articleRules = ArticleRules::find()->select('category_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+        $articleRules = ArticleRules::find()->select('category_id')
+            //->where(['in', 'domain_id', $domainIds])
+            ->asArray()->all();
         $itemData = [];
 
         $step = 20;
-        $limit = 50;
+        $limit = 40;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()

@@ -1,5 +1,4 @@
 <!-- 爱收集资源网-->
-
 <html>
 <head>
     <meta charset="utf-8">
@@ -26,6 +25,7 @@
 </head>
 <body>
 
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
 <script src="/codemirror/lib/codemirror.js"></script>
 <script src="/codemirror/addon/edit/closetag.js"></script>
 <script src="/codemirror/mode/xml/xml.js"></script>
@@ -35,16 +35,41 @@
 <script src="/code-blast.js"></script>
 
 <script>
-    window.cm = CodeMirror(document.body, {
-        lineNumbers: true,
-        mode:  "htmlmixed",
-        theme: 'monokai',
-        lineWrapping: true,
-        autofocus: true,
-        tabSize: 2,
-        value: "",
-        autoCloseTags: true,
-        blastCode: { effect: 2 },
+    $.ajax({
+        url: "/index.php/template/content?id=<?= $id ?>",
+        type: "get",
+        success: function (data) {
+            // console.log(data);
+            window.cm = CodeMirror(document.body, {
+                lineNumbers: true,
+                mode: "htmlmixed",
+                theme: 'monokai',
+                lineWrapping: true,
+                autofocus: true,
+                tabSize: 2,
+                value: data,
+                autoCloseTags: true,
+                blastCode: {effect: 2},
+            });
+
+        }
+    });
+
+
+    $(document).keydown(function (e) {
+        // ctrl + s
+        if (e.ctrlKey == true && e.keyCode == 83) {
+            console.log('ctrl+s');
+            $.ajax({
+                url: "/index.php/template/save-content",
+                type: "post",
+                data: {content: window.cm.getValue(), id: <?= $id ?>},
+                success: function (data) {
+                    window.location.href= "/index.php/template/update?id=<?= $id ?>&update=1";
+                }
+            });
+            return false; // 截取返回false就不会保存网页了
+        }
     });
 </script>
 
