@@ -329,8 +329,8 @@ class BaiduKeywords extends Base
             ->asArray()->all();
         $itemData = [];
 
-        $step = 20;
-        $limit = 40;
+        $step = 100;
+        $limit = 100;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()
@@ -349,11 +349,19 @@ class BaiduKeywords extends Base
                     ->all();
 
                 foreach ($keywordData as $keywordDatum) {
-                    $itemData[] = $keywordDatum;
+//                    $itemData[] = $keywordDatum;
+                    $l = $keywordDatum;
+                    $l['name'] = trim($keywordDatum['name']);
+                    $all = AllBaiduKeywords::findOne($l['id']);
+                    $all->status = 10;
+                    $all->save(false);
+                    LongKeywords::bdPushReptileNew($l, $l['pid']);
                 }
+                sleep(2);
             }
         }
 
+        exit('执行完成!');
         return $itemData;
 
 
