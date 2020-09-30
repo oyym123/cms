@@ -19,7 +19,7 @@ class RedisListController extends \yii\console\Controller
             'list_name' => 'list_long_keywords',
         ];
         for ($i = 1; $i < 86400; $i++) {
-            list($code, $msg) = (new RedisTools())->getList($dataGet, 50);
+            list($code, $msg) = (new RedisTools())->getList($dataGet, 200);
             $keywords = array_column($msg, 'key_id');
 
             if ($code > 0) {
@@ -31,7 +31,7 @@ class RedisListController extends \yii\console\Controller
             } else {
                 Tools::writeLog([$msg], 'set_keywords.log');
             }
-            sleep(3);
+            sleep(8);
         }
     }
 

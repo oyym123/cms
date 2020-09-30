@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_common);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_common . '" >' . $name . '  </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_common . '" >' . $name . '  </a>';
                 }
             ],
             [
@@ -61,7 +61,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_home);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_home . '" >' . $name . '  </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_home . '" >' . $name . '  </a>';
                 }
             ],
             [
@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_list);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_list . '" >' . $name . '  </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_list . '" >' . $name . '  </a>';
                 }
             ],
             [
@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_inside);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_inside . '" >' . $name . '  </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_inside . '" >' . $name . '  </a>';
                 }
             ],
             [
@@ -88,7 +88,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_detail);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_detail . '" >' . $name . ' </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_detail . '" >' . $name . ' </a>';
                 }
             ],
             [
@@ -97,7 +97,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'content' => function ($model, $key, $index, $column) {
                     $tem = \common\models\Template::findOne($model->t_tags);
                     $name = $tem ? $tem->name : '';
-                    return '<a href="/index.php/template/' . $model->t_tags . '" >' . $name . ' </a>';
+                    return '<a href="/index.php/template/update?id=' . $model->t_tags . '" >' . $name . ' </a>';
                 }
             ],
             [
@@ -108,7 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     $str = '';
                     foreach ($tem as $item) {
                         $name = $item ? $item->name : '';
-                        $str .= '<a href="/index.php/template/' . $item->id . '" >' . $name . ' </a><br>';
+                        $str .= '<a href="/index.php/template/update?id=' . $item->id . '" >' . $name . ' </a><br>';
                     }
 
                     return $str;

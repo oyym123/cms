@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'en_name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'content')->textarea(['rows' => 8]) ?>
-    <a  href="/index.php/template/edit?id=<?= $model->id?>" class="btn_edit">【快捷键打开编辑器】 ctrl + x 【快捷键保存】 xtrl + s</a>
+    <a  href="/index.php/template/edit?id=<?= $model->id?>" class="btn_edit" target="_blank">【快捷键打开编辑器】 ctrl + x 【快捷键保存】 xtrl + s</a>
     <?= $form->field($model, 'php_func')->textarea(['rows' => 5])->hint('需要自定义页面时,找后端填写此栏目') ?>
 
 

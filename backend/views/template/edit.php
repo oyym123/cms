@@ -19,21 +19,24 @@
             height: 100%;
             font-size: 20px;
         }
-
     </style>
-
 </head>
 <body>
-
 <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
-<script src="/codemirror/lib/codemirror.js"></script>
-<script src="/codemirror/addon/edit/closetag.js"></script>
-<script src="/codemirror/mode/xml/xml.js"></script>
-<script src="/codemirror/mode/javascript/javascript.js"></script>
-<script src="/codemirror/mode/css/css.js"></script>
-<script src="/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-<script src="/code-blast.js"></script>
+<!--<script src="/codemirror/lib/codemirror.js"></script>-->
+<!--<script src="/codemirror/addon/edit/closetag.js"></script>-->
+<!--<script src="/codemirror/mode/xml/xml.js"></script>-->
+<!--<script src="/codemirror/mode/javascript/javascript.js"></script>-->
+<!--<script src="/codemirror/mode/css/css.js"></script>-->
+<!--<script src="/codemirror/mode/htmlmixed/htmlmixed.js"></script>-->
+<!--<script src="/code-blast.js"></script>-->
 
+<script src="/codemirror/lib/codemirror.js"></script>
+<script src="/codemirror/5.32.0/mode/xml/xml.js"></script>
+<script src="/codemirror/5.32.0/mode/javascript/javascript.min.js"></script>
+<script src="/codemirror/5.32.0/mode/css/css.js"></script>
+<script src="/codemirror/5.32.0/mode/clike/clike.js"></script>
+<script src="/codemirror/5.32.0/mode/php/php.js"></script>
 <script>
     $.ajax({
         url: "/index.php/template/content?id=<?= $id ?>",
@@ -42,19 +45,19 @@
             // console.log(data);
             window.cm = CodeMirror(document.body, {
                 lineNumbers: true,
-                mode: "htmlmixed",
+                mode: "application/x-httpd-php",
                 theme: 'monokai',
                 lineWrapping: true,
                 autofocus: true,
+                indentUnit: 30,
                 tabSize: 2,
                 value: data,
-                autoCloseTags: true,
-                blastCode: {effect: 2},
-            });
 
+                matchBrackets:true,
+                autoCloseTags: true,
+            });
         }
     });
-
 
     $(document).keydown(function (e) {
         // ctrl + s
@@ -73,5 +76,5 @@
     });
 </script>
 
-</body>
+
 </html>

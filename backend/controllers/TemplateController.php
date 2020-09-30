@@ -204,7 +204,8 @@ class TemplateController extends Controller
         $this->layout = 'blank';
 
         return $this->render('edit', [
-            'id' => $id
+            'id' => $id,
+            'content'=>$template->content
         ]);
 
     }
