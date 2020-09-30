@@ -544,12 +544,13 @@ class LongKeywords extends Base
         $domainIds = BaiduKeywords::getDomainIds();
 
         //查询出所有的规则分类
-        $articleRules = ArticleRules::find()->select('category_id,domain_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
-
+        $articleRules = ArticleRules::find()->select('category_id,domain_id,column_id')->where($andWhere)->asArray()->all();
+//        echo '<pre>';
+//        print_r($articleRules);exit;
         $itemData = [];
 
         $step = 20;
-        $limit = 30;
+        $limit = 25;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $column = DomainColumn::find()
@@ -562,7 +563,7 @@ class LongKeywords extends Base
                     ->andWhere(['type_id' => $rules['category_id']])
                     ->andWhere(['>','back_time','2020-08-01 00:00:00'])  //有回调参数的关键词
                     //表示没有栏目使用过
-                    ->orderBy('id desc')
+//                    ->orderBy('id desc')
                     ->offset($i * $step)
                     ->limit($step)
                     ->andWhere(['column_id' => 0])                  //表示没有栏目使用过

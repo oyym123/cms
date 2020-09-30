@@ -289,7 +289,7 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
-        ini_set ("memory_limit","-1");
+        ini_set("memory_limit", "-1");
         $listRes = Tools::curlGet('http://8.129.37.130/distribute/list-length');
         $listArr = json_decode($listRes, true);
 
@@ -306,6 +306,7 @@ class CmsController extends Controller
         $little = $yesArr = $noArr = [];
 
         foreach ($articleRules as $key => $rules) {
+            $tui = 0;
             $column = DomainColumn::find()
                 ->where(['id' => $rules['column_id']])->one();
             $res = AllBaiduKeywords::find()
@@ -315,12 +316,12 @@ class CmsController extends Controller
                 ->andWhere(['>', 'column_id', 0])
                 ->count();
 
-            $tui = MipFlag::find()
-                ->where(['db_id' => $column->domain_id])
-                ->andWhere(['>', 'created_at', $timeStart])
-                ->andWhere(['<', 'created_at', $timeEnd])
-                ->count();
-            $tuiTotal += $tui;
+//            $tui = MipFlag::find()
+//                ->where(['db_id' => $column->domain_id])
+//                ->andWhere(['>', 'created_at', $timeStart])
+//                ->andWhere(['<', 'created_at', $timeEnd])
+//                ->count();
+//            $tuiTotal += $tui;
             $lastArticle = PushArticle::findx($column->domain_id)->orderBy('id desc')->one();
             $total += $res;
             $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
@@ -360,6 +361,7 @@ class CmsController extends Controller
         echo '<div style="background: black;color: white">';
         echo $timeStart . '  至 ' . $timeEnd . '<h1>期间的文章总量：' . $total . ' 篇</h1>';
 //        echo '<h2> 关键词推入总量：' . $pushNum . ' 个</h2>';
+        echo '<h2> Redis中剩余：' . Yii::$app->redis->llen('list_long_keywords') . ' 个</h2>';
         echo '<h2> 爬虫分发器中剩余：' . $listArr['data'][0] . ' 条</h2>';
         echo '<h2> 爬虫爬取关键词量：' . $catchNum . ' 个</h2>';
         echo '<h2> 百度推送总量：' . $tuiTotal . ' 个</h2>';

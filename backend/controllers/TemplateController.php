@@ -182,7 +182,10 @@ class TemplateController extends Controller
             return $this->redirect(['update', 'id' => $id]);
         } else {
             $template->content = $content;
-            $template->save(false);
+            if ($template->save(false)) {
+                //更新模板
+                DomainTpl::setTmp(0, $id);
+            }
             exit('成功');
             Yii::$app->getSession()->setFlash('success', '内容修改保存成功！');
             return $this->redirect(['update', 'id' => $id]);
@@ -205,7 +208,7 @@ class TemplateController extends Controller
 
         return $this->render('edit', [
             'id' => $id,
-            'content'=>$template->content
+            'content' => $template->content
         ]);
 
     }

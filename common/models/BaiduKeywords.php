@@ -81,10 +81,36 @@ class BaiduKeywords extends Base
             46,    //cxch.org.cn
             76,    //xunke.org.cn
             //-------------------------------
-
-
-
-
+            15,       //ztjyb.com
+            21,       //renjianfojiao.org
+            26,       //xiaozhan.org.cn
+            27,       //liyef.org.cn
+            28,       //yaoburan.com
+            29,       //jianqingyuan.cn
+            33,       //nuanlai.org.cn
+            36,       //hs1563.com
+            37,       //bhia.org.cn
+            42,       //lnifc.org.cn
+            43,       //apsba.org.cn
+            44,       //hljocs.org.cn
+            49,       //szwiser.org.cn
+            52,       //cp6rh.org.cn
+            56,       //ysttwh.org.cn
+            57,       //wgpg.org.cn
+            59,       //liticheku.org.cn
+            62,       //hncd888.com
+            64,       //hbrl11.com
+            65,       //sankou39.com
+            66,       //gdsfjy.org.cn
+            67,       //iotxing.org.cn
+            68,       //icwpi.org.cn
+            70,       //ktown.org.cn
+            74,       //agct.org.cn
+            75,       //7986.org.cn
+            77,       //pyfr.org.cn
+            78,       //jmsgfxx.org.cn
+            79,       //cf315.org.cn
+            80,       //styl.org.cn
         ];
 
         return $domainIds;
