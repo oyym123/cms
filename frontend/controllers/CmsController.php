@@ -289,18 +289,20 @@ class CmsController extends Controller
 
     public function actionCountArticle()
     {
+        set_time_limit(0);
+        ignore_user_abort(0);
         ini_set("memory_limit", "-1");
         $listRes = Tools::curlGet('http://8.129.37.130/distribute/list-length');
         $listArr = json_decode($listRes, true);
 
         $domainIds = BaiduKeywords::getDomainIds();
-        $articleRules = ArticleRules::find()->select('category_id,column_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
+        $articleRules = ArticleRules::find()->select('category_id,column_id,domain_id')->where(['in', 'domain_id', $domainIds])->asArray()->all();
 
         $itemData = [];
         $timeStart = Yii::$app->request->get('start', Date('Y-m-d') . ' 00:00:00');
         $timeEnd = Yii::$app->request->get('end', date("Y-m-d", strtotime("+1 day")) . ' 00:00:00');
         $_GET['domain'] = 0;
-        $tuiTotal = $total = 0;
+        $total = 0;
         $min = 500;
         $littleMin = 100;
         $little = $yesArr = $noArr = [];
@@ -309,19 +311,12 @@ class CmsController extends Controller
             $tui = 0;
             $column = DomainColumn::find()
                 ->where(['id' => $rules['column_id']])->one();
-            $res = AllBaiduKeywords::find()
-                ->where(['type_id' => $rules['category_id']])
-                ->andWhere(['>', 'updated_at', $timeStart])
+
+            $res = PushArticle::findx($column->domain_id)
+                ->andWhere(['>', 'created_at', $timeStart])
                 ->andWhere(['<', 'updated_at', $timeEnd])
-                ->andWhere(['>', 'column_id', 0])
                 ->count();
 
-//            $tui = MipFlag::find()
-//                ->where(['db_id' => $column->domain_id])
-//                ->andWhere(['>', 'created_at', $timeStart])
-//                ->andWhere(['<', 'created_at', $timeEnd])
-//                ->count();
-//            $tuiTotal += $tui;
             $lastArticle = PushArticle::findx($column->domain_id)->orderBy('id desc')->one();
             $total += $res;
             $lastUrl = 'https://' . $column->domain->name . '/' . $lastArticle->column_name . '/' . $lastArticle->id . '.html';
@@ -357,6 +352,11 @@ class CmsController extends Controller
             ->andWhere(['<', 'back_time', $timeEnd])
             ->count();
 
+        $tuiTotal = MipFlag::find()
+            ->andWhere(['>', 'created_at', $timeStart])
+            ->andWhere(['<', 'created_at', $timeEnd])
+            ->count();
+
         echo '<pre>';
         echo '<div style="background: black;color: white">';
         echo $timeStart . '  至 ' . $timeEnd . '<h1>期间的文章总量：' . $total . ' 篇</h1>';
@@ -390,10 +390,11 @@ class CmsController extends Controller
     public function actionCheckComputer()
     {
         $checkComputer = Tools::curlGet(\Yii::$app->params['local_reptile_url'] . '/cms/check-computer');
+
+
         echo '<pre>';
         echo '<div style="background: black;color: white;">';
         echo '<h1>时间大于15分钟的标记为红色!</h1>';
-
         $data = json_decode($checkComputer, true);
         $num = 0;
         $noArr = $yesArr = [];

@@ -66,10 +66,10 @@ class DomainColumnSearch extends DomainColumn
             'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere([
-            'domain.id' => $this->domain_id[0],
-        ])
-            ->innerJoinWith('domain', 'domain.id = domain_column.domain_id');
+//        $query->andFilterWhere([
+//            'domain.id' => $this->domain_id[0],
+//        ])
+//            ->innerJoinWith('domain', 'domain.id = domain_column.domain_id');
 
 
         $query->andFilterWhere(['like', 'name', $this->name])

@@ -119,26 +119,38 @@ class SiteMap extends Base
     public static function getAllUrl($domain)
     {
         $timeStart = Date('Y-m-d') . ' 00:00:00';  //当天凌晨
-        $siteMap = SiteMap::find()->where([
-            'domain_id' => $domain->id,
-            'type' => SiteMap::TYPE_PC_TXT
-        ])->andWhere([
-            '>', 'updated_at', $timeStart
-        ])->orderBy('id desc')->one();
+//        $siteMap = SiteMap::find()->where([
+//            'domain_id' => $domain->id,
+//            'type' => SiteMap::TYPE_PC_TXT
+//        ])->andWhere([
+//            '>', 'updated_at', $timeStart
+//        ])->orderBy('id desc')->one();
+//
+//        if ($siteMap) {
+//            $articles = PushArticle::findx($domain->id)
+//                ->select('id,column_name,key_id,user_id')
+//                ->where([
+//                    '>', 'id', $siteMap->update_start_id
+//                ])->andWhere([
+//                    '<', 'id', $siteMap->last_url_id
+//                ])->orderBy('id desc')->all();
 
-        if ($siteMap) {
+
             $articles = PushArticle::findx($domain->id)
                 ->select('id,column_name,key_id,user_id')
                 ->where([
-                    '>', 'id', $siteMap->update_start_id
+                    '>', 'created_at', date("Y-m-d"). ' 00:00:00'
                 ])->andWhere([
-                    '<', 'id', $siteMap->last_url_id
-                ])->orderBy('id desc')->all();
+                    '<', 'created_at', date("Y-m-d", strtotime("+1 day")) . ' 00:00:00'
+                ])->orderBy('id desc')->asArray()->all();
+//            echo '<pre>';
+//            print_r($articles);
+//            exit;
 
             list($dataPc, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_PC_TXT);
             list($dataM, $urlNum) = self::setTxt($articles, $domain, SiteMap::TYPE_M_TXT);
             return [explode(PHP_EOL, $dataM), explode(PHP_EOL, $dataPc)];
-        }
+//        }
         return [[], []];
     }
 

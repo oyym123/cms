@@ -78,7 +78,7 @@ $domain = \common\models\Domain::getDomainInfo();
     ?>
 
     <link type="image/x-icon" rel="shortcut icon" href="/favicon.ico">
-    <link href="/css/index.css" rel="stylesheet" type="text/css"/>
+
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
     <script type="text/javascript" src="/js/index.js"></script>
 </head>

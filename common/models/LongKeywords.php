@@ -550,7 +550,7 @@ class LongKeywords extends Base
         $itemData = [];
 
         $step = 20;
-        $limit = 25;
+        $limit = 45;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $column = DomainColumn::find()
