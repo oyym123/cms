@@ -93,128 +93,128 @@ class FanController extends Controller
 
             $domain = Domain::getDomainInfo();
             $columnInfo = DomainColumn::find()->where(['name' => $column, 'domain_id' => $domain->id])->one();
-            $model['content'] = "2. 请翻开书到12页。 
-15 Please take out your notebooks/exercise books.请拿出笔记本/练习本。 
-16 No more talking, please. 请安静。 
-17 Attention, please. 请注意。 
-18 Let’s have a dictation. 让我们来听写。 
-19 We’re going to have a new lesson today.今天我们要上新课。 
-20 First let’s have a revision. 首先我们复习一下。 
-21 Who can answer this question? 谁能回答这个问题？ 
-22 Do you have any questions? 你们有问题吗？ 
-24 Let me see. 让我看看/想想。 
-25 Put up your hands if you have any questions. 如果有问题请举手。 
-26 Raise your hands, please. 请举手。 
-27 Hands down. 把手放下。 
-28 Repeat after me/Follow me. 跟我读。 
-29 Listen to me, please. 请听我说。 
-30 Look at the blackboard/screen, please. 请看黑板/屏幕。 
-31 All eyes on me, please. 请都看着我。 
-32 Can you solve this problem? 能做出这道题吗？ 
-33 Let’s read it together. Ready, go!大家齐声朗读，预备，起。 
-34 Read slowly and clearly. 读慢一点，清楚一点。 
-35 Who wants to try? 谁想试一试？ 
-36 Who wants to do it on the blackboard? 谁愿意到黑板上来做？ 
-37 Are you through? 做完了吗？ 
-38 Have you finished? 做完了吗？ 
-39 You did a very good job. 做得不错。 
-40 Very good./Good try./ Well done! 完成得不错。 
-41 Terrific!/ Wonderful! / Excellent! 很棒！ 
-42 Please give him (her) a big hand. 请给他/她一些掌声。 
-43 Can you follow me? 能跟上吗？ 
-44 Do you understand? 你听懂了吗？ 
-45 Don’t be nervous. 不要紧张。 
-46 Any one can help him/ her? 谁来帮他/她一下？ 
-47 Any volunteers? 谁自愿回答？ 
-48 I beg your pardon? 对不起，能再说一遍吗？ 
-49 Take it easy.请放心/别紧张。 
-50 Be brave / active, please. 请勇敢/主动些。 
-51 Who wants to try? 谁来试试？ 
-52 Come up to the front, please. 请到前面来。 
-53 Go back to your seat, please. 请回座位。 
-54 Come on. You can do it. 来吧！你能做到的。 
-55 Come on, you’re almost there.来吧！你快（做/答）对了。 
-56 I’ll give you a clue (hint). 我给你一些提示。 
-57 You can do it this way. 你可以这样来做。 
-58 Let’s play a game. 让我们玩个游戏。 
-59 Are you tired? Let’s take a break.累了吗？休息一下。 
-60 Look up the word in the dictionary. 在字典里查这个词。 
-61 Take notes, please.请作笔记。 
-62 Are you clear ? 明白了吗？ 
-63 Is that right /correct? 那个正确吗？ 
-64 Can you find the mistakes? 你能找出错误吗？ 
-65 Do you know how to correct the mistakes? 你知道怎么改错吗？ 
-66 Are you ready? 准备好了吗？ 
-67 Can you guess it? 能猜猜吗？ 
-68 Yes. You’re right.对，你对了。 
-69 I’m sorry. Can you say that again? 对不起，能再说一遍吗? 
-70 Take your time. 慢慢来。 
-71 Use your head. 动动脑筋。 
-72 Good idea! That makes sense. 好主意。有道理。 
-73 Whose turn is it? 轮到谁了？ 
-74 Now you’re going to read one by one. 现在你们依次朗读。 
-75 Who’s next? 接下来是谁？ 
-76 You’re next.接下来是你。 
-77 It’s your turn.轮到你了。 
-78 Just hands. No voices. 不要说，请举手。 
-79 Do it on your own.自己做。 
-80 From the very beginning. 从头开始。 
-81 Please read it to the end. 请读到结尾。 
-82 Stop here, please. 请停下来。 
-83 Hands up before you answer. 回答问题前，请举手。 
-84 Here’s your homework for today. 这是今天的家庭作业。 
-85 Hand in your homework tomorrow. 家庭作业明天交。 
-86 Please pass the exercise books to the front.请将练习本递到前面来。 
-87 Who wants to come to the front? 谁愿意到前面来？ 
-88 Come to my office after class. 下课后到办公室找我。 
-89 Come and see me after class. 课后找我。 
-90 Watch me and I'll show you.看着我，我来演示。 
-91 I want all of you to answer this question. 我请大家一齐来回答这个问题。";
-            $model['content'] = str_replace(['<br/>','\r\n'], ['','<p></p>'], $model['content']);
-
-            $numberLower = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-            $numberUp = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
-
-            $symbols = [
-                '、' => '<p></p>',
-                ':' => '<p></p>',
-                '：' => '<p></p>',
-                '.' => '<p></p>',
-            ];
-
-            $resReplace = ['⑴', '⑵', '⑶', '⑷'];
-
-            $upArrOne = [];
-
-            foreach ($numberLower as $itemLower) {
-                foreach ($symbols as $key => $symbol) {
-                    $upArrOne[$itemLower . $key] = $symbol;
-                }
-            }
-
-            $upArrTwo = [];
-            foreach ($numberUp as $itemUp) {
-                foreach ($symbols as $key => $symbol) {
-                    $upArrTwo[$itemUp . $key] = $symbol . '　　<p></p>';
-                }
-            }
-
-
-            //后面转换
-            $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
-            $replaceArrUp = $replaceArrDown = [];
-
-            foreach ($upArrOne as $key => $item) {
-                $model['content'] = str_replace($key, $item . $key, $model['content']);
-            }
-
-            foreach ($upArrTwo as $key => $item) {
-                $model['content'] = str_replace($key, $item . $key, $model['content']);
-            }
-
-            foreach ($resReplace as $item) {
-                $model['content'] = str_replace($item, '<p></p>' . $item, $model['content']);
-            }
+//            $model['content'] = "2. 请翻开书到12页。
+//15 Please take out your notebooks/exercise books.请拿出笔记本/练习本。
+//16 No more talking, please. 请安静。
+//17 Attention, please. 请注意。
+//18 Let’s have a dictation. 让我们来听写。
+//19 We’re going to have a new lesson today.今天我们要上新课。
+//20 First let’s have a revision. 首先我们复习一下。
+//21 Who can answer this question? 谁能回答这个问题？
+//22 Do you have any questions? 你们有问题吗？
+//24 Let me see. 让我看看/想想。
+//25 Put up your hands if you have any questions. 如果有问题请举手。
+//26 Raise your hands, please. 请举手。
+//27 Hands down. 把手放下。
+//28 Repeat after me/Follow me. 跟我读。
+//29 Listen to me, please. 请听我说。
+//30 Look at the blackboard/screen, please. 请看黑板/屏幕。
+//31 All eyes on me, please. 请都看着我。
+//32 Can you solve this problem? 能做出这道题吗？
+//33 Let’s read it together. Ready, go!大家齐声朗读，预备，起。
+//34 Read slowly and clearly. 读慢一点，清楚一点。
+//35 Who wants to try? 谁想试一试？
+//36 Who wants to do it on the blackboard? 谁愿意到黑板上来做？
+//37 Are you through? 做完了吗？
+//38 Have you finished? 做完了吗？
+//39 You did a very good job. 做得不错。
+//40 Very good./Good try./ Well done! 完成得不错。
+//41 Terrific!/ Wonderful! / Excellent! 很棒！
+//42 Please give him (her) a big hand. 请给他/她一些掌声。
+//43 Can you follow me? 能跟上吗？
+//44 Do you understand? 你听懂了吗？
+//45 Don’t be nervous. 不要紧张。
+//46 Any one can help him/ her? 谁来帮他/她一下？
+//47 Any volunteers? 谁自愿回答？
+//48 I beg your pardon? 对不起，能再说一遍吗？
+//49 Take it easy.请放心/别紧张。
+//50 Be brave / active, please. 请勇敢/主动些。
+//51 Who wants to try? 谁来试试？
+//52 Come up to the front, please. 请到前面来。
+//53 Go back to your seat, please. 请回座位。
+//54 Come on. You can do it. 来吧！你能做到的。
+//55 Come on, you’re almost there.来吧！你快（做/答）对了。
+//56 I’ll give you a clue (hint). 我给你一些提示。
+//57 You can do it this way. 你可以这样来做。
+//58 Let’s play a game. 让我们玩个游戏。
+//59 Are you tired? Let’s take a break.累了吗？休息一下。
+//60 Look up the word in the dictionary. 在字典里查这个词。
+//61 Take notes, please.请作笔记。
+//62 Are you clear ? 明白了吗？
+//63 Is that right /correct? 那个正确吗？
+//64 Can you find the mistakes? 你能找出错误吗？
+//65 Do you know how to correct the mistakes? 你知道怎么改错吗？
+//66 Are you ready? 准备好了吗？
+//67 Can you guess it? 能猜猜吗？
+//68 Yes. You’re right.对，你对了。
+//69 I’m sorry. Can you say that again? 对不起，能再说一遍吗?
+//70 Take your time. 慢慢来。
+//71 Use your head. 动动脑筋。
+//72 Good idea! That makes sense. 好主意。有道理。
+//73 Whose turn is it? 轮到谁了？
+//74 Now you’re going to read one by one. 现在你们依次朗读。
+//75 Who’s next? 接下来是谁？
+//76 You’re next.接下来是你。
+//77 It’s your turn.轮到你了。
+//78 Just hands. No voices. 不要说，请举手。
+//79 Do it on your own.自己做。
+//80 From the very beginning. 从头开始。
+//81 Please read it to the end. 请读到结尾。
+//82 Stop here, please. 请停下来。
+//83 Hands up before you answer. 回答问题前，请举手。
+//84 Here’s your homework for today. 这是今天的家庭作业。
+//85 Hand in your homework tomorrow. 家庭作业明天交。
+//86 Please pass the exercise books to the front.请将练习本递到前面来。
+//87 Who wants to come to the front? 谁愿意到前面来？
+//88 Come to my office after class. 下课后到办公室找我。
+//89 Come and see me after class. 课后找我。
+//90 Watch me and I'll show you.看着我，我来演示。
+//91 I want all of you to answer this question. 我请大家一齐来回答这个问题。";
+//            $model['content'] = str_replace(['<br/>','\r\n'], ['','<p></p>'], $model['content']);
+//
+//            $numberLower = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+//            $numberUp = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+//
+//            $symbols = [
+//                '、' => '<p></p>',
+//                ':' => '<p></p>',
+//                '：' => '<p></p>',
+//                '.' => '<p></p>',
+//            ];
+//
+//            $resReplace = ['⑴', '⑵', '⑶', '⑷'];
+//
+//            $upArrOne = [];
+//
+//            foreach ($numberLower as $itemLower) {
+//                foreach ($symbols as $key => $symbol) {
+//                    $upArrOne[$itemLower . $key] = $symbol;
+//                }
+//            }
+//
+//            $upArrTwo = [];
+//            foreach ($numberUp as $itemUp) {
+//                foreach ($symbols as $key => $symbol) {
+//                    $upArrTwo[$itemUp . $key] = $symbol . '　　<p></p>';
+//                }
+//            }
+//
+//
+//            //后面转换
+//            $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
+//            $replaceArrUp = $replaceArrDown = [];
+//
+//            foreach ($upArrOne as $key => $item) {
+//                $model['content'] = str_replace($key, $item . $key, $model['content']);
+//            }
+//
+//            foreach ($upArrTwo as $key => $item) {
+//                $model['content'] = str_replace($key, $item . $key, $model['content']);
+//            }
+//
+//            foreach ($resReplace as $item) {
+//                $model['content'] = str_replace($item, '<p></p>' . $item, $model['content']);
+//            }
 
             $upArr = ['知乎', '百度知道', '360', '头条'];
 
