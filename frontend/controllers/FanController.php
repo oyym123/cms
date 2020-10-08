@@ -218,6 +218,7 @@ class FanController extends Controller
 
             $upArr = ['知乎', '百度知道', '360', '头条'];
 
+            $model['content'] = nl2br( $model['content']);
             $model['content'] = str_replace($upArr, '', $model['content']);
 
             $model['content'] = str_replace(['<p>.</p>', '. .</p>', '</p>.</p>'], ['', '.</p>', ''], $model['content']);
