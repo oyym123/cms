@@ -133,6 +133,7 @@ class FanController extends Controller
 //            print_r($res);
 //            exit;
 
+            
             $desc = $model['intro'];
 
             $view = Yii::$app->view;
