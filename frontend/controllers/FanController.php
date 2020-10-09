@@ -11,6 +11,7 @@ use common\models\Fan;
 use common\models\FanUser;
 use common\models\LongKeywords;
 use common\models\PushArticle;
+use common\models\RedisTools;
 use common\models\Template;
 use common\models\Tools;
 use yii\data\Pagination;
@@ -96,10 +97,10 @@ class FanController extends Controller
 
             $upArr = ['知乎', '百度知道', '360', '头条'];
 
-            $model['content'] = nl2br( $model['content']);
+            $model['content'] = nl2br($model['content']);
             $model['content'] = str_replace($upArr, '', $model['content']);
 
-            $model['content'] = str_replace(['<p>.</p>', '. .</p>', '</p>.</p>','<h2></h2>'], ['', '.</p>', '',''], $model['content']);
+            $model['content'] = str_replace(['<p>.</p>', '. .</p>', '</p>.</p>', '<h2></h2>'], ['', '.</p>', '', ''], $model['content']);
 //
 //            $model['content']= str_replace($upArr, $replaceArrUp, $model['content']);
 //
@@ -137,7 +138,7 @@ class FanController extends Controller
             $view = Yii::$app->view;
             $view->params['detail_tdk'] = [
                 'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
-                'title' => $model['title'],
+                'title' => $model['title'] . '_' . $domain->zh_name,
                 'keywords' => $oldTitle,
                 'description' => $desc,
                 'og_type' => 'news',
@@ -445,12 +446,37 @@ class FanController extends Controller
             ->select('id,keywords as name')
             ->limit(10);
 
+
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
 
         $models = $query->offset($pages->offset)
             ->limit($pages->limit)
             ->asArray()->all();
+
+//        $redis = Yii::$app->redis2;
+//
+//        $redis->set("test0", '1232');
+//        exit;
+//
+//        if ($redis->hlen("$page" . "0") <= 0) {
+//            foreach ($models as $key => $v) {
+//                $redis->hmset("$page" . "$key", $v);
+//            }
+//        } else {
+//            foreach ($models as $key => $v) {
+//                $b[] = $redis->hmget("$page" . "$key", ["id", "goods_name", "goods_stock", "goods_price", "goods_img", "goods_visit"]);
+//            }
+//            $models = $b;
+//        }
+//
+//
+//        $countQuery = clone $query;
+//        $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);
+//
+//        $models = $query->offset($pages->offset)
+//            ->limit($pages->limit)
+//            ->asArray()->all();
 
         $domain = Domain::getDomainInfo();
 
@@ -550,9 +576,10 @@ class FanController extends Controller
                 'data' => $model
             ];
 
+            $domain = Domain::getDomainInfo();
             $view = Yii::$app->view;
             $view->params['tags_tdk'] = [
-                'title' => $model['keywords'],
+                'title' => $model['keywords'] . '_' . $domain->zh_name,
                 'keywords' => $model['keywords'],
                 'intro' => $model['intro'],
                 'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,

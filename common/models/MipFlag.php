@@ -188,10 +188,15 @@ class MipFlag extends Base
         }
 
         if ($remain == 0) {
-            Tools::writeLog($domain->name . "Tag推送次数用完");
+            Tools::writeLog($flag . '.' . $domain->name . "Tag推送次数用完");
             return 1;
         } else {
-            $remain = 1500;    //分5个时间推送
+            //每次推送最大为1498
+            if ($remain > 1498) {
+                $remain = 1498;
+            } else {
+                $remain = $remain - 2;
+            }
             $urls = array_slice($info, 1, $remain);
             $info = $urls;
         }
@@ -203,11 +208,11 @@ class MipFlag extends Base
 
         Tools::writeLog($jsonres);
         if (!isset($resDaSecond['success'])) {
-            Tools::writeLog(['res' => $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
+            Tools::writeLog(['res' => $flag . '.' . $domain->name . "百度站长Tag推送失败:", 'data' => $jsonres]);
             return 1;
         } else {
-            Tools::writeLog($domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
-            foreach ($urls as $key => $url) {
+            Tools::writeLog($flag . '.' . $domain->name . "百度站长Tag成功推送" . $jsonres->success . "条，今日还可推送:" . $jsonres->remain . "条");
+            foreach ($info as $key => $url) {
                 if ($key > 0) {
                     //更新插入 标记已经推送过了
                     $saveData = [
@@ -387,23 +392,24 @@ class MipFlag extends Base
         foreach ($domains as $da) {
             if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 1); //PC推送
-            }
-        }
-    }
-
-    public static function pushMipM()
-    {
-        set_time_limit(0);
-        //获取所有的域名
-        $_GET['domain'] = 0;
-        $domainIds = BaiduKeywords::getDomainIds();
-        $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
-        foreach ($domains as $da) {
-            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
                 MipFlag::pushUrl($da->id, 0, 2); //移动推送
             }
         }
     }
+
+//    public static function pushMipM()
+//    {
+//        set_time_limit(0);
+//        //获取所有的域名
+//        $_GET['domain'] = 0;
+//        $domainIds = BaiduKeywords::getDomainIds();
+//        $domains = Domain::find()->where(['in', 'id', $domainIds])->all();
+//        foreach ($domains as $da) {
+//            if (!empty($da->baidu_token) && $da->name != 'demo.com') {
+//                MipFlag::pushUrl($da->id, 0, 2); //移动推送
+//            }
+//        }
+//    }
 
 
 }

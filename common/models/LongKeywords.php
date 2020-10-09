@@ -561,7 +561,7 @@ class LongKeywords extends Base
                     ->andWhere(['catch_status' => 100])              //表示后台输入的词
                     ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
                     ->andWhere(['type_id' => $rules['category_id']])
-                    ->andWhere(['>','back_time','2020-08-01 00:00:00'])  //有回调参数的关键词
+                    ->andWhere(['>', 'back_time', '2020-08-01 00:00:00'])  //有回调参数的关键词
                     //表示没有栏目使用过
 //                    ->orderBy('id desc')
                     ->offset($i * $step)
@@ -589,7 +589,7 @@ class LongKeywords extends Base
                         continue;
                     }
 
-                    echo $longKeyword['name'] . "<br/>";
+                    echo $longKeyword['name'] . PHP_EOL;
 
                     //根据长尾关键词以及规则 从爬虫库拉取文章数据 保存到相应的文章表中
                     $data = [
@@ -655,8 +655,9 @@ class LongKeywords extends Base
                             list($code, $msg) = self::getBaiduKey(['keywords' => $longKeyword['name']], 1);
 
                             if ($code < 0) {
-                                echo '<pre>';
-                                print_r($msg);
+                                print_r('保存单词  ' . $longKeyword['name'] . PHP_EOL);
+                                Tools::writeLog('保存单词' . $saveData[0]['domain_id'] . '  ' . $saveData[0]['title'], 'set_rules.log');
+                                PushArticle::setArticle($saveData[0]);
                             } else {
                                 Tools::writeLog('保存' . $longKeyword['name'], 'set_rules.log');
 

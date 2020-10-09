@@ -15,6 +15,12 @@ return [
             'port' => 6379,
             'database' => 0,
         ],
+        'redis2' => [
+            'class' => 'yii\redis\Connection',
+            'hostname' => 'localhost',
+            'port' => 6379,
+            'database' => 1,
+        ],
         'view' => [
             'class' => 'yii\web\View',
             'renderers' => [

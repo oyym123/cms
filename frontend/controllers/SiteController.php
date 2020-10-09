@@ -310,6 +310,14 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionError()
+    {
+        exit('12321');
+        return $this->render('error', [
+            'model' => $model,
+        ]);
+    }
+
     /**
      * Requests password reset.
      *
