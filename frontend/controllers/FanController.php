@@ -597,7 +597,15 @@ class FanController extends Controller
             ];
 
             if (empty($modelInfo)) {
-                return $this->render($render, ['models' => ['data' => ['title' => '没有内容了!']]]);
+                $keywordsInfo = AllBaiduKeywords::findOne($arr);
+
+                $view->params['tags_tdk'] = [
+                    'title' => $keywordsInfo->keywords . '_' . $domain->zh_name,
+                    'keywords' => $keywordsInfo->keywords,
+                    'intro' => $keywordsInfo->keywords,
+                    'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
+                ];
+                return $this->render($render, ['models' => ['data' => ['title' => $keywordsInfo->keywords]]]);
             }
 
             return $this->render($render, ['models' => $res]);
