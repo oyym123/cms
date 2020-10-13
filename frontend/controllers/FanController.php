@@ -3,8 +3,10 @@
 namespace frontend\controllers;
 
 use common\models\AllBaiduKeywords;
+use common\models\ArticleRules;
 use common\models\BaiduKeywords;
 use common\models\BlackArticle;
+use common\models\Category;
 use common\models\Domain;
 use common\models\DomainColumn;
 use common\models\Fan;
@@ -444,8 +446,12 @@ class FanController extends Controller
             ->where(['name' => $columnName, 'domain_id' => $domain->id])
             ->one();
 
+        //查询文章规则
+        $rules = ArticleRules::find()->select('category_id')->where(['domain_id' => $domain->id])->asArray()->all();
+        $typeIds = array_column($rules, 'category_id');
+        //该域名下所有设定的类型 没有文章也进行展示
         $query = AllBaiduKeywords::find()
-            ->where(['domain_id' => $domain->id])
+            ->where(['in', 'type_id', $typeIds])
 //            ->andWhere(['>', 'm_pv', AllBaiduKeywords::FLAG_M_PV])
             ->select('id,keywords as name')
             ->orderBy('id desc')
