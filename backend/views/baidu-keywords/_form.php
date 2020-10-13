@@ -11,9 +11,38 @@ use yii\widgets\ActiveForm;
 <div class="baidu-keywords-form">
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'type')->dropDownList([\common\models\DomainColumn::getType()], ['prompt' => '--请选择类型--']) ?>
+    <?=
+    $form->field($model, 'type_id')->widget(\kartik\select2\Select2::classname(), [
+        'options' => ['placeholder' => '请输入分类 ...'],
+        'pluginOptions' => [
+            'id' => new \yii\web\JsExpression("function(rs) {
+                    return rs.taskId;
+                }"),
+            'placeholder' => 'search ...',
 
-    <?= $form->field($model, 'keywords')->textInput(['maxlength' => true]) ?>
+            'allowClear' => true,
+            'language' => [
+                'errorLoading' => new \yii\web\JsExpression("function () { return 'Waiting...'; }"),
+            ],
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['category/get-category']),
+                'dataType' => 'json',
+                'data' => new \yii\web\JsExpression('function(params) {
+                    return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new \yii\web\JsExpression('function (markup) {
+                 return markup; }'),
+            'templateResult' => new \yii\web\JsExpression('function(res) {
+                 return res.text; }'),
+            'templateSelection' => new \yii\web\JsExpression('function (res) {
+                 return res.text; }'),
+        ],
+    ])->hint('输入c 检索自定义页面 添加单个');
+
+    ?>
+
+
+    <?= $form->field($model, 'keywords')->textarea(['rows' => 10]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('保存', ['class' => 'btn btn-success']) ?>

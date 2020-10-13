@@ -11,6 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+
 /**
  * KeywordsController implements the CRUD actions for Keywords model.
  */
@@ -40,22 +41,51 @@ class KeywordsController extends Controller
         $searchModel = new KeywordsSearch();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
         if (Yii::$app->request->post('hasEditable')) {
             $id = Yii::$app->request->post('editableKey');
             $model = Keywords::findOne(['id' => $id]);
             $output = '';
             $posted = current($_POST['Keywords']);
             $post = ['Keywords' => $posted];
+
             if ($model->load($post)) {
-                $model->save();
+
                 isset($posted['keywords']) && $output = $model->keywords;
-                isset($posted['status']) && $output = Base::getBaseS($model->status);
-                // 其他的这里就忽略了，大致可参考这个title
+                if (isset($posted['status']) && $model->status == 0) {
+                    $output = '<strong style="color: mediumvioletred">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                } elseif (isset($posted['status'])) {
+                    $output = '<strong style="color: blue">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                }
+
+                if (isset($posted['note'])) {
+                    //查询
+                    $keywords = Keywords::find()->select('keywords.id')
+                        ->innerJoinWith('aizhanRules', 'aizhanRules.id = keywords.rules_id')
+                        ->Where([
+                            'keywords.status' => 1,
+                            'keywords.note' => 0
+                        ])
+                        ->orderBy('search_num asc')
+                        ->asArray()
+                        ->all();
+
+                    $ids = array_column($keywords, 'id');
+                    $idsArr = array_slice($ids, 0, array_search($id,$ids));
+
+                    Keywords::updateAll([
+                        'check_time' => date('Y-m-d H:i:s'),
+                        'note' => 100
+                    ], ['in', 'id', $idsArr]);
+
+                    $output = '<strong style="color: blue">检测时间:' . date('Y-m-d H:i:s') . '</strong>';
+                }
+                $model->save();
             }
-            $out = Json::encode(['output'=>$output, 'message'=>'']);
+
+            $out = Json::encode(['output' => $output, 'message' => '']);
             return $out;
         }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -151,6 +181,4 @@ class KeywordsController extends Controller
     {
         Keywords::catchKeyWords();
     }
-
-
 }

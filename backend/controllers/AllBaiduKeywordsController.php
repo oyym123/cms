@@ -183,6 +183,6 @@ class AllBaiduKeywordsController extends Controller
     /** 推入爬虫库 */
     public function actionSetPa()
     {
-        BaiduKeywords::pushKeywords();
+//        BaiduKeywords::pushKeywords();
     }
 }

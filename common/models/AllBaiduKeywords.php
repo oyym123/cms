@@ -55,6 +55,8 @@ class AllBaiduKeywords extends Base
     const CATCH_STATUS_START = 20;  //可抓取
     const CATCH_STATUS_OVER = 30;  //搜狗抓取挖完毕
 
+    const FLAG_M_PV = 50;
+
     /**
      * {@inheritdoc}
      */
@@ -436,5 +438,67 @@ class AllBaiduKeywords extends Base
             $arr[$re->type_id] = $re->category->name;
         }
         return $arr;
+    }
+
+    /** 更新关键词百度指数 */
+    public static function updateZhi()
+    {
+        $keyData = AllBaiduKeywords::find()
+            ->where(['>', 'created_at', '2020-10-12 00:00:00'])
+            ->andWhere(['<', 'id', 1689188])
+            ->andWhere(['catch_status' => 100])
+            ->orderBy('id desc')->limit(60000)->all();
+
+//        echo count($keyData);
+//        exit;
+
+        $ids = $saveData = [];
+        foreach ($keyData as $item) {
+            $info = (new BaiDuSdk())->getRank($item->keywords)[0];
+            $tname = '';
+
+            if (!isset($info['mobile']['pv'])) {
+                $info = [];
+            }
+
+            $saveData = [
+                'show_reasons' => '后台添加',
+                'm_pv' => $info['mobile']['pv'] ?? 0,
+                'm_show' => $info['mobile']['show'] ?? 0,
+                'pid' => 0,
+                'm_ctr' => $info['mobile']['ctr'] ?? 0,
+                'm_click' => $info['mobile']['click'] ?? 0,
+                'm_rec_bid' => $info['mobile']['recBid'] ?? 0,
+                'm_charge' => $info['mobile']['charge'] ?? 0,
+                'm_rank' => $info['mobile']['rank'] ?? 0,
+                'm_show_rate' => $info['mobile']['showRate'] ?? 0,
+                'all_cpc' => $info['all']['cpc'] ?? 0,
+                'all_ctr' => $info['all']['ctr'] ?? 0,
+                'all_click' => $info['all']['cpc'] ?? 0,
+                'all_pv' => $info['all']['pv'] ?? 0,
+                'all_charge' => $info['all']['charge'] ?? 0,
+                'all_show' => $info['all']['show'] ?? 0,
+                'all_rank' => $info['all']['rank'] ?? 0,
+                'all_show_rate' => $info['all']['showRate'] ?? 0,
+                'all_rec_bid' => $info['all']['recBid'] ?? 0,
+                'pc_ctr' => $info['pc']['ctr'] ?? 0,
+                'pc_show' => $info['pc']['show'] ?? 0,
+                'pc_pv' => $info['pc']['pv'] ?? 0,
+                'pc_rank' => $info['pc']['rank'] ?? 0,
+                'pc_show_rate' => $info['pc']['showRate'] ?? 0,
+                'pc_click' => $info['pc']['click'] ?? 0,
+                'bid' => $info['bid'] ?? 0,
+                'word_package' => '',
+                'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'from_keywords' => '',
+                'similar' => '',
+                'domain_id' => $postData['domain_id'] ?? 0,
+                'column_id' => $postData['column_id'] ?? 0,
+                'competition' => $info['competition'] ?? 0,
+                'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
+            ];
+            //保存所有的关键词
+            $res = AllBaiduKeywords::updateAll($saveData, ['id' => $item->id]);
+        }
     }
 }

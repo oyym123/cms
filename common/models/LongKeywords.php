@@ -381,7 +381,7 @@ class LongKeywords extends Base
 
         self::updateAll($dataSave, ['key_id' => $data['id']]);
 //        $msg = self::find()->where(['key_id' => $data['id']])->one();
-        return [1,array_column($keywords, 'name')];
+        return [1, array_column($keywords, 'name')];
 
 
 //      self::pushReptile($msg);
@@ -548,7 +548,7 @@ class LongKeywords extends Base
         $articleRules = ArticleRules::find()
             ->select('category_id,domain_id,column_id')
             ->where($andWhere)
-            ->andWhere(['in','id',$domainIds])
+            ->andWhere(['in', 'domain_id', $domainIds])
             ->asArray()->all();
 //        echo '<pre>';
 //        print_r($articleRules);exit;

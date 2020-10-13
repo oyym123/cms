@@ -97,9 +97,9 @@ class Keywords extends Base
     public function rules()
     {
         return [
-            [['sort', 'search_num', 'type', 'status'], 'integer'],
+            [['sort', 'search_num', 'type', 'status', 'rules_id'], 'integer'],
             [['content'], 'string'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'check_time'], 'safe'],
             [['keywords', 'form', 'rank', 'title', 'note', 'url'], 'string', 'max' => 255],
         ];
     }
@@ -119,12 +119,19 @@ class Keywords extends Base
             'search_num' => '搜索数量',
             'title' => '网页标题',
             'content' => '内容页数据',
+            'check_time' => '检测时间',
             'note' => '备注',
             'status' => '状态',
             'url' => '链接',
             'created_at' => '创建时间',
             'updated_at' => '修改时间',
         ];
+    }
+
+    /** 获取规则 */
+    public function getAizhanRules()
+    {
+        return $this->hasOne(AizhanRules::className(), ['id' => 'rules_id']);
     }
 
     /** 创建一个关键词*/
@@ -161,12 +168,9 @@ class Keywords extends Base
     }
 
     /** 爬取爱站网的竞品关键词数据 */
-    public static function catchKeyWords($rulesId = 0)
+    public static function catchKeyWords()
     {
         set_time_limit(0);
-
-        $noAllow = ['图', '视频', '音乐', ','];
-
         //爱站网址 mobile =手机
         $aizhanUrl = 'https://baidurank.aizhan.com/mobile/';
         $rulesAll = AizhanRules::find()->where(['status' => AizhanRules::STATUS_ENABLE])->all();
@@ -203,12 +207,14 @@ class Keywords extends Base
 						<td class="owner">@s', $re, $searchNum);
                     preg_match('@<a name="baiduLink" rel="nofollow" target="_blank" href="(.*)?" class="gray" title="(.*)?">@', $re, $info);
                     preg_match('@<a class="gray" rel="nofollow" target="_blank" href="(.*)?" title="(.*)?">@', $re, $keywords);
+                    preg_match('/\d+/', $searchNum[1], $arrNum);
 
 //                $content = Tools::curlGet($info[1]);
 //                $content = mb_convert_encoding($content, 'UTF-8');
+
                     $data = [
                         'rank' => $rank1[1] . ',' . $rank2[1],
-                        'search_num' => intval($searchNum[1]),
+                        'search_num' => $arrNum[0],
                         'type' => self::TYPE_SHORT_MOBILE,
                         'keywords' => $keywords[2],
                         'url' => $info[1],
@@ -233,32 +239,6 @@ class Keywords extends Base
                     list($code, $msg) = self::createOne($data);
                     if ($code < 0) {
                         $error[] = $keywords[2] . $msg;
-                    } else {
-                        //指数在10以下的时候 获取它的下拉词 以及相关搜索词 并且导入到词库
-                        if ($data['search_num'] <= 10) {
-                            sleep(1);
-                            //相关词 导入到长尾词库
-                            list($code, $longKeywords) = LongKeywords::getBaiduKey([
-                                'keywords' => $data['keywords'],
-                                'id' => $msg->id
-                            ], 0);
-
-                            if ($code < 0) {
-                                $error[] = $longKeywords;
-                            } else {
-                                $longKeywords = array_merge([$data['keywords']], $longKeywords);
-
-                                //导入到总词库
-                                list($code1, $msg1) = AllBaiduKeywords::setKeywordsAiZhan([
-                                    'type_id' => $rules->category_id,
-                                    'keywords' => implode(PHP_EOL, $longKeywords)
-                                ]);
-
-                                if ($code1 < 0) {
-                                    $error[] = $msg1;
-                                }
-                            }
-                        }
                     }
                 }
                 self::dd($error);
@@ -268,5 +248,46 @@ class Keywords extends Base
             $rules->updated_at = date('Y-m-d H:i:s');
             $rules->save(false);
         }
+    }
+
+    /** 筛选后的词入库 */
+    public static function setKeywords($data)
+    {
+        $rulesAll = AizhanRules::find()->where(['status' => AizhanRules::STATUS_ENABLE])->all();
+
+        //循环规则
+        foreach ($rulesAll as $rules) {
+            $keywords = Keywords::find()->where([
+                'rules_id' => $rules->id,
+                'note' => 100,
+                'status' => Base::S_ON
+            ])->andWhere(['<=', 'search_num', 10])->all();
+
+            foreach ($keywords as $keyword) {
+                sleep(1);
+                //相关词 导入到长尾词库
+                list($code, $longKeywords) = LongKeywords::getBaiduKey([
+                    'keywords' => $data['keywords'],
+                    'id' => $keyword->id
+                ], 0);
+
+                if ($code < 0) {
+                    $error[] = $longKeywords;
+                } else {
+                    $longKeywords = array_merge([$keyword->keywords], $longKeywords);
+                    //导入到总词库
+                    list($code1, $msg1) = AllBaiduKeywords::setKeywordsAiZhan([
+                        'type_id' => $rules->category_id,
+                        'keywords' => implode(PHP_EOL, $longKeywords)
+                    ]);
+                    if ($code1 < 0) {
+                        $error[] = $msg1;
+                    }
+                }
+            }
+        }
+
+        print_r($error);
+        exit;
     }
 }

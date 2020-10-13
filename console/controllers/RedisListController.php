@@ -14,10 +14,12 @@ class RedisListController extends \yii\console\Controller
     //将关键词从队列取出并且保存到数据库中
     public function actionSetKeywords()
     {
+
         $dataGet = [
             'prefix' => 'list_keywords_',
             'list_name' => 'list_long_keywords',
         ];
+
         for ($i = 1; $i < 86400; $i++) {
             list($code, $msg) = (new RedisTools())->getList($dataGet, 200);
             $keywords = array_column($msg, 'key_id');
@@ -34,5 +36,4 @@ class RedisListController extends \yii\console\Controller
             sleep(8);
         }
     }
-
 }

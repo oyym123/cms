@@ -152,6 +152,7 @@ class BaiduKeywords extends Base
             'from_keywords' => '来源词',
             'pc_show_rate' => 'Pc Show Rate',
             'pc_rank' => 'Pc Rank',
+            'type_id' => '分类',
             'type' => '类型',
             'column_id' => '栏目',
             'domain_id' => '域名',
@@ -330,7 +331,7 @@ class BaiduKeywords extends Base
         $itemData = [];
 
         $step = 100;
-        $limit = 100;
+        $limit = 200;
         for ($i = 0; $i <= $limit; $i++) {
             foreach ($articleRules as $key => $rules) {
                 $keywordData = AllBaiduKeywords::find()
@@ -486,17 +487,18 @@ class BaiduKeywords extends Base
 
             $data = (new BaiDuSdk())->getRank($item);
             if ($data === false) {
-                $error[] = $item . '  没有请求请成功！';
+                $error[] = $item . '  没有请求成功！';
                 continue;
             }
 
             $info = $data[0];
-
+            $category = Category::findOne($postData['type_id']);
             $saveData = [
                 'show_reasons' => '后台添加',
                 'm_pv' => $info['mobile']['pv'],
                 'm_show' => $info['mobile']['show'],
-                'type' => $postData['type'],
+                'type' => $category->en_name,
+                'type_id' => $postData['type_id'],
                 'pid' => 0,
                 'm_ctr' => $info['mobile']['ctr'],
                 'm_click' => $info['mobile']['click'],

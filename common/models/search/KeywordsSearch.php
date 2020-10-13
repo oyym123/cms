@@ -18,7 +18,7 @@ class KeywordsSearch extends Keywords
     public function rules()
     {
         return [
-            [['id', 'sort', 'search_num', 'type','status'], 'integer'],
+            [['id', 'sort', 'search_num', 'type', 'status', 'rules_id'], 'integer'],
             [['keywords', 'form', 'rank', 'title', 'content', 'note', 'url', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -41,7 +41,7 @@ class KeywordsSearch extends Keywords
      */
     public function search($params)
     {
-        $query = Keywords::find();
+        $query = Keywords::find()->select('keywords.*,aizhan_rules.column_id');
 
         // add conditions that should always apply here
         $dataProvider = new ActiveDataProvider([
@@ -59,13 +59,16 @@ class KeywordsSearch extends Keywords
             return $dataProvider;
         }
 
+        $query->innerJoinWith('aizhanRules', 'aizhanRules.id = keywords.rules_id');
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
             'sort' => $this->sort,
             'search_num' => $this->search_num,
             'type' => $this->type,
-            'status' => $this->status,
+            'keywords.status' => $this->status,
+            'keywords.note' => $this->note,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ]);
@@ -75,7 +78,6 @@ class KeywordsSearch extends Keywords
             ->andFilterWhere(['like', 'rank', $this->rank])
             ->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'content', $this->content])
-            ->andFilterWhere(['like', 'note', $this->note])
             ->andFilterWhere(['like', 'url', $this->url]);
 
         return $dataProvider;

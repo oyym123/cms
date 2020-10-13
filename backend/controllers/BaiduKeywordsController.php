@@ -68,8 +68,8 @@ class BaiduKeywordsController extends Controller
         $model = new BaiduKeywords();
         if ($model->load(Yii::$app->request->post())) {
 
-            Yii::$app->getSession()->setFlash('error', '暂停一级拓展词');
-            return $this->redirect(['create']);
+//            Yii::$app->getSession()->setFlash('error', '暂停一级拓展词');
+//            return $this->redirect(['create']);
 
             $data = Yii::$app->request->post();
             ignore_user_abort();

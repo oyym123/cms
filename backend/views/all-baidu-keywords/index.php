@@ -8,8 +8,9 @@ use yii\widgets\Pjax;
 /* @var $searchModel common\models\search\BaiduKeywordsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '百度营销关键词';
+$this->title = '这是直接爬取的词，请不要输入大指数的词，程序没有添加指数过滤';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="baidu-keywords-index">
     <h1><?= Html::encode($this->title) ?></h1>

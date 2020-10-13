@@ -15,18 +15,18 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="keywords-index">
     <h1><?= Html::encode($this->title) ?></h1>
-<!--    <p>-->
-<!--        <button id="catch_aizhan" class="btn btn-primary"> 抓取爱站关键词</button>-->
-<!--        <b id="topic"></b>-->
-<!--        <br/>-->
-<!--        <br/>-->
-<!--        <input type="text" id="catch_value" class="form-control">-->
-<!--    </p>-->
-<!---->
-<!--    <br/>-->
-<!--    <p>-->
-<!--        --><?//= Html::a('创建新的关键词', ['create'], ['class' => 'btn btn-success']) ?>
-<!--    </p>-->
+    <!--    <p>-->
+    <!--        <button id="catch_aizhan" class="btn btn-primary"> 抓取爱站关键词</button>-->
+    <!--        <b id="topic"></b>-->
+    <!--        <br/>-->
+    <!--        <br/>-->
+    <!--        <input type="text" id="catch_value" class="form-control">-->
+    <!--    </p>-->
+    <!---->
+    <!--    <br/>-->
+    <!--    <p>-->
+    <!--        --><? //= Html::a('创建新的关键词', ['create'], ['class' => 'btn btn-success']) ?>
+    <!--    </p>-->
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -45,6 +45,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'editableOptions' => [
                     'asPopover' => false,
                 ],
+                'content' => function ($model, $key, $index, $column) {
+                    return '<strong style="color: green">' . $model->keywords . '</strong>';
+                }
             ],
             [
                 'label' => '状    　　　　　    　　　　　态',
@@ -56,12 +59,49 @@ $this->params['breadcrumbs'][] = $this->title;
                     'data' => [0 => '关闭', 1 => '开启'],
                 ],
                 'value' => function ($model) {
-                    return \common\models\Base::getBaseS($model->status);
+                    if ($model->status == 0) {
+                        return '<strong style="color: mediumvioletred">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                    } else {
+                        return '<strong style="color: blue">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                    }
                 },
                 'filter' => [0 => '关闭', 1 => '开启'],
+                'content' => function ($model, $key, $index, $column) {
+                    if ($model->status == 0) {
+                        return '<strong style="color: mediumvioletred">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                    } else {
+                        return '<strong style="color: blue">' . \common\models\Base::getBaseS($model->status) . '</strong>';
+                    }
+                }
             ],
+            [
+                'label' => '所属栏目',
+                'attribute' => 'column_id',
+                'content' => function ($model, $key, $index, $column) {
+                    return $model->aizhanRules->column->zh_name;
 
+                }
+            ],
             'search_num',
+            [
+                'label' => '检    　　　测    　　　节 　　　　点',
+                'attribute' => 'note',
+                'class' => 'kartik\grid\EditableColumn',
+                'filter' => [0 => '未检测', 100 => '已检测'],
+                'filterInputOptions' => ['prompt' => '是否检测', 'class' => 'form-control', 'id' => null],
+                'editableOptions' => [
+                    'inputType' => \kartik\editable\Editable::INPUT_RADIO_LIST,
+                    'data' => [100 => '确定检测至该节点'],
+                    'asPopover' => false,
+                ],
+                'content' => function ($model, $key, $index, $column) {
+                    if ($model->note == 100) {
+                        return '检测时间:' . $model->check_time;
+                    } else {
+                        return '点击输入节点';
+                    }
+                }
+            ],
             'sort',
             [
                 'label' => '关键词来源',
@@ -81,9 +121,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     return \common\models\Keywords::getType($model->type);
                 }
             ],
+//            'check_time',
             'rank',
-
-//            'title',
+//           'title',
             //'content:ntext',
             //'note',
             'url:url',

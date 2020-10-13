@@ -61,19 +61,16 @@
                     ['label' => '文章    金币', 'icon' => 'file-code-o', 'url' => ['/push-article/index?domain_id=16']],
 //                        ]
 //                    ],
-                    ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
+
                     ['label' => '爱站规则设定', 'icon' => 'fa fa-circle-o', 'url' => ['/aizhan-rules/index']],
-                    ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],
+                    ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index?sort=search_num&KeywordsSearch%5Bstatus%5D=1&KeywordsSearch%5Bnote%5D=0']],
 //                    ['label' => '兔子队列', 'icon' => 'dashboard', 'url' => ['/rabbitemq/index']],
 //                    ['label' => '黑帽文章', 'icon' => 'dashboard', 'url' => ['/black-article/index']],
 //                    ['label' => '白帽文章', 'icon' => 'dashboard', 'url' => ['/white-article/index']],
-
+                    ['label' => '一级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
                     ['label' => '关键词', 'icon' => 'dashboard', 'url' => ['#'],
                         'items' => [
-
-                            ['label' => '百度营销一级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/baidu-keywords/index']],
-                            ['label' => '下拉框关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/long-keywords/index']],
-                            ['label' => '爱站关键词', 'icon' => 'fa fa-circle-o', 'url' => ['/keywords/index']],
+                            ['label' => '要做的三级词 & tags', 'icon' => 'fa fa-circle-o', 'url' => ['/all-baidu-keywords/index']],
                         ]
                     ],
                     ['label' => '敏感词库', 'icon' => 'dashboard', 'url' => ['/special-keywords/index']],

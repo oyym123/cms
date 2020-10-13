@@ -446,9 +446,10 @@ class FanController extends Controller
 
         $query = AllBaiduKeywords::find()
             ->where(['domain_id' => $domain->id])
+//            ->andWhere(['>', 'm_pv', AllBaiduKeywords::FLAG_M_PV])
             ->select('id,keywords as name')
+            ->orderBy('id desc')
             ->limit(10);
-
 
         $countQuery = clone $query;
         $pages = new Pagination(['totalCount' => $countQuery->count(), 'pageSize' => '120']);

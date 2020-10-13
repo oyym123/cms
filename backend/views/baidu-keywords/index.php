@@ -8,7 +8,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel common\models\search\BaiduKeywordsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '百度营销关键词';
+$this->title = 'Tags词 >> 将会匹配下拉词相关词 做为其子类 爬取的词';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="baidu-keywords-index">
