@@ -598,11 +598,15 @@ class FanController extends Controller
 
             if (empty($modelInfo)) {
                 $keywordsInfo = AllBaiduKeywords::findOne($arr);
+                $homeColumn = DomainColumn::find()->where([
+                    'domain_id' => $domain->id,
+                    'name' => 'home'
+                ])->one();
 
                 $view->params['tags_tdk'] = [
                     'title' => $keywordsInfo->keywords . '_' . $domain->zh_name,
-                    'keywords' => $keywordsInfo->keywords,
-                    'intro' => $keywordsInfo->keywords,
+                    'keywords' => $homeColumn->keywords,
+                    'intro' => $homeColumn->intro,
                     'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
                 ];
                 return $this->render($render, ['models' => ['data' => ['title' => $keywordsInfo->keywords]]]);
