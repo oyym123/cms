@@ -447,11 +447,12 @@ class FanController extends Controller
             ->one();
 
         //查询文章规则
-        $rules = ArticleRules::find()->select('category_id')->where(['domain_id' => $domain->id])->asArray()->all();
-        $typeIds = array_column($rules, 'category_id');
+//        $rules = ArticleRules::find()->select('category_id')->where(['domain_id' => $domain->id])->asArray()->all();
+//        $typeIds = array_column($rules, 'category_id');
         //该域名下所有设定的类型 没有文章也进行展示
         $query = AllBaiduKeywords::find()
-            ->where(['in', 'type_id', $typeIds])
+//            ->where(['in', 'type_id', $typeIds])
+            ->where(['domain_id' => $domain->id])
 //            ->andWhere(['>', 'm_pv', AllBaiduKeywords::FLAG_M_PV])
             ->select('id,keywords as name')
             ->orderBy('id desc')
@@ -552,67 +553,161 @@ class FanController extends Controller
     public function actionTagsDetail()
     {
         $url = Yii::$app->request->url;
-        if (preg_match('/\d+/', $url, $arr)) { //获取id
-            $modelInfo = PushArticle::find()
-                ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time,column_id')
-                ->where(['key_id' => $arr])
-//                ->andWhere(['like', 'title_img', 'http'])
-                ->asArray()->one();
-
-            $columnZhName = '';
-            $model = $modelInfo;
-            if (!empty($model)) {
-                $columnObj = DomainColumn::findOne($model['column_id']);
-                if (!empty($columnObj)) {
-                    $columnZhName = $columnObj->zh_name;
-                    $columnEnName = $columnObj->name;
-                }
-            }
-            $oldTitle = $model['title'];
-            $model['title'] = Tools::getKTitle($model['title']);
-            list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
-            $this->layout = $layout;
-            $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
-            $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
-
-            if ($user = FanUser::findOne($model['user_id'])) {
-//                $model['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
-                $model['nickname'] = $user->username;
-                $model['avatar'] = $user->avatar;
-            } else {
-                $model['nickname'] = '佚名';
-                $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
-            }
-            $res = [
-                'data' => $model
-            ];
+        if (preg_match('/\d+/', $url, $tagId)) { //获取id
 
             $domain = Domain::getDomainInfo();
-            $view = Yii::$app->view;
-            $view->params['tags_tdk'] = [
-                'title' => $model['keywords'] . '_' . $domain->zh_name,
-                'keywords' => $model['keywords'],
-                'intro' => $model['intro'],
-                'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
-            ];
 
-            if (empty($modelInfo)) {
-                $keywordsInfo = AllBaiduKeywords::findOne($arr);
-                $homeColumn = DomainColumn::find()->where([
-                    'domain_id' => $domain->id,
-                    'name' => 'home'
-                ])->one();
+            if ($domain->id == 16) {
+                //step 1 查询:
+                $allKeywords = AllBaiduKeywords::find()->select('id,pid,keywords')->where(['id' => $tagId])->asArray()->one();
+                //表示有父类id  则将所有的子类id 文章都搜出来展示
+                if ($allKeywords['pid'] > 0) {
+                    $allK = AllBaiduKeywords::find()->select('id')
+                        ->where([
+                            'pid' => $allKeywords['pid'],
+                        ])
+                        ->andWhere(['>', 'type_id', 0])
+                        ->asArray()
+                        ->all();
+                    $andWhere = ['in', 'key_id', array_column($allK, 'id')];
 
+                } else { //没有父类id 则进行选取后面的5篇文章
+                    $andWhere = ['between', 'key_id', $tagId, $tagId + 5];
+                }
+
+                $modelInfo = PushArticle::find()
+                    ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time,column_id')
+                    ->where($andWhere)
+                    ->limit(5)
+                    ->asArray()
+                    ->all();
+
+                list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
+                $this->layout = $layout;
+                $arrRes = [];
+
+                foreach ($modelInfo as $info) {
+                    $model = $info;
+                    if (!empty($model)) {
+                        $columnObj = DomainColumn::findOne($model['column_id']);
+                        if (!empty($columnObj)) {
+                            $columnZhName = $columnObj->zh_name;
+                            $columnEnName = $columnObj->name;
+                        }
+                    }
+
+                    $oldTitle = $model['title'];
+                    $model['title'] = Tools::getKTitle($model['title']);
+
+                    $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
+                    $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
+
+                    if ($user = FanUser::findOne($model['user_id'])) {
+//                $model['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
+                        $model['nickname'] = $user->username;
+                        $model['avatar'] = $user->avatar;
+                    } else {
+                        $model['nickname'] = '佚名';
+                        $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+                    }
+                    $arrRes[] = $model;
+                }
+                $domain = Domain::getDomainInfo();
+
+                $modelFirst = $modelInfo[0];
+                $view = Yii::$app->view;
                 $view->params['tags_tdk'] = [
-                    'title' => $keywordsInfo->keywords . '_' . $domain->zh_name,
-                    'keywords' => $homeColumn->keywords,
-                    'intro' => $homeColumn->intro,
+                    'title' => $modelFirst['keywords'] . '_' . $domain->zh_name,
+                    'keywords' => $modelFirst['keywords'],
+                    'intro' => $modelFirst['intro'],
                     'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
                 ];
-                return $this->render($render, ['models' => ['data' => ['title' => $keywordsInfo->keywords]]]);
+
+                if (empty($modelInfo)) {
+                    //取首页的tdk
+                    $keywordsInfo = AllBaiduKeywords::findOne($tagId);
+                    $homeColumn = DomainColumn::find()->where([
+                        'domain_id' => $domain->id,
+                        'name' => 'home'
+                    ])->one();
+
+                    $view->params['tags_tdk'] = [
+                        'title' => $keywordsInfo->keywords . '_' . $domain->zh_name,
+                        'keywords' => $homeColumn->keywords,
+                        'intro' => $homeColumn->intro,
+                        'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
+                    ];
+                    return $this->render($render, ['models' => ['data' => ['title' => $keywordsInfo->keywords]]]);
+                }
+                return $this->render($render, ['models' => ['data' => $arrRes]]);
+
+            } else {
+                $modelInfo = PushArticle::find()
+                    ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time,column_id')
+                    ->where(['key_id' => $tagId])
+//                ->andWhere(['like', 'title_img', 'http'])
+                    ->asArray()->one();
+
+                $columnZhName = '';
+                $model = $modelInfo;
+                if (!empty($model)) {
+                    $columnObj = DomainColumn::findOne($model['column_id']);
+                    if (!empty($columnObj)) {
+                        $columnZhName = $columnObj->zh_name;
+                        $columnEnName = $columnObj->name;
+                    }
+                }
+
+                $oldTitle = $model['title'];
+                $model['title'] = Tools::getKTitle($model['title']);
+                list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
+                $this->layout = $layout;
+                $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
+                $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
+
+                if ($user = FanUser::findOne($model['user_id'])) {
+//                $model['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
+                    $model['nickname'] = $user->username;
+                    $model['avatar'] = $user->avatar;
+                } else {
+                    $model['nickname'] = '佚名';
+                    $model['avatar'] = 'http://img.thszxxdyw.org.cn/userImg/b4ae0201906141846584975.png';
+                }
+
+                $res = [
+                    'data' => $model
+                ];
+
+                $view = Yii::$app->view;
+                $view->params['tags_tdk'] = [
+                    'title' => $model['keywords'] . '_' . $domain->zh_name,
+                    'keywords' => $model['keywords'],
+                    'intro' => $model['intro'],
+                    'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
+                ];
+
+                if (empty($modelInfo)) {
+                    $keywordsInfo = AllBaiduKeywords::findOne($tagId);
+                    $homeColumn = DomainColumn::find()->where([
+                        'domain_id' => $domain->id,
+                        'name' => 'home'
+                    ])->one();
+
+                    $view->params['tags_tdk'] = [
+                        'title' => $keywordsInfo->keywords . '_' . $domain->zh_name,
+                        'keywords' => $homeColumn->keywords,
+                        'intro' => $homeColumn->intro,
+                        'canonical' => 'https://' . $_SERVER['HTTP_HOST'] . $url,
+                    ];
+                    return $this->render($render, ['models' => ['data' => ['title' => $keywordsInfo->keywords]]]);
+                }
+
+                return $this->render($render, ['models' => $res]);
+
+
             }
 
-            return $this->render($render, ['models' => $res]);
+
         }
     }
 }

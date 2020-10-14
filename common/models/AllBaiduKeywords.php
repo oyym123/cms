@@ -72,7 +72,7 @@ class AllBaiduKeywords extends Base
     {
         return [
             [['domain_id', 'column_id', 'keywords'], 'required'],
-            [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status', 'catch_status'], 'integer'],
+            [['pc_show_rate', 'pc_rank', 'competition', 'column_id', 'domain_id', 'is_father', 'match_type', 'pc_click', 'pc_pv', 'pc_show', 'pc_ctr', 'all_show_rate', 'all_rank', 'all_cpc', 'all_click', 'all_pv', 'all_show', 'all_ctr', 'm_show_rate', 'm_rank', 'm_click', 'm_pv', 'status', 'catch_status'], 'integer'],
             [['bid', 'all_rec_bid', 'm_rec_bid'], 'number'],
             [['word_package', 'json_info', 'type'], 'string'],
             [['created_at', 'updated_at', 'back_time'], 'safe'],
@@ -144,6 +144,12 @@ class AllBaiduKeywords extends Base
         $oldInfo = self::find()->where(['keywords' => $data['keywords']])->one();
 
         if (!empty($oldInfo)) {
+            //将pid绑定上
+            $oldInfo->pid = $data['pid'];
+            $oldInfo->from_keywords = $data['from_keywords'];
+            $oldInfo->type_id = $data['type_id'];
+            $oldInfo->is_father = isset($data['is_father']) ? 1 : 0;
+            $oldInfo->save(false);
             return [-1, $data['keywords'] . '   已经重复了'];
         }
 
@@ -196,6 +202,120 @@ class AllBaiduKeywords extends Base
             }
         }
         return [$arr, $error];
+    }
+
+
+    /**
+     * 新增关键词 并且调用百度营销词接口获取相应的参数
+     */
+    public static function setKeywordsTags($postData)
+    {
+        set_time_limit(0);
+        $keywords = Tools::cleanKeywords($postData['keywords']);
+
+        list($keyData, $error) = self::checkKeywords($keywords);
+
+
+        foreach ($keyData as $item) {
+            $flag1 = 0;
+            foreach (Keywords::getNoAllow() as $no) {
+                if (strpos($no, $item) !== false) {
+                    $error[] = $item . ' 包含' . $no . '不保存！';
+                    $flag1 = 1;
+                }
+            }
+
+            //当词语中包含一些不应该存在的词 则不保存
+            if ($flag1 == 1) {
+                continue;
+            }
+
+            $data = [[]];
+            $info = $data[0];
+            $tname = '';
+
+            //获取词的顶级分类名称
+            $topName = Category::findOne($postData['type_id']);
+            if ($topName) {
+                $tname = $topName->en_name;
+            }
+
+            $saveData = [
+                'show_reasons' => '后台添加',
+                'm_pv' => $info['mobile']['pv'] ?? 0,
+                'm_show' => $info['mobile']['show'] ?? 0,
+                'type' => $tname,
+                'type_id' => $postData['type_id'],
+                'pid' => 0,
+                'm_ctr' => $info['mobile']['ctr'] ?? 0,
+                'm_click' => $info['mobile']['click'] ?? 0,
+                'm_rec_bid' => $info['mobile']['recBid'] ?? 0,
+                'm_charge' => $info['mobile']['charge'] ?? 0,
+                'm_rank' => $info['mobile']['rank'] ?? 0,
+                'm_show_rate' => $info['mobile']['showRate'] ?? 0,
+                'all_cpc' => $info['all']['cpc'] ?? 0,
+                'all_ctr' => $info['all']['ctr'] ?? 0,
+                'all_click' => $info['all']['cpc'] ?? 0,
+                'all_pv' => $info['all']['pv'] ?? 0,
+                'all_charge' => $info['all']['charge'] ?? 0,
+                'all_show' => $info['all']['show'] ?? 0,
+                'all_rank' => $info['all']['rank'] ?? 0,
+                'all_show_rate' => $info['all']['showRate'] ?? 0,
+                'all_rec_bid' => $info['all']['recBid'] ?? 0,
+                'pc_ctr' => $info['pc']['ctr'] ?? 0,
+                'pc_show' => $info['pc']['show'] ?? 0,
+                'pc_pv' => $info['pc']['pv'] ?? 0,
+                'pc_rank' => $info['pc']['rank'] ?? 0,
+                'pc_show_rate' => $info['pc']['showRate'] ?? 0,
+                'pc_click' => $info['pc']['click'] ?? 0,
+                'bid' => $info['bid'] ?? 0,
+                'catch_status' => 11,  //表示机器
+                'word_package' => '',
+                'businessPoints' => json_encode([], JSON_UNESCAPED_UNICODE),
+                'keywords' => $item,
+                'from_keywords' => '',
+                'similar' => '',
+                'domain_id' => $postData['domain_id'] ?? 0,
+                'column_id' => $postData['column_id'] ?? 0,
+                'competition' => $info['competition'] ?? 0,
+                'json_info' => json_encode($info, JSON_UNESCAPED_UNICODE),
+            ];
+
+            //保存所有的关键词
+            list($code, $msg) = self::createOne($saveData);
+
+//            //只保存主词
+            if ($code < 0) {
+                $error[] = $msg;
+            }
+//
+//                //保存主词
+//                $dataSave = [
+//                    'name' => $info['word'],
+//                    'key_id' => $msg->id,
+//                    'type_name' => $msg->type,
+//                    'keywords' => $info['word'],
+//                ];
+//
+//                list($codeKey, $msgKey) = LongKeywords::createOne($dataSave);
+//
+//                if ($codeKey > 0) {
+//                    LongKeywords::bdPushReptile($msgKey);
+//                }
+//
+//
+//                //保存扩展词
+//                BaiduKeywords::getSdkWords($msg->id);
+//            }
+
+
+        }
+
+        if (!empty($error)) {
+            return [-1, $error];
+        } else {
+            return [1, 'success'];
+        }
     }
 
 

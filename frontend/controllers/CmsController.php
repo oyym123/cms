@@ -104,7 +104,7 @@ class CmsController extends Controller
     public function actionCatchYin()
     {
         set_time_limit(0);
-        (new BaiduKeywords())->getSdkWords();
+        (new BaiduKeywords())->getSdkWords(233100);
     }
 
     /** 爬取关键词

@@ -78,7 +78,7 @@ class CmsController extends \yii\console\Controller
     public function actionCatchBd()
     {
         set_time_limit(0);
-        (new BaiduKeywords())->getSdkWords();
+        (new BaiduKeywords())->getSdkWords(233100);
     }
 
     /**

@@ -322,12 +322,18 @@ class LongKeywords extends Base
         foreach ($allKeyWords as $key => $item) {
             foreach ($item as $k => $value) {
                 if (strpos($value, ',') === false) {
+
                     $dataSave = [
                         'name' => $value,
                         'key_id' => $data['id'],
                         'type' => $key,
                         'keywords' => $data['keywords'],
                     ];
+
+                    if ($from == 2) { //表示是从tags词过来的
+                        $dataSave['key_id'] = 0;
+                        $dataSave['tid'] = $data['id'];
+                    }
 
                     list($code, $msg) = self::createOne($dataSave);
 
@@ -381,8 +387,8 @@ class LongKeywords extends Base
 
         self::updateAll($dataSave, ['key_id' => $data['id']]);
 //        $msg = self::find()->where(['key_id' => $data['id']])->one();
-        return [1, array_column($keywords, 'name')];
 
+        return [1, array_column($keywords, 'name')];
 
 //      self::pushReptile($msg);
         echo '<pre>';

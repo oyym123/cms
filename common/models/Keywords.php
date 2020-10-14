@@ -290,4 +290,52 @@ class Keywords extends Base
         print_r($error);
         exit;
     }
+
+
+    /** 获取下拉词相关词 */
+    public function getKeywords($keywords)
+    {
+        //循环所有的tags
+        $keywords = BaiduKeywords::find()->where(['status' => 1])->all();
+
+        foreach ($keywords as $keyword) {
+            //获取下拉词 并且保存到长尾词库
+            list($code, $longKeywords) = LongKeywords::getBaiduKey([
+                'keywords' => $keyword->keywords,
+                'id' => $keyword->id
+            ], 2);
+
+            if ($code < 0) {
+                continue;
+            }
+
+            $remainKeywords = $mDownTags = [];
+
+            //取三个下拉词 存到tags
+            foreach ($longKeywords as $key => $longKeyword) {
+                if ($key <= 2) {
+                    $mDownTags[] = $longKeyword;
+                } else {
+                    $remainKeywords[] = $longKeyword;
+                }
+            }
+
+
+            print_r($longKeywords);
+            exit;
+
+            //剩下的下拉词 拿去保存
+
+
+            //导入到总词库
+            list($code1, $msg1) = AllBaiduKeywords::setKeywordsTags([
+                'type_id' => $keyword->type_id,
+                'keywords' => implode(PHP_EOL, $keywords)
+            ]);
+            if ($code1 < 0) {
+                $error[] = $msg1;
+            }
+        }
+
+    }
 }

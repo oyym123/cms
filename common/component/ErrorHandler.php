@@ -27,7 +27,7 @@ class ErrorHandler extends BaseErrorHandler
             } else {
                 Yii::$app->session->set($keyRefresh, $refresh - 1);
             }
-            
+
             if ($refresh > 0) {
                 echo '与数据服务器断开连接，正在重新连接。。。。 []~(￣▽￣)~*';
 //                Tools::writeLog([$refresh], 'refresh.log');
@@ -42,6 +42,19 @@ class ErrorHandler extends BaseErrorHandler
         if (Yii::$app->request->getIsAjax()) {
             exit(json_encode(array('code' => $exception->getCode(), 'msg' => $exception->getMessage())));
         } else {
+            if (PHP_OS == "Linux") {
+                echo '<img src="/images/404/new404.png" style="width: 100%;height:100%">';
+                exit;
+            }
+            
+            if (strpos($exception->getMessage(), 'Page not found.') !== false) {
+                echo '<img src="/images/404/new404.png" style="width: 100%;height:100%">';
+                exit;
+            } else {
+                echo '<pre>';
+                print_r($exception->getMessage());
+                exit;
+            }
 //            //将500的代码，发送监控预警
 //            if (!empty($exception->getCode()) && $exception->getCode() == 8) {
 //                $params = [];
@@ -56,8 +69,7 @@ class ErrorHandler extends BaseErrorHandler
 //                print_r($params);
 //                exit;
 //            }
-            echo '<img src="/images/404/new404.png" style="width: 100%;height:100%">';
-            exit;
+
             echo Yii::$app->getView()->renderFile($this->errorView, ['exception' => $exception,], $this);
         }
     }

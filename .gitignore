@@ -49,3 +49,5 @@ phpunit.phar
 backend/web/nginx.htaccess
 frontend/web/nginx.htaccess
 frontend/web/map
+
+common/component/ErrorHandler.php

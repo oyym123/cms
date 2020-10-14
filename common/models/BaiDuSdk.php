@@ -108,15 +108,14 @@ class BaiDuSdk extends sms_service_KRService
      */
     public function getKeyWords($keywords)
     {
-
         $datas = $this->getKRByQueryTest($keywords);
         if ($datas === false) {
             return false;
         } else {
             $arr = json_decode(json_encode($datas), TRUE);
+            Tools::writeLog($arr, 'getKeywords.log'); //备份
             return $arr;
         }
-
     }
 
     /**

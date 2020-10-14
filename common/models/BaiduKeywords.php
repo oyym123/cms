@@ -140,6 +140,11 @@ class BaiduKeywords extends Base
         ];
     }
 
+    public function getCategory()
+    {
+        return $this->hasOne(Category::className(), ['id' => 'type_id']);
+    }
+
 
     /**
      * {@inheritdoc}
@@ -220,6 +225,7 @@ class BaiduKeywords extends Base
         }
     }
 
+
     /**
      * 获取百度SDK关键词的数据
      */
@@ -234,26 +240,17 @@ class BaiduKeywords extends Base
         //所有的种词
         $error = [];
 
-        $initWords = self::find()->where(['pid' => 0])->andWhere(['>', 'id', '232703'])->all();
-
+        $initWords = self::find()
+            ->where([
+                'pid' => 0,
+                'm_down_tags' => ''
+            ])
+//            ->andWhere($andWhere)
+            ->all();
 
         //用种词调用相关词查询接口 最多只能查询到300个
         foreach ($initWords as $key => $initWord) {
             sleep(1);
-            //保存种词本身
-            $dataSave = [
-                'name' => $initWord->keywords,
-                'key_id' => $id,
-                'type_name' => $initWord->type,
-                'keywords' => $initWord->keywords,
-            ];
-
-            list($codeLong, $msgLong) = self::setLongKeywords($dataSave, 0);
-
-            if ($codeLong < 0) {
-                Tools::writeLog($initWord->keywords . '重复了', 'create_long.txt');
-                continue;
-            }
 
             $data = (new BaiDuSdk())->getKeyWords($initWord->keywords);
             Tools::writeLog('获取到   ' . $initWord->keywords . '    所有的拓展词', 'create_long.txt');
@@ -262,39 +259,76 @@ class BaiduKeywords extends Base
                 continue;
             }
 
-            foreach ($data as $k => $item) {
-                $saveData = [
-                    'type' => $initWord->type,
-                    'pid' => $initWord->id,
-                    'pc_pv' => $item['pcPV'],
-                    'show_reasons' => json_encode($item['showReasons'], JSON_UNESCAPED_UNICODE),
-                    'm_pv' => $item['mobilePV'],
-                    'word_package' => $item['wordPackage'],
-                    'all_rec_bid' => $item['recBid'],
-                    'businessPoints' => json_encode($item['businessPoints'], JSON_UNESCAPED_UNICODE),
-                    'all_pv' => $item['pv'],
-                    'keywords' => $item['word'],
-                    'from_keywords' => $initWord->keywords,
-                    'similar' => $item['similar'],
-                    'competition' => $item['competition'],
-                    'json_info' => json_encode($item, JSON_UNESCAPED_UNICODE),
-                ];
-
-                //保存所有的关键词
-                list($code, $msg) = AllBaiduKeywords::createOne($saveData);
-
-                if ($code > 0) {
-                    $dataSave = [
-                        'name' => $item['word'],
-                        'key_id' => $msg->id,
-                        'type_name' => $msg->type,
-                        'keywords' => $initWord->keywords,
-                    ];
-                    self::setLongKeywords($dataSave, $k);
+            if (count($data) > 5) { //截取前面三个 组成标题
+                $mDownTagsArr = [];
+                $mDownTags = array_slice($data, 1, 3);
+                foreach ($mDownTags as $downTag) {
+                    $mDownTagsArr[] = $downTag['word'];
                 }
 
-                if ($code < 0) {
-                    $error[] = $msg;
+                $initWord->m_down_tags = implode(',', $mDownTagsArr);
+                $initWord->save(false);
+                array_splice($data, 0, 3);
+            }
+
+            $arrSort = [];
+            foreach ($data as $row) {
+                $arrSort[] = $row['mobilePV'];
+            }
+
+            array_multisort($arrSort, SORT_DESC, $data);
+
+            foreach ($data as $da) {
+                if ($da['mobilePV'] <= 13) {
+                    $newArr[] = $da;
+                }
+            }
+
+            if (count($newArr) < 10) {
+                array_multisort($arrSort, SORT_ASC, $data);
+                $newArr = $data;
+            }
+
+            //将父级id也保存进去
+            $saveDataFather = [
+                'type' => $initWord->type,
+                'type_id' => $initWord->type_id,
+                'pid' => $initWord->id,
+                'keywords' => $initWord->keywords,
+                'from_keywords' => $initWord->keywords,
+                'is_father' => 1,
+            ];
+
+            //保存所有的关键词
+            list($code, $msg) = AllBaiduKeywords::createOne($saveDataFather);
+
+//          print_r($data).PHP_EOL;exit;
+            foreach ($newArr as $k => $item) {
+                if ($k < 10) {
+                    $saveData = [
+                        'type' => $initWord->type,
+                        'type_id' => $initWord->type_id,
+                        'pid' => $initWord->id,
+                        'pc_pv' => $item['pcPV'],
+                        'show_reasons' => json_encode($item['showReasons'], JSON_UNESCAPED_UNICODE),
+                        'm_pv' => $item['mobilePV'],
+                        'word_package' => $item['wordPackage'],
+                        'all_rec_bid' => $item['recBid'],
+                        'businessPoints' => json_encode($item['businessPoints'], JSON_UNESCAPED_UNICODE),
+                        'all_pv' => $item['pv'],
+                        'keywords' => $item['word'],
+                        'from_keywords' => $initWord->keywords,
+                        'similar' => $item['similar'],
+                        'competition' => $item['competition'],
+                        'json_info' => json_encode($item, JSON_UNESCAPED_UNICODE),
+                    ];
+
+                    //保存所有的关键词
+                    list($code, $msg) = AllBaiduKeywords::createOne($saveData);
+
+                    if ($code < 0) {
+                        $error[] = $msg;
+                    }
                 }
             }
         }
@@ -338,11 +372,10 @@ class BaiduKeywords extends Base
                     ->select('id,keywords as name, type as type_name,from_keywords as keywords,pid,m_pv')
                     ->where([
                         'status' => 1,
-                        'type_id' => $rules['category_id']
+                        'type_id' => $rules['category_id'],
+                        'is_father' => 0
                     ])
-                    ->andWhere([
-                        'catch_status' => 100
-                    ])
+                    ->andWhere(['>', 'pid', 0])
                     ->orderBy('id desc')
                     ->offset($i * $step)
                     ->limit($step)

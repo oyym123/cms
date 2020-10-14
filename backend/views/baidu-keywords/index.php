@@ -31,23 +31,23 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'keywords',
             'm_pv',
-            'from_keywords',
-            [
-                'label' => '域名',
-                'attribute' => 'domain_id',
-                'filter' => \common\models\Domain::getDomianName(),
-                'filterInputOptions' => ['prompt' => '所有域名', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
-                'content' => function ($model, $key, $index, $column) {
-                    return $model->domain->name;
-                }
-            ],
+//            'from_keywords',
+//            [
+//                'label' => '域名',
+//                'attribute' => 'domain_id',
+//                'filter' => \common\models\Domain::getDomianName(),
+//                'filterInputOptions' => ['prompt' => '所有域名', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+//                'content' => function ($model, $key, $index, $column) {
+//                    return $model->domain->name;
+//                }
+//            ],
             [
                 'label' => '分类　　　   　　　   ',
-                'attribute' => 'column_id',
-                'filter' => \common\models\DomainColumn::getColumnData(1),
-                'filterInputOptions' => ['prompt' => '所有栏目', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
+                'attribute' => 'type_id',
+                'filter' => \common\models\AllBaiduKeywords::cate(),
+                'filterInputOptions' => ['prompt' => '所有状态', 'class' => 'form-control', 'id' => null, 'value' => 'all'],
                 'content' => function ($model, $key, $index, $column) {
-                    return $model->column->name . '　【' . $model->column->zh_name . '】';
+                    return $model->category->name . ' 【' . $model->type_id . '】';
                 }
             ],
 //            'pc_show_rate',

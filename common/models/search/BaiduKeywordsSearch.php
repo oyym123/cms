@@ -94,6 +94,11 @@ class BaiduKeywordsSearch extends BaiduKeywords
             'updated_at' => $this->updated_at,
         ]);
 
+        $query->andFilterWhere([
+            'category.id' => $this->type_id[0],
+        ])
+            ->innerJoinWith('category', 'category.id = all_baidu_keywords.type_id');
+
         $query->andFilterWhere(['like', 'keywords', $this->keywords])
             ->andFilterWhere(['like', 'from_keywords', $this->from_keywords])
             ->andFilterWhere(['like', 'pc_cpc', $this->pc_cpc])
