@@ -85,9 +85,8 @@ class PushArticleController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index', ['id' => $model->id, 'domain_id' => $model->domain_id]]);
         }
 
         return $this->render('update', [
@@ -118,10 +117,15 @@ class PushArticleController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = PushArticle::findOne($id)) !== null) {
+        $_GET['domain'] = 0;
+        $domainId = Yii::$app->request->get('domain_id', 0);
+
+        if (Yii::$app->request->post('domain_id', 0)) {
+            $domainId = Yii::$app->request->post('domain_id', 0);
+        }
+        if (($model = PushArticle::findx($domainId)->where(['id' => $id])->one()) !== null) {
             return $model;
         }
-
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

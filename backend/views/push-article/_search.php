@@ -18,17 +18,45 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <!--    --><? //= $form->field($model, 'id') ?>
     <!---->
     <!--    --><? //= $form->field($model, 'b_id') ?>
 
-    <?= $form->field($model, 'column_id') ?>
+    <!--    --><? //= $form->field($model, 'column_id') ?>
 
     <!--    --><? //= $form->field($model, 'column_name') ?>
 
-    <?= $form->field($model, 'rules_id') ?>
+    <!--    --><? //= $form->field($model, 'rules_id') ?>
 
-    <?php echo $form->field($model, 'domain_id') ?>
+    <?=
+    $form->field($model, 'domain_id')->widget(\kartik\select2\Select2::classname(), [
+        'options' => ['placeholder' => '请输入域名 ...'],
+        'pluginOptions' => [
+            'id' => new \yii\web\JsExpression("function(rs) {
+                    return rs.taskId;
+                }"),
+            'placeholder' => 'search ...',
+            'multiple' => true,
+            'allowClear' => true,
+            'language' => [
+                'errorLoading' => new \yii\web\JsExpression("function () { return 'Waiting...'; }"),
+            ],
+            'ajax' => [
+                'url' => \yii\helpers\Url::to(['domain/get-domain']),
+                'dataType' => 'json',
+                'data' => new \yii\web\JsExpression('function(params) {
+                    return {q:params.term}; }')
+            ],
+            'escapeMarkup' => new \yii\web\JsExpression('function (markup) {
+                 return markup; }'),
+            'templateResult' => new \yii\web\JsExpression('function(res) {
+                 return res.text; }'),
+            'templateSelection' => new \yii\web\JsExpression('function (res) {
+                 return res.text; }'),
+        ],
+    ])->label('类型')->hint('输入c 检索自定义页面 添加单个');
+    ?>
+
 
     <!--    --><?php // echo $form->field($model, 'domain') ?>
 
@@ -47,7 +75,7 @@ use yii\widgets\ActiveForm;
     <!---->
     <?php echo $form->field($model, 'title') ?>
 
-    <?php echo $form->field($model, 'push_time') ?>
+    <!--    --><?php //echo $form->field($model, 'push_time') ?>
 
     <?php echo $form->field($model, 'created_at') ?>
 

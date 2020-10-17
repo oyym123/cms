@@ -46,7 +46,7 @@ class ErrorHandler extends BaseErrorHandler
                 echo '<img src="/images/404/new404.png" style="width: 100%;height:100%">';
                 exit;
             }
-            
+
             if (strpos($exception->getMessage(), 'Page not found.') !== false) {
                 echo '<img src="/images/404/new404.png" style="width: 100%;height:100%">';
                 exit;

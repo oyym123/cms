@@ -25,18 +25,29 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
 //            'b_id',
             'column_id',
-            'column_name',
-            'rules_id',
-            'domain_id',
-            'domain',
+//            'column_name',
+//            'rules_id',
+            [
+                'label' => '域名',
+                'attribute' => 'domain_id',
+                'content' => function ($model, $key, $index, $column) {
+                    return \common\models\Domain::findOne($model->domain_id)->name;
+                }
+            ],
+            [
+                'label' => '修改',
+                'attribute' => 'intro',
+                'content' => function ($model, $key, $index, $column) {
+                    return '<a href="/index.php/push-article/update?id=' . $model->id . '&domain_id=' . $model->domain_id . '">点击文章修改</a>';
+                }
+            ],
+
 //            'from_path',
             'keywords',
 //            'title_img',
-
             [
                 'label' => '状态',
                 'attribute' => 'status',
@@ -51,9 +62,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'title',
             'push_time',
             'created_at',
-            'updated_at',
-
-            ['class' => 'yii\grid\ActionColumn'],
+//            'updated_at',
         ],
     ]); ?>
 

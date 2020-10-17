@@ -35,8 +35,7 @@ return [
             ],
         ],
         'errorHandler' => [
-//            'errorAction' => 'site/error',
-            'class' => 'common\component\ErrorHandler',
+            'errorAction' => 'site/error',
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -62,6 +61,8 @@ return [
                 'label/index_<id:\d+>.html' => '/fan/tags-list',
                 
                 'jaks<id:\d+>mq/' => '/fan/tags-detail',
+                'jaks<id:\d+mq\/>' => '/fan/tags-detail',
+                
                 'customize_<id:\d+>.html' => '/site/customize',
                 'jaks' => '/fan',
                 'jaks/<id:\d+>.html' => '/fan/detail',            

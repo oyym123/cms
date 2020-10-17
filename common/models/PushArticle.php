@@ -69,21 +69,21 @@ class PushArticle extends Modelx
         return [
             'id' => 'ID',
             'b_id' => 'B ID',
-            'column_id' => 'Column ID',
+            'column_id' => '栏目',
             'column_name' => 'Column Name',
-            'rules_id' => 'Rules ID',
-            'domain_id' => 'Domain ID',
+            'rules_id' => '规则id',
+            'domain_id' => '域名',
             'domain' => 'Domain',
-            'from_path' => 'From Path',
-            'keywords' => 'Keywords',
-            'title_img' => 'Title Img',
-            'status' => 'Status',
-            'content' => 'Content',
-            'intro' => 'Intro',
-            'title' => 'Title',
-            'push_time' => 'Push Time',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'from_path' => '来源',
+            'keywords' => '关键词',
+            'title_img' => '推荐图片',
+            'status' => '状态',
+            'content' => '内容',
+            'intro' => '简介',
+            'title' => '标题',
+            'push_time' => '发布时间',
+            'created_at' => '创建时间',
+            'updated_at' => '修改时间',
         ];
     }
 
@@ -275,9 +275,15 @@ class PushArticle extends Modelx
         exit;
     }
 
+    /** 获取域名 */
+    public function getDomain()
+    {
+        return $this->hasOne(Domain::className(), ['id' => 'domain_id']);
+    }
+
     public function fanti()
     {
 
-
     }
+
 }

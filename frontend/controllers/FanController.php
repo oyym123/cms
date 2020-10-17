@@ -557,11 +557,13 @@ class FanController extends Controller
 
             $domain = Domain::getDomainInfo();
 
-            if ($domain->id == 16) {
+            if (1) {
                 //step 1 查询:
                 $allKeywords = AllBaiduKeywords::find()->select('id,pid,keywords')->where(['id' => $tagId])->asArray()->one();
+
+                $andWhere1 = [];
                 //表示有父类id  则将所有的子类id 文章都搜出来展示
-                if ($allKeywords['pid'] > 0) {
+                if (0) {
                     $allK = AllBaiduKeywords::find()->select('id')
                         ->where([
                             'pid' => $allKeywords['pid'],
@@ -570,14 +572,15 @@ class FanController extends Controller
                         ->asArray()
                         ->all();
                     $andWhere = ['in', 'key_id', array_column($allK, 'id')];
-
                 } else { //没有父类id 则进行选取后面的5篇文章
-                    $andWhere = ['between', 'key_id', $tagId, $tagId + 5];
+                    $andWhere = ['between', 'key_id', $tagId, ($tagId + 5)];
+                    $andWhere1 = ['<', 'key_id', ($tagId - 5)];
                 }
 
                 $modelInfo = PushArticle::find()
                     ->select('user_id,keywords,id,column_name,title_img,content,title,intro,push_time,column_id')
-                    ->where($andWhere)
+//                    ->where(['>', 'key_id', $tagId])
+//                    ->andWhere(['<', 'key_id', $tagId + 10])
                     ->limit(5)
                     ->asArray()
                     ->all();

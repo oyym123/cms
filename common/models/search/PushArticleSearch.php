@@ -17,7 +17,7 @@ class PushArticleSearch extends PushArticle
     public function rules()
     {
         return [
-            [['id', 'b_id', 'column_id', 'rules_id', 'domain_id', 'status'], 'integer'],
+            [['id', 'b_id', 'column_id', 'rules_id', 'status'], 'integer'],
             [['column_name', 'domain', 'from_path', 'keywords', 'title_img', 'content', 'intro', 'title', 'push_time', 'created_at', 'updated_at'], 'safe'],
         ];
     }
@@ -40,7 +40,17 @@ class PushArticleSearch extends PushArticle
      */
     public function search($params)
     {
-        $query = PushArticle::findx(\Yii::$app->request->get('domain_id'));
+        $_GET['domain'] = 0;
+        $data = \Yii::$app->request->get('PushArticleSearch');
+        if (isset($data['domain_id']) && is_array($data['domain_id'])) {
+            $data['domain_id'] = $data['domain_id'][0];
+        }
+
+        if (!isset($data['domain_id'])) {
+            $data['domain_id'] = 16;
+        }
+
+        $query = PushArticle::findx($data['domain_id']);
 
         // add conditions that should always apply here
 
@@ -77,7 +87,7 @@ class PushArticleSearch extends PushArticle
             ->andFilterWhere(['like', 'content', $this->content])
             ->andFilterWhere(['like', 'intro', $this->intro])
             ->andFilterWhere(['like', 'title', $this->title]);
-
+        $query->orderBy('id desc');
         return $dataProvider;
     }
 }

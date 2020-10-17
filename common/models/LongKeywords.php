@@ -549,7 +549,7 @@ class LongKeywords extends Base
 
         //查询指定20个站 的规则
         $domainIds = BaiduKeywords::getDomainIds();
-
+//        $domainIds = [16];
         //查询出所有的规则分类
         $articleRules = ArticleRules::find()
             ->select('category_id,domain_id,column_id')
@@ -569,8 +569,8 @@ class LongKeywords extends Base
                     ->where(['id' => $rules['column_id']])->asArray()->one();
                 //每个短尾词扩展  6个小指数长尾词 联表查询
                 $longKeywords = AllBaiduKeywords::find()->select('id,keywords as name,pid as key_id,type')
-                    ->andWhere(['catch_status' => 100])              //表示后台输入的词
                     ->andWhere(['status' => 10])                     //表示已经推送到爬虫库中的数据
+//                    ->andWhere(['>', 'pid', 0])
                     ->andWhere(['type_id' => $rules['category_id']])
                     ->andWhere(['>', 'back_time', '2020-08-01 00:00:00'])  //有回调参数的关键词
                     //表示没有栏目使用过

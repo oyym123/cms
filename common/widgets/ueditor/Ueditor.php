@@ -41,67 +41,78 @@ class Ueditor extends InputWidget
     public function run()
     {
         if ($this->hasModel()) {
-            $imgView = '?imageView2/1/w/240/h/180';
-            if ($this->model->type == BlackArticle::TYPE_ZUO_WEN_WANG) {
-                $this->registerClientScript($this->model);
-            }
-
-            if ($this->model->type == BlackArticle::TYPE_DOC_TXT) {
-                //前面转换
-                $upArr = [
-                    '一，', '二，', '三，', '四，', '五，',
-                    '一、', '二、', '三、', '四、', '五、',
-                    '一,', '二,', '三,', '四,', '五,',
-                    '1、', '2、', '3、', '4、', '5、',
-                    '1，', '2，', '3，', '4，', '5，',
-                    '1,', '2,', '3,', '4,', '5,'
-                ];
-
-                //后面转换
-                $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
-                $replaceArrUp = $replaceArrDown = [];
-
-                foreach ($upArr as $item) {
-                    $replaceArrUp[] = '<br>' . $item;
-                }
-
-                $this->model->content = str_replace($upArr, $replaceArrUp, $this->model->content);
-
-                foreach ($downArr as $item) {
-                    $replaceArrDown[] = $item . '<br>';
-                }
-                $this->model->content = str_replace($downArr, $replaceArrDown, $this->model->content);
-                $this->registerClientScript();
-            }
-
-            if ($this->model->type == BlackArticle::TYPE_SOUGOU_WEIXIN) {
-                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
-                if (strpos($this->model->content, '<div id="js_article" class="rich_media">') !== false) {
-                    $content = $this->model->content;
-                    preg_match('@<div id="js_article" class="rich_media">(.*)?   <div class="function_mod function_mod_index"@s', $content, $contentInfo);
-                    $content = str_replace('data-src="', 'src="', $contentInfo[0]);
-                    $this->model->content = $content;
-                }
-                $this->registerClientScript($this->model);
-            }
-
-            if ($this->model->type == BlackArticle::TYPE_DOC_WORD) {
-                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
-                $this->model->content = preg_replace("@(.*)?</head><body>@", '', $this->model->content);
-                $images = json_decode($this->model->image_urls, true);
-                if (!empty($images)) {
-                    foreach ($images as $img) {
-                        $this->model->content = str_replace($img, \Yii::$app->params['QiNiuHost'] . 'wordImg/' . $img, $this->model->content);
-                    }
-                }
-                $this->registerClientScript($this->model);
-            }
-
+            $this->model->content = nl2br($this->model->content);
+            $this->registerClientScript($this->model);
             return Html::activeTextarea($this->model, $this->attribute, ['id' => $this->id]);
         } else {
             return Html::textarea($this->id, $this->value, ['id' => $this->id]);
         }
     }
+    
+//    public function run()
+//    {
+//        if ($this->hasModel()) {
+//            $imgView = '?imageView2/1/w/240/h/180';
+//            if ($this->model->type == BlackArticle::TYPE_ZUO_WEN_WANG) {
+//                $this->registerClientScript($this->model);
+//            }
+//
+//            if ($this->model->type == BlackArticle::TYPE_DOC_TXT) {
+//                //前面转换
+//                $upArr = [
+//                    '一，', '二，', '三，', '四，', '五，',
+//                    '一、', '二、', '三、', '四、', '五、',
+//                    '一,', '二,', '三,', '四,', '五,',
+//                    '1、', '2、', '3、', '4、', '5、',
+//                    '1，', '2，', '3，', '4，', '5，',
+//                    '1,', '2,', '3,', '4,', '5,'
+//                ];
+//
+//                //后面转换
+//                $downArr = ['?', '？', '！ ', '？ ', '。 ', '! ',];
+//                $replaceArrUp = $replaceArrDown = [];
+//
+//                foreach ($upArr as $item) {
+//                    $replaceArrUp[] = '<br>' . $item;
+//                }
+//
+//                $this->model->content = str_replace($upArr, $replaceArrUp, $this->model->content);
+//
+//                foreach ($downArr as $item) {
+//                    $replaceArrDown[] = $item . '<br>';
+//                }
+//                $this->model->content = str_replace($downArr, $replaceArrDown, $this->model->content);
+//                $this->registerClientScript();
+//            }
+//
+//            if ($this->model->type == BlackArticle::TYPE_SOUGOU_WEIXIN) {
+//                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
+//                if (strpos($this->model->content, '<div id="js_article" class="rich_media">') !== false) {
+//                    $content = $this->model->content;
+//                    preg_match('@<div id="js_article" class="rich_media">(.*)?   <div class="function_mod function_mod_index"@s', $content, $contentInfo);
+//                    $content = str_replace('data-src="', 'src="', $contentInfo[0]);
+//                    $this->model->content = $content;
+//                }
+//                $this->registerClientScript($this->model);
+//            }
+//
+//            if ($this->model->type == BlackArticle::TYPE_DOC_WORD) {
+//                $this->model->content = preg_replace("@<script(.*?)><\/script>@is", "", $this->model->content);
+//                $this->model->content = preg_replace("@(.*)?</head><body>@", '', $this->model->content);
+//                $images = json_decode($this->model->image_urls, true);
+//                if (!empty($images)) {
+//                    foreach ($images as $img) {
+//                        $this->model->content = str_replace($img, \Yii::$app->params['QiNiuHost'] . 'wordImg/' . $img, $this->model->content);
+//                    }
+//                }
+//                $this->registerClientScript($this->model);
+//            }
+//
+//            return Html::activeTextarea($this->model, $this->attribute, ['id' => $this->id]);
+//        } else {
+//            return Html::textarea($this->id, $this->value, ['id' => $this->id]);
+//        }
+//    }
 
     /**
      * 注册Js
