@@ -43,6 +43,7 @@ class Fan extends BaseController
                 $dataStr .= "
                 '" . $item['name'] . "' => '/fan',
                 '" . $item['name'] . "/<id:\d+>.html' => '/fan/detail',            
+                '" . $item['name'] . "/<id:\d+\/>' => '/fan/detail',            
                 '" . $item['name'] . "/index_<id:\d+>.html' => '/fan',
                 ";
             }
