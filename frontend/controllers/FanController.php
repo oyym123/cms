@@ -493,7 +493,7 @@ class FanController extends Controller
 
         if ($domain) {
             foreach ($models as &$item) {
-                $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags;
+                $item['url'] = '/' . $domain->start_tags . $item['id'] . $domain->end_tags. '/';
             }
         }
 
@@ -557,7 +557,7 @@ class FanController extends Controller
 
             $domain = Domain::getDomainInfo();
 
-            if (1) {
+            if (0) {
                 //step 1 查询:
                 $allKeywords = AllBaiduKeywords::find()->select('id,pid,keywords')->where(['id' => $tagId])->asArray()->one();
 

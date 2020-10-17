@@ -166,7 +166,7 @@ class SiteController extends Controller
             $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
+            $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags . '/';
             if ($user = FanUser::findOne($item['user_id'])) {
                 $item['nickname'] = $user->username;
                 $item['avatar'] = $user->avatar;
