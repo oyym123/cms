@@ -163,7 +163,7 @@ class SiteController extends Controller
         }
 
         foreach ($models as &$item) {
-            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '/';
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags . '/';

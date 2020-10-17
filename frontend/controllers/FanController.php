@@ -117,8 +117,8 @@ class FanController extends Controller
 
             $res = [
                 'data' => $model,
-                'pre' => '/' . $column . '/' . ($arr[0] - 1) . '.html',
-                'next' => '/' . $column . '/' . ($arr[0] + 1) . '.html',
+                'pre' => '/' . $column . '/' . ($arr[0] - 1) . '/',
+                'next' => '/' . $column . '/' . ($arr[0] + 1) . '/',
                 'pre_title' => $preTitle,
                 'next_title' => $nextTitle,
                 'keywords' => $model['keywords'],
@@ -265,7 +265,7 @@ class FanController extends Controller
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
 //            $item['push_time'] = date('Y-m-d H:i:s', (time() - 3600));
-            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '/';
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
@@ -363,7 +363,7 @@ class FanController extends Controller
         foreach ($models as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '/';
             $item['keywords_url'] = '/' . $domain->start_tags . $item['key_id'] . $domain->end_tags;
             if ($user = FanUser::findOne($item['user_id'])) {
 //                $item['push_time'] = Tools::formatTime(time() - 3600);
@@ -602,7 +602,7 @@ class FanController extends Controller
                     $oldTitle = $model['title'];
                     $model['title'] = Tools::getKTitle($model['title']);
 
-                    $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
+                    $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '/';
                     $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
                     if ($user = FanUser::findOne($model['user_id'])) {
@@ -665,7 +665,7 @@ class FanController extends Controller
                 $model['title'] = Tools::getKTitle($model['title']);
                 list($layout, $render) = Fan::renderView(Template::TYPE_INSIDE);
                 $this->layout = $layout;
-                $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '.html';
+                $model['url'] = 'http://' . $_SERVER['HTTP_HOST'] . '/' . $columnEnName . '/' . $model['id'] . '/';
                 $model['user_url'] = '/user/index_' . $model['user_id'] . '.html';
 
                 if ($user = FanUser::findOne($model['user_id'])) {

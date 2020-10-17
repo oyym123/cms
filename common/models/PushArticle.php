@@ -133,7 +133,7 @@ class PushArticle extends Modelx
             }
             $item['title'] = Tools::getKTitle($item['title']);
             $item['user_url'] = '/user/index_' . $item['user_id'] . '.html';
-            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '/';
         }
 
         return $article;
@@ -167,7 +167,7 @@ class PushArticle extends Modelx
 
         foreach ($article as &$item) {
             $item['title'] = Tools::getKTitle($item['title']);
-            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '.html';
+            $item['url'] = '/' . $columnEnName . '/' . $item['id'] . '/';
         }
 
         return $article;
